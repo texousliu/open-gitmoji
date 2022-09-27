@@ -7,12 +7,8 @@
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.github.texousliu.opengitmoji.services.MyApplicationService"/>
-        <projectService serviceImplementation="com.github.texousliu.opengitmoji.services.MyProjectService"/>
+        <completion.contributor language="TEXT"
+                                order="first, before commitCompletion"
+                                implementationClass="com.github.texousliu.opengitmoji.contributor.OpenGMCompletionContributor"/>
     </extensions>
-
-    <applicationListeners>
-        <listener class="com.github.texousliu.opengitmoji.listeners.MyProjectManagerListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
-    </applicationListeners>
 </idea-plugin>
