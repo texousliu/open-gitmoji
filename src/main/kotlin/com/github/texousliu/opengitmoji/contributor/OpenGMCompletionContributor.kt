@@ -2,6 +2,7 @@ package com.github.texousliu.opengitmoji.contributor
 
 import com.github.texousliu.opengitmoji.context.OpenGMContext
 import com.github.texousliu.opengitmoji.model.GM
+import com.github.texousliu.opengitmoji.model.GMField
 import com.github.texousliu.opengitmoji.model.GMLanguage
 import com.github.texousliu.opengitmoji.model.GMInputModel
 import com.intellij.codeInsight.completion.*
@@ -27,12 +28,15 @@ class OpenGMCompletionContributor : CompletionContributor() {
                     if (parameters.editor.document.charsSequence.isEmpty()) return
                     val language = OpenGMContext.getLanguage()
                     val inputModel = OpenGMContext.getInputModel()
+                    val presentableText = OpenGMContext.getPresentableText()
+                    val tailText = OpenGMContext.getTailText()
+                    val typeText = OpenGMContext.getTypeText()
                     OpenGMContext.gms().forEach {
                         result.addElement(
                             LookupElementBuilder.create(it, lookupString(it, language, inputModel))
-                                .withPresentableText(it.code)
-                                .withTypeText(it.entity)
-                                .withTailText(description(it, language))
+                                .withPresentableText(text(it, presentableText))
+                                .withTailText(text(it, tailText))
+                                .withTypeText(text(it, typeText))
                                 .withLookupStrings(
                                     listOf(
                                         it.code.lowercase(),
@@ -67,6 +71,18 @@ class OpenGMCompletionContributor : CompletionContributor() {
         return when(language) {
             GMLanguage.EN -> it.description
             else -> it.cn_description
+        }
+    }
+
+    private fun text(it: GM, filed: GMField): String {
+        return when(filed) {
+            GMField.CODE -> it.code
+            GMField.NAME -> it.name
+            GMField.EMOJI -> it.emoji
+            GMField.ENTITY -> it.entity
+            GMField.DESCRIPTION -> it.description
+            GMField.CN_DESCRIPTION -> it.cn_description
+            else -> ""
         }
     }
 
