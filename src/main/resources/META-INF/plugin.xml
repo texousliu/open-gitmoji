@@ -11,4 +11,10 @@
                                 order="first, before commitCompletion"
                                 implementationClass="com.github.texousliu.opengitmoji.contributor.OpenGMCompletionContributor"/>
     </extensions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <projectConfigurable instance="com.github.texousliu.opengitmoji.config.OpenGMConfig" groupId="other"
+                             id="open.texousliu.config.settings.gm.OpenGMSettings"/>
+    </extensions>
+
 </idea-plugin>

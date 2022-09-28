@@ -2,6 +2,10 @@
 
 # open-gitmoji Changelog
 
+### RELEASE 0.0.2
+
+- add language and input model config (添加语言及替换配置)
+
 ### RELEASE 0.0.1
 
 ## [Unreleased]

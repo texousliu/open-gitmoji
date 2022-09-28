@@ -42,3 +42,4 @@ Plugin based on the [IntelliJ Platform Plugin Template][template].
 
 ## 感谢
 - https://github.com/hellokaton/gitmoji-plugin
+- https://github.com/patou/gitmoji-intellij-plugin
