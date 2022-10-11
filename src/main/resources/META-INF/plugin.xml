@@ -6,6 +6,18 @@
 
     <depends>com.intellij.modules.platform</depends>
 
+    <description>
+        <![CDATA[
+            Description is settings in the build.gradle file
+        ]]>
+    </description>
+
+    <change-notes>
+        <![CDATA[
+            Change notes is settings in the build.gradle file
+        ]]>
+    </change-notes>
+
     <extensions defaultExtensionNs="com.intellij">
         <completion.contributor language="TEXT"
                                 order="first, before commitCompletion"
