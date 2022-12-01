@@ -4,6 +4,9 @@
 
 ## [Unreleased]
 
+## [0.0.6]
+- upgrade idea supported version（支持IDEA2022.3版本）
+
 ## [0.0.5]
 ### Added
 - add description and change notes（添加描述及变更日志）
