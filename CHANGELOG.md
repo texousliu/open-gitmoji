@@ -4,6 +4,9 @@
 
 ## [Unreleased]
 
+## [1.0.0]
+- cancel until version limit（取消最高版本限制）
+
 ## [0.0.6]
 - upgrade idea supported version（支持IDEA2022.3版本）
 
