@@ -4,6 +4,12 @@
 
 ## [Unreleased]
 
+## [1.0.2]
+- change plugin icon（修改插件图标）
+
+## [1.0.1]
+- add plugin icon（添加插件图标）
+
 ## [1.0.0]
 - cancel until version limit（取消最高版本限制）
 
