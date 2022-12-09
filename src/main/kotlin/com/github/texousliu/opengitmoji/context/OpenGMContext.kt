@@ -9,6 +9,7 @@ const val OPEN_GM_LANGUAGE_KEY = "open.texousliu.config.settings.gm.OpenGMSettin
 const val OPEN_GM_PRESENTABLE_TEXT_KEY = "open.texousliu.config.settings.gm.OpenGMSettings.OpenGMPresentableTextKey"
 const val OPEN_GM_TAIL_TEXT_KEY = "open.texousliu.config.settings.gm.OpenGMSettings.OpenGMTailTextKey"
 const val OPEN_GM_TYPE_TEXT_KEY = "open.texousliu.config.settings.gm.OpenGMSettings.OpenGMTypeTextKey"
+const val OPEN_GM_TC_TEXT_KEY = "open.texousliu.config.settings.gm.OpenGMSettings.OpenGMTCTextKey"
 
 object OpenGMContext {
 
@@ -71,6 +72,16 @@ object OpenGMContext {
     fun setTypeText(filed: GMField) {
         val projectInstance = PropertiesComponent.getInstance()
         projectInstance.setValue(OPEN_GM_TYPE_TEXT_KEY, filed.ordinal.toString())
+    }
+
+    fun getTriggerCondition(): Boolean {
+        val projectInstance = PropertiesComponent.getInstance()
+        return projectInstance.getValue(OPEN_GM_TC_TEXT_KEY)?.toBoolean() ?: false
+    }
+
+    fun setTriggerCondition(v: Boolean) {
+        val projectInstance = PropertiesComponent.getInstance()
+        projectInstance.setValue(OPEN_GM_TC_TEXT_KEY, v)
     }
 
     fun gms(): List<GM> {

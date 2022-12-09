@@ -4,6 +4,11 @@
 
 ## [Unreleased]
 
+## [1.0.3]
+- Add text starting with : to prompt for configuration. Solve the problem that it will be triggered when there is no need to prompt
+- 添加以 : 开头的文本才会提示配置，解决不需要提示的时候也会触发的问题
+- add '：' supported（添加中文冒号支持）
+
 ## [1.0.2]
 - change plugin icon（修改插件图标）
 

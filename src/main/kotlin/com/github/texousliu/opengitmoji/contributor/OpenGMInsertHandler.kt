@@ -14,8 +14,11 @@ class OpenGMInsertHandler : InsertHandler<LookupElement> {
     private fun replace(text: String, replaceText: String): String {
         val s = text.trim()
         val rt = ":${replaceText}"
+        val rtz = "：$replaceText"
         if (s.contains(rt)) {
             return s.replace(rt, replaceText)
+        } else if (s.contains(rtz)) {
+            return s.replace(rtz, replaceText)
         }
         return s
     }

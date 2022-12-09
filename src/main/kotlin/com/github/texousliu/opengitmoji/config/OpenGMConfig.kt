@@ -8,6 +8,7 @@ import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.ui.ComboBox
 import java.awt.FlowLayout
 import java.awt.GridLayout
+import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -24,18 +25,22 @@ class OpenGMConfig // constructor(private val project: Project)
     private val gmTailTextComboBox = ComboBox(GMField.values())
     private val gmTypeTextComboBox = ComboBox(GMField.values())
 
+    private val gmTriggerConditionBox = JCheckBox("")
+
     private var configGMLanguage: GMLanguage = OpenGMContext.getLanguage()
     private var configGMInputModel: GMInputModel = OpenGMContext.getInputModel()
 
     private var configGMPresentableText: GMField = OpenGMContext.getPresentableText()
     private var configGMTailText: GMField = OpenGMContext.getTailText()
     private var configGMTypeText: GMField = OpenGMContext.getTypeText()
+    private var configGMTriggerCondition: Boolean = OpenGMContext.getTriggerCondition()
 
     override fun isModified(): Boolean = gmLanguageComboBox.selectedIndex != configGMLanguage.ordinal
             || gmInputModelComboBox.selectedIndex != configGMInputModel.ordinal
             || gmPresentableTextComboBox.selectedIndex != configGMPresentableText.ordinal
             || gmTailTextComboBox.selectedIndex != configGMTailText.ordinal
             || gmTypeTextComboBox.selectedIndex != configGMTypeText.ordinal
+            || gmTriggerConditionBox.isSelected != configGMTriggerCondition
 
 
     override fun getDisplayName(): String = "OpenGM"
@@ -61,6 +66,11 @@ class OpenGMConfig // constructor(private val project: Project)
         gmTextPanel.add(gmTailTextComboBox, null)
         gmTextPanel.add(gmTypeTextComboBox, null)
         gmSettingsPanel.add(gmTextPanel)
+
+        val gmTCPanel = JPanel(FlowLayout(FlowLayout.LEADING))
+        gmTCPanel.add(JLabel("GM Trigger Start With ':' "))
+        gmTCPanel.add(gmTriggerConditionBox, null)
+        gmSettingsPanel.add(gmTCPanel)
     }
 
     override fun apply() {
@@ -71,12 +81,16 @@ class OpenGMConfig // constructor(private val project: Project)
         configGMTailText = GMField.values()[gmTailTextComboBox.selectedIndex]
         configGMTypeText = GMField.values()[gmTypeTextComboBox.selectedIndex]
 
+        configGMTriggerCondition = gmTriggerConditionBox.isSelected
+
         OpenGMContext.setLanguage(configGMLanguage)
         OpenGMContext.setInputModel(configGMInputModel)
 
         OpenGMContext.setPresentableText(configGMPresentableText)
         OpenGMContext.setTailText(configGMTailText)
         OpenGMContext.setTypeText(configGMTypeText)
+
+        OpenGMContext.setTriggerCondition(configGMTriggerCondition)
     }
 
     override fun reset() {
@@ -87,12 +101,16 @@ class OpenGMConfig // constructor(private val project: Project)
         configGMTailText = OpenGMContext.getTailText()
         configGMTypeText = OpenGMContext.getTypeText()
 
+        configGMTriggerCondition = OpenGMContext.getTriggerCondition()
+
         gmLanguageComboBox.selectedIndex = configGMLanguage.ordinal
         gmInputModelComboBox.selectedIndex = configGMInputModel.ordinal
 
         gmPresentableTextComboBox.selectedIndex = configGMPresentableText.ordinal
         gmTailTextComboBox.selectedIndex = configGMTailText.ordinal
         gmTypeTextComboBox.selectedIndex = configGMTypeText.ordinal
+
+        gmTriggerConditionBox.isSelected = configGMTriggerCondition
     }
 
     override fun createComponent(): JComponent = gmSettingsPanel
