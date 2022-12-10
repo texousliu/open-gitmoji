@@ -1,1 +1,1 @@
-rootProject.name = "open-gitmoji"
+rootProject.name = "Open Gitmoji"

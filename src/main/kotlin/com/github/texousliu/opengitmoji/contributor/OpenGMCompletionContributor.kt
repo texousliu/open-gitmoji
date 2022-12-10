@@ -67,9 +67,9 @@ class OpenGMCompletionContributor : CompletionContributor() {
 
     private fun lookupString(it: GM, desc: String, inputModel: GMInputModel): String {
         return when (inputModel) {
-            GMInputModel.TEXT -> it.code
-            GMInputModel.UNICODE_WITH_DESC -> "${it.emoji} $desc"
-            GMInputModel.TEXT_WITH_DESC -> "${it.code} $desc"
+            GMInputModel.CODE -> it.code
+            GMInputModel.EMOJI_WITH_DESC -> "${it.emoji} $desc"
+            GMInputModel.CODE_WITH_DESC -> "${it.code} $desc"
             else -> it.emoji
         }
     }

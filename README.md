@@ -1,4 +1,4 @@
-# open-gitmoji
+# Open Gitmoji
 
 ## Features
 - [x] Keywords emoji tips and input（Emoji 提示及插入）.

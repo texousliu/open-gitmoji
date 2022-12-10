@@ -32,7 +32,7 @@ object OpenGMContext {
 
     fun getInputModel(): GMInputModel {
         val projectInstance = PropertiesComponent.getInstance()
-        val mi = projectInstance.getValue(OPEN_GM_INPUT_MODEL_KEY)?.toInt() ?: GMInputModel.UNICODE.ordinal
+        val mi = projectInstance.getValue(OPEN_GM_INPUT_MODEL_KEY)?.toInt() ?: GMInputModel.EMOJI.ordinal
         return GMInputModel.values()[mi]
     }
 

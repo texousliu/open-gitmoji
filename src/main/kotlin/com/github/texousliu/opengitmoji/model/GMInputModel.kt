@@ -1,10 +1,10 @@
 package com.github.texousliu.opengitmoji.model
 
-enum class GMInputModel {
+enum class GMInputModel(val description: String) {
 
-    UNICODE,
-    TEXT,
-    UNICODE_WITH_DESC,
-    TEXT_WITH_DESC
+    EMOJI("Emoji"),
+    CODE("Code"),
+    EMOJI_WITH_DESC("Emoji And Description"),
+    CODE_WITH_DESC("Code And Description")
 
 }

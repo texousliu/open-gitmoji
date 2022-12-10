@@ -6,24 +6,25 @@ import com.github.texousliu.opengitmoji.model.GMInputModel
 import com.github.texousliu.opengitmoji.model.GMLanguage
 import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.ui.ComboBox
+import com.intellij.util.containers.stream
 import java.awt.FlowLayout
 import java.awt.GridLayout
 import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
+import kotlin.streams.toList
 
 
-class OpenGMConfig // constructor(private val project: Project)
-    : SearchableConfigurable {
+class OpenGMConfig : SearchableConfigurable {
     private val gmSettingsPanel: JPanel
 
-    private val gmLanguageComboBox = ComboBox(GMLanguage.values())
-    private val gmInputModelComboBox = ComboBox(GMInputModel.values())
+    private val gmLanguageComboBox = ComboBox(GMLanguage.values().stream().map(GMLanguage::description).toArray())
+    private val gmInputModelComboBox = ComboBox(GMInputModel.values().stream().map(GMInputModel::description).toArray())
 
-    private val gmPresentableTextComboBox = ComboBox(GMField.values())
-    private val gmTailTextComboBox = ComboBox(GMField.values())
-    private val gmTypeTextComboBox = ComboBox(GMField.values())
+    private val gmPresentableTextComboBox = ComboBox(GMField.values().stream().map(GMField::description).toArray())
+    private val gmTailTextComboBox = ComboBox(GMField.values().stream().map(GMField::description).toArray())
+    private val gmTypeTextComboBox = ComboBox(GMField.values().stream().map(GMField::description).toArray())
 
     private val gmTriggerConditionBox = JCheckBox("")
 
@@ -43,34 +44,31 @@ class OpenGMConfig // constructor(private val project: Project)
             || gmTriggerConditionBox.isSelected != configGMTriggerCondition
 
 
-    override fun getDisplayName(): String = "OpenGM"
+    override fun getDisplayName(): String = "Open Gitmoji"
 
     override fun getId(): String = "open.texousliu.config.settings.gm.OpenGMSettings"
 
     init {
         val flow = GridLayout(20, 2)
         gmSettingsPanel = JPanel(flow)
-        val gmLanguagePanel = JPanel(FlowLayout(FlowLayout.LEADING))
-        gmLanguagePanel.add(JLabel("GM Language "))
-        gmLanguagePanel.add(gmLanguageComboBox, null)
-        gmSettingsPanel.add(gmLanguagePanel)
+
+        val gmTCPanel = JPanel(FlowLayout(FlowLayout.LEADING))
+        gmTCPanel.add(JLabel("Trigger Start With ':' "))
+        gmTCPanel.add(gmTriggerConditionBox, null)
+        gmSettingsPanel.add(gmTCPanel)
 
         val gmModelPanel = JPanel(FlowLayout(FlowLayout.LEADING))
-        gmModelPanel.add(JLabel("GM Input Model "))
+        gmModelPanel.add(JLabel("Input Model    "))
         gmModelPanel.add(gmInputModelComboBox, null)
+        gmModelPanel.add(gmLanguageComboBox, null)
         gmSettingsPanel.add(gmModelPanel)
 
         val gmTextPanel = JPanel(FlowLayout(FlowLayout.LEADING))
-        gmTextPanel.add(JLabel("GM Hint Formatter "))
+        gmTextPanel.add(JLabel("Hint Formatter "))
         gmTextPanel.add(gmPresentableTextComboBox, null)
         gmTextPanel.add(gmTailTextComboBox, null)
         gmTextPanel.add(gmTypeTextComboBox, null)
         gmSettingsPanel.add(gmTextPanel)
-
-        val gmTCPanel = JPanel(FlowLayout(FlowLayout.LEADING))
-        gmTCPanel.add(JLabel("GM Trigger Start With ':' "))
-        gmTCPanel.add(gmTriggerConditionBox, null)
-        gmSettingsPanel.add(gmTCPanel)
     }
 
     override fun apply() {

@@ -1,8 +1,12 @@
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 
-# open-gitmoji Changelog
+# Open Gitmoji Changelog
 
 ## [Unreleased]
+
+## [1.0.4]
+- Change plugin name to `Open Gitmoji`（变更插件名称为 `Open Gitmoji`）
+- Organize the configuration interface（整理配置界面）
 
 ## [1.0.3]
 - Add text starting with : to prompt for configuration. Solve the problem that it will be triggered when there is no need to prompt

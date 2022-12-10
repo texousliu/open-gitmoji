@@ -1,13 +1,13 @@
 package com.github.texousliu.opengitmoji.model
 
-enum class GMField {
+enum class GMField(val description: String) {
 
-    DISABLE,
-    EMOJI,
-    ENTITY,
-    CODE,
-    NAME,
-    DESCRIPTION,
-    CN_DESCRIPTION,
+    DISABLE("Disable"),
+    EMOJI("Emoji"),
+    ENTITY("Entity"),
+    CODE("Code"),
+    NAME("Name"),
+    DESCRIPTION("Description"),
+    CN_DESCRIPTION("Description(zh_CN)"),
 
 }
