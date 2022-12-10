@@ -22,6 +22,7 @@ A must-have plugin for working with Emoji.<br>
 <li>easy way for input emoji unicode or emoji code</li>
 <li>customize Chinese and English</li>
 <li>custom prompt typography</li> 
+<li>custom trigger with `:`</li> 
 </ul>
 <br>
 
@@ -30,6 +31,7 @@ A must-have plugin for working with Emoji.<br>
 <li>输入 emoji-unicode 或 emoji-code 的简单方法。</li>
 <li>配置中英文。</li>
 <li>自定义提示排版。</li> 
+<li>自定义以`:`开头提示。</li> 
 </ul>
 <!-- Plugin description end -->
 
