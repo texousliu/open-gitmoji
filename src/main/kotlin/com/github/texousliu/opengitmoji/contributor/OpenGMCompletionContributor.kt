@@ -25,6 +25,8 @@ class OpenGMCompletionContributor : CompletionContributor() {
                     context: ProcessingContext,
                     result: CompletionResultSet
                 ) {
+                    // 如果不是多行文本输入框，直接返回
+                    if (parameters.editor.isOneLineMode) return
                     val doc = parameters.editor.document.charsSequence
                     if (doc.isEmpty()) return
                     if (OpenGMContext.getTriggerCondition()) {
@@ -62,7 +64,8 @@ class OpenGMCompletionContributor : CompletionContributor() {
     }
 
     private fun lookupString(it: GM, language: GMLanguage, inputModel: GMInputModel): String {
-        return lookupString(it, description(it, language), inputModel)
+        val ls = lookupString(it, description(it, language), inputModel)
+        return "${ls}${OpenGMContext.REPLACE_SUFFIX_MARK}"
     }
 
     private fun lookupString(it: GM, desc: String, inputModel: GMInputModel): String {

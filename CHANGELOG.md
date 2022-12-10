@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+## [1.0.5]
+- fix bug in code input model（修复code模式下输入替换的BUG）
+- Fix the bug that the single-line text input box will also prompt emoji（修复单行文本输入框也会提示emoji的BUG）
+
 ## [1.0.4]
 - Change plugin name to `Open Gitmoji`（变更插件名称为 `Open Gitmoji`）
 - Organize the configuration interface（整理配置界面）

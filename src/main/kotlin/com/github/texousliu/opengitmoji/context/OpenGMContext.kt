@@ -13,6 +13,7 @@ const val OPEN_GM_TC_TEXT_KEY = "open.texousliu.config.settings.gm.OpenGMSetting
 
 object OpenGMContext {
 
+    const val REPLACE_SUFFIX_MARK = "$$:$$"
     private val gmList = ArrayList<GM>()
 
     init {
