@@ -9,10 +9,10 @@
 ## 使用演示
 
 ### 非`:`形式
-![非`:`形式](doc/emoji-finish.gif)
+![非`:`形式](doc/Open%20Emoji%20Finish.gif)
 
 ### `:`形式
-![`:`形式](doc/emoji-with-colon-finish.gif)
+![`:`形式](doc/Open%20Emoji%20Colon%20Finish.gif)
 
 
 ### Plugin config（插件配置）
