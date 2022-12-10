@@ -4,6 +4,16 @@
 - [x] Keywords emoji tips and input（Emoji 提示及插入）.
 - [x] Language config（语言配置）.
 - [x] custom prompt typography（自定义提示排版）.
+- [x] start with `:`（`:`开头才提示配置）
+
+## 使用演示
+
+### 非`:`形式
+![非`:`形式](doc/emoji-finish.gif)
+
+### `:`形式
+![`:`形式](doc/emoji-with-colon-finish.gif)
+
 
 ### Plugin config（插件配置）
 <!-- Plugin description -->
