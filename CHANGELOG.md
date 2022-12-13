@@ -4,6 +4,10 @@
 
 ## [Unreleased]
 
+## [1.0.6]
+- add suffix text config（添加 suffix text 支持）
+- Sort out the configuration interface（梳理配置界面）
+
 ## [1.0.5]
 - fix bug in code input model（修复code模式下输入替换的BUG）
 - Fix the bug that the single-line text input box will also prompt emoji（修复单行文本输入框也会提示emoji的BUG）

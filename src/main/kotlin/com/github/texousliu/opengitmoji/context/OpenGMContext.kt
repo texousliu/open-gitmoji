@@ -10,6 +10,7 @@ const val OPEN_GM_PRESENTABLE_TEXT_KEY = "open.texousliu.config.settings.gm.Open
 const val OPEN_GM_TAIL_TEXT_KEY = "open.texousliu.config.settings.gm.OpenGMSettings.OpenGMTailTextKey"
 const val OPEN_GM_TYPE_TEXT_KEY = "open.texousliu.config.settings.gm.OpenGMSettings.OpenGMTypeTextKey"
 const val OPEN_GM_TC_TEXT_KEY = "open.texousliu.config.settings.gm.OpenGMSettings.OpenGMTCTextKey"
+const val OPEN_GM_SUFFIX_TEXT_KEY = "open.texousliu.config.settings.gm.OpenGMSettings.OpenGMSuffixTextKey"
 
 object OpenGMContext {
 
@@ -83,6 +84,16 @@ object OpenGMContext {
     fun setTriggerCondition(v: Boolean) {
         val projectInstance = PropertiesComponent.getInstance()
         projectInstance.setValue(OPEN_GM_TC_TEXT_KEY, v)
+    }
+
+    fun getSuffixText(): String {
+        val projectInstance = PropertiesComponent.getInstance()
+        return projectInstance.getValue(OPEN_GM_SUFFIX_TEXT_KEY) ?: " "
+    }
+
+    fun setSuffixText(v: String) {
+        val projectInstance = PropertiesComponent.getInstance()
+        return projectInstance.setValue(OPEN_GM_SUFFIX_TEXT_KEY, v)
     }
 
     fun gms(): List<GM> {

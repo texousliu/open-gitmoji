@@ -4,6 +4,8 @@ import com.github.texousliu.opengitmoji.context.OpenGMContext
 import com.intellij.codeInsight.completion.InsertHandler
 import com.intellij.codeInsight.completion.InsertionContext
 import com.intellij.codeInsight.lookup.LookupElement
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 class OpenGMInsertHandler : InsertHandler<LookupElement> {
 
@@ -21,7 +23,20 @@ class OpenGMInsertHandler : InsertHandler<LookupElement> {
         } else if (s.contains(rtz)) {
             s = s.replace(rtz, replaceText)
         }
-        return s.replace(OpenGMContext.REPLACE_SUFFIX_MARK, "");
+        return s.replace(OpenGMContext.REPLACE_SUFFIX_MARK, getSuffixText());
+    }
+
+    private fun getSuffixText(): String {
+        var suffixExpression = OpenGMContext.getSuffixText();
+        if (suffixExpression.contains("#{DATE}") || suffixExpression.contains("#{TIME}")) {
+            val current = LocalDateTime.now()
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+            val formatted = current.format(formatter)
+            val dt = formatted.split(" ")
+            suffixExpression = suffixExpression.replace("#{DATE}", dt[0])
+            suffixExpression = suffixExpression.replace("#{TIME}", dt[1])
+        }
+        return suffixExpression;
     }
 
 }
