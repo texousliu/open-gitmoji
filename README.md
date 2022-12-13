@@ -5,6 +5,7 @@
 - [x] Language config（语言配置）.
 - [x] custom prompt typography（自定义提示排版）.
 - [x] start with `:`（`:`开头才提示配置）
+- [x] suffix text supported（添加结束文本）
 
 ## 使用演示
 
@@ -23,6 +24,7 @@ A must-have plugin for working with Emoji.<br>
 <li>customize Chinese and English</li>
 <li>custom prompt typography</li> 
 <li>custom trigger with `:`</li> 
+<li>custom suffix append text</li> 
 </ul>
 <br>
 
@@ -32,6 +34,7 @@ A must-have plugin for working with Emoji.<br>
 <li>配置中英文。</li>
 <li>自定义提示排版。</li> 
 <li>自定义以`:`开头提示。</li> 
+<li>自定义结尾插入文本</li> 
 </ul>
 <!-- Plugin description end -->
 
