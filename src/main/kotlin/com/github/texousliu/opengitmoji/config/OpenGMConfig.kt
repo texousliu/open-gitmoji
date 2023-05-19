@@ -12,7 +12,7 @@ import com.intellij.util.containers.stream
 import com.intellij.util.ui.UI
 import java.awt.BorderLayout
 import java.awt.FlowLayout
-import java.awt.GridLayout
+import java.awt.GridBagConstraints
 import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -72,16 +72,23 @@ class OpenGMConfig : SearchableConfigurable {
         gmTextPanel.add(gmTailTextComboBox, null)
         gmTextPanel.add(gmTypeTextComboBox, null)
 
-        val format = UI.PanelFactory.grid()
-            .add(UI.PanelFactory.panel(gmModelPanel).withLabel("Input format:"))
-            .add(UI.PanelFactory.panel(gmTextPanel).withLabel("Hint format:"))
-            .add(UI.PanelFactory.panel(gmSuffixTextField).withLabel("Suffix append:")
-                .withComment("Add some additional information after entering text. " +
+        val gmPrefixPanel = JPanel(FlowLayout(FlowLayout.LEADING))
+        val gc = GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.LINE_START, GridBagConstraints.HORIZONTAL,
+                null, 0, 0)
+        UI.PanelFactory.panel(gmSuffixTextField).resizeX(true)
+                .withComment("Add some additional information after entering text.<br/>" +
                         "For example: text, date and time. " +
                         "The default is a space text. <br/>" +
                         "Date expression: #{DATE}, " +
-                        "Time expression: #{TIME}"))
+                        "Time expression: #{TIME}", false)
+                .addToPanel(gmPrefixPanel, gc, false)
+
+        val format = UI.PanelFactory.grid()
+            .add(UI.PanelFactory.panel(gmModelPanel).withLabel("Input format:"))
+            .add(UI.PanelFactory.panel(gmTextPanel).withLabel("Hint format:"))
+            .add(UI.PanelFactory.panel(gmPrefixPanel).withLabel("Suffix append:"))
             .createPanel()
+
         format.border = IdeBorderFactory.createTitledBorder("Format")
 
         gmSettingsPanel = JPanel(BorderLayout())

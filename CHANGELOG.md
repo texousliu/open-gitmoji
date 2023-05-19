@@ -3,6 +3,8 @@
 # Open Gitmoji Changelog
 
 ## [Unreleased]
+- 梳理配置界面
+- 添加输入提示
 
 ## [1.0.6]
 - add suffix text config（添加 suffix text 支持）
