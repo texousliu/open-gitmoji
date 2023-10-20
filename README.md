@@ -6,6 +6,17 @@
 - [x] custom prompt typography（自定义提示排版）.
 - [x] start with `:`（`:`开头才提示配置）
 - [x] suffix text supported（添加结束文本）
+- [ ] 选项列表配置列表，
+  - 通过配置来添加选项展示（没有配置时默认有一个 gitmoji-unicode + description-cn）
+  - 添加多个则一个 gitmoji 展示多行
+  - 添加占位符支持
+    - gitmoji
+    - gitmoji-unicode
+    - description
+    - description-cn
+    - date（已有）
+    - time（已有）
+- [ ] 自定义 gitmoji 支持
 
 ## 使用演示
 
