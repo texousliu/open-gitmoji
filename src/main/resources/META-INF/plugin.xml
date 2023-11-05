@@ -29,4 +29,9 @@
                              id="open.texousliu.config.settings.gm.OpenGMSettings"/>
     </extensions>
 
+    <extensions defaultExtensionNs="com.intellij">
+        <projectConfigurable instance="com.github.texousliu.opengitmoji.config.OpenGitmojiConfiguration" groupId="other"
+                             id="open.texousliu.config.settings.gm.OpenGitmojiSettings"/>
+    </extensions>
+
 </idea-plugin>
