@@ -21,7 +21,7 @@
     <extensions defaultExtensionNs="com.intellij">
         <completion.contributor language="TEXT"
                                 order="first, before commitCompletion"
-                                implementationClass="com.github.texousliu.opengitmoji.contributor.OpenGMCompletionContributor"/>
+                                implementationClass="com.github.texousliu.opengitmoji.contributor.OpenGitmojiCompletionContributor"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">

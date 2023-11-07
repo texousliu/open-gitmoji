@@ -16,7 +16,6 @@ object OpenGMContext {
 
     const val REPLACE_SUFFIX_MARK = "$$:$$"
     private val gmList = ArrayList<GM>()
-
     init {
         loadGM()
     }
