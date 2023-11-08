@@ -6,6 +6,7 @@ import com.github.texousliu.opengitmoji.model.RegexTableInfo
 import com.google.gson.Gson
 import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.ui.DialogPanel
+import java.awt.BorderLayout
 import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JPanel
@@ -39,6 +40,9 @@ class OpenGitmojiConfiguration : SearchableConfigurable {
         gmSettingsPanel.reset()
     }
 
-    override fun createComponent(): JComponent = gmSettingsPanel
+    override fun createComponent(): JComponent {
+//        gmSettingsPanel.layout = BorderLayout()
+        return gmSettingsPanel
+    }
 
 }

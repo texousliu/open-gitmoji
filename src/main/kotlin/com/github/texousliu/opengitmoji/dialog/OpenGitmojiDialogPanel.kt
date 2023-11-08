@@ -11,8 +11,12 @@ import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.RightGap
+import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.actionListener
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.gridLayout.HorizontalAlign
+import com.intellij.ui.dsl.gridLayout.VerticalAlign
+import com.intellij.ui.paint.LinePainter2D
 import com.intellij.ui.table.JBTable
 import java.awt.Dimension
 import javax.swing.JComponent
@@ -42,23 +46,27 @@ fun openGitmojiDialogPanel(): DialogPanel {
                         .actionListener { event, component -> OpenGitmojiContext.setTriggerCondition(component.isSelected) }
                         .onReset {
                             checkBox.isSelected = OpenGitmojiContext.getConfigTriggerCondition()
-                        }
-            }.rowComment("Optimize input habits and reduce trouble caused by unnecessary prompts")
-        }
+                        }.resizableColumn()
+            }.layout(RowLayout.PARENT_GRID)
+                    .rowComment("Optimize input habits and reduce trouble caused by unnecessary prompts")
+        }.resizableColumn()
 
         group("Prompt List") {
             row {
                 label("Not indented row")
-            }
+            }.layout(RowLayout.PARENT_GRID)
             row {
                 cell(createPromptListTable(jbTable))
+                        .gap(RightGap.SMALL)
                         .onReset {
                             (jbTable.model as DefaultTableModel).rowCount = 0
                             OpenGitmojiContext.getConfigRegexTableInfoObj().rows.forEach {
                                 (jbTable.model as DefaultTableModel).addRow(arrayOf(it.regex, OpenGitmojiUtils.demo(it.regex), it.enable))
                             }
-                        }
-            }
+                        }.resizableColumn()
+                        .horizontalAlign(HorizontalAlign.FILL)
+                        .verticalAlign(VerticalAlign.FILL)
+            }.layout(RowLayout.PARENT_GRID)
         }
     }
 }
@@ -84,7 +92,7 @@ fun createPromptListTable(jbTable: JBTable): JComponent {
                 (jbTable.model as DefaultTableModel).removeRow(row)
                 removeRegexTableInfoRow(row)
             }.createPanel()
-    panel.preferredSize = Dimension(600, 400)
+//    panel.preferredSize = Dimension(600, 400)
     return panel
 }
 
@@ -103,8 +111,8 @@ fun removeRegexTableInfoRow(index: Int) {
 class AddRegexDialogWrapper : DialogWrapper(true) {
 
     var enable = JBCheckBox("Enable Regex")
-    var regex = JBTextField(30)
-    var demo = JBTextField(30)
+    var regex = JBTextField()
+    var demo = JBTextField()
 
     init {
         title = "测试title"
@@ -138,12 +146,12 @@ class AddRegexDialogWrapper : DialogWrapper(true) {
             }
             row {
                 label("Regex")
-                cell(regex)
-            }
+                cell(regex).horizontalAlign(HorizontalAlign.FILL)
+            }.layout(RowLayout.PARENT_GRID)
             row {
                 label("Demo")
-                cell(demo)
-            }
+                cell(demo).horizontalAlign(HorizontalAlign.FILL)
+            }.layout(RowLayout.PARENT_GRID)
         }
     }
 
