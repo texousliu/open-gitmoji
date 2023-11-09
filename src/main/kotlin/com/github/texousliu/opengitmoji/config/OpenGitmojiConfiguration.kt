@@ -1,48 +1,43 @@
 package com.github.texousliu.opengitmoji.config
 
 import com.github.texousliu.opengitmoji.context.OpenGitmojiContext
-import com.github.texousliu.opengitmoji.dialog.openGitmojiDialogPanel
-import com.github.texousliu.opengitmoji.model.RegexTableInfo
-import com.google.gson.Gson
+import com.github.texousliu.opengitmoji.dialog.OpenGitmojiDialogPanel
 import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.ui.DialogPanel
-import java.awt.BorderLayout
-import javax.swing.JCheckBox
 import javax.swing.JComponent
-import javax.swing.JPanel
 
 
 class OpenGitmojiConfiguration : SearchableConfigurable {
-    private val gmSettingsPanel: DialogPanel = openGitmojiDialogPanel()
 
-    override fun isModified(): Boolean =
-            OpenGitmojiContext.getTriggerCondition() != OpenGitmojiContext.getConfigTriggerCondition()
-            || OpenGitmojiContext.getRegexTableInfo() != OpenGitmojiContext.getConfigRegexTableInfo()
+    private val panel = OpenGitmojiDialogPanel()
+    private val gmSettingsPanel: DialogPanel = panel.dialogPanel
+
+    private fun tableModified(): Boolean {
+        val config = OpenGitmojiContext.getGitmojiPatterns()
+        if (config.size != panel.gitmojiPatterns.size) return true
+        for ((index, gitmojiPattern) in panel.gitmojiPatterns.withIndex()) {
+            if (config[index] != gitmojiPattern) return true
+        }
+        return false
+    }
+
+    override fun isModified(): Boolean = tableModified()
+            || OpenGitmojiContext.getTriggerWithColon() != panel.checkBox.isSelected
 
 
     override fun getDisplayName(): String = "Open Gitmoji Settings"
 
     override fun getId(): String = "open.texousliu.config.settings.gm.OpenGitmojiSettings"
 
-    init {
-        // input border
-    }
-
     override fun apply() {
-        OpenGitmojiContext.setConfigTriggerCondition(OpenGitmojiContext.getTriggerCondition())
-        OpenGitmojiContext.setConfigRegexTableInfo(OpenGitmojiContext.getRegexTableInfo())
-        gmSettingsPanel.apply()
+        OpenGitmojiContext.apply(panel.gitmojiPatterns, panel.checkBox.isSelected)
     }
 
     override fun reset() {
-        OpenGitmojiContext.setRegexTableInfo(OpenGitmojiContext.getConfigRegexTableInfo())
-        OpenGitmojiContext.setTriggerCondition(OpenGitmojiContext.getConfigTriggerCondition())
+        OpenGitmojiContext.reset()
         gmSettingsPanel.reset()
     }
 
-    override fun createComponent(): JComponent {
-//        gmSettingsPanel.layout = BorderLayout()
-        return gmSettingsPanel
-    }
+    override fun createComponent(): JComponent = gmSettingsPanel
 
 }

@@ -1,83 +1,78 @@
 package com.github.texousliu.opengitmoji.context
 
-import com.github.texousliu.opengitmoji.model.GM
-import com.github.texousliu.opengitmoji.model.GMList
-import com.github.texousliu.opengitmoji.model.RegexTableInfo
+import com.github.texousliu.opengitmoji.model.*
+import com.github.texousliu.opengitmoji.utils.OpenGitmojiUtils
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.intellij.ide.util.PropertiesComponent
 
-const val OPEN_GIT_EMOJI_INPUT_MODEL_KEY = "open.texousliu.config.settings.gm.OpenGitmojiSettings.OpenGMInputModelKey"
 const val OPEN_GIT_EMOJI_TABLE_INFO_KEY = "open.texousliu.config.settings.gm.OpenGitmojiSettings.OpenGMTableInfoKey"
-const val OPEN_GIT_EMOJI_PRESENTABLE_TEXT_KEY = "open.texousliu.config.settings.gm.OpenGitmojiSettings.OpenGMPresentableTextKey"
-const val OPEN_GIT_EMOJI_TAIL_TEXT_KEY = "open.texousliu.config.settings.gm.OpenGitmojiSettings.OpenGMTailTextKey"
-const val OPEN_GIT_EMOJI_TYPE_TEXT_KEY = "open.texousliu.config.settings.gm.OpenGitmojiSettings.OpenGMTypeTextKey"
 const val OPEN_GIT_EMOJI_TC_TEXT_KEY = "open.texousliu.config.settings.gm.OpenGitmojiSettings.OpenGMTCTextKey"
-const val OPEN_GIT_EMOJI_SUFFIX_TEXT_KEY = "open.texousliu.config.settings.gm.OpenGitmojiSettings.OpenGMSuffixTextKey"
+const val OPEN_COMPATIBLE_WITH_OLD_CONFIG = "open.texousliu.config.settings.gm.OpenGitmojiSettings.OpenGMCompatible"
 
 object OpenGitmojiContext {
 
     const val REPLACE_SUFFIX_MARK = "$$:$$"
     private val gmList = ArrayList<GM>()
-    private var regexTableInfo = Gson().toJson(RegexTableInfo(mutableListOf()))
-    private var triggerCondition = true
+    private var gitmojiPatterns = mutableListOf<GitmojiPattern>()
+    private var triggerWithColon = true
 
     init {
+        compatibleWithOldConfigurations()
         loadGM()
     }
 
-    fun getRegexTableInfo(): String {
-        return regexTableInfo
+    fun reset() {
+        triggerWithColon = getConfigTriggerWithColon()
+        gitmojiPatterns = getConfigGitmojiPatterns()
     }
 
-    fun getRegexTableInfoObj(): RegexTableInfo {
-        return Gson().fromJson(regexTableInfo, RegexTableInfo::class.java)
+    fun apply(gitmojiPatterns: MutableList<GitmojiPattern>, triggerCondition: Boolean) {
+        this.gitmojiPatterns.clear()
+        this.gitmojiPatterns.addAll(gitmojiPatterns)
+        this.triggerWithColon = triggerCondition
+
+        applyConfigGitmojiPatterns()
+        applyConfigTriggerWithColon()
     }
 
-    fun setRegexTableInfo(tableInfo: String) {
-        this.regexTableInfo = tableInfo
+    fun getGitmojiPatterns(): MutableList<GitmojiPattern> {
+        return gitmojiPatterns
     }
 
-    fun setRegexTableInfo(tableInfo: RegexTableInfo) {
-        this.regexTableInfo = Gson().toJson(tableInfo)
+    fun getTriggerWithColon(): Boolean {
+        return triggerWithColon
     }
 
-    fun getTriggerCondition(): Boolean {
-        return triggerCondition
-    }
-
-    fun setTriggerCondition(v: Boolean) {
-        this.triggerCondition = v
-    }
-
-    fun getConfigRegexTableInfo(): String {
-        val projectInstance = PropertiesComponent.getInstance()
-        return projectInstance.getValue(OPEN_GIT_EMOJI_TABLE_INFO_KEY) ?: Gson().toJson(RegexTableInfo(mutableListOf()))
-    }
-
-    fun getConfigRegexTableInfoObj(): RegexTableInfo {
+    fun getConfigGitmojiPatterns(): MutableList<GitmojiPattern> {
         val projectInstance = PropertiesComponent.getInstance()
         return Gson().fromJson(projectInstance.getValue(OPEN_GIT_EMOJI_TABLE_INFO_KEY)
-                ?: Gson().toJson(RegexTableInfo(mutableListOf())),RegexTableInfo::class.java)
+                ?: Gson().toJson(mutableListOf<GitmojiPattern>()), ListTypeToken().type)
     }
 
-    fun setConfigRegexTableInfo(tableInfo: String) {
+    private fun applyConfigGitmojiPatterns() {
         val projectInstance = PropertiesComponent.getInstance()
-        projectInstance.setValue(OPEN_GIT_EMOJI_TABLE_INFO_KEY, tableInfo)
+        projectInstance.setValue(OPEN_GIT_EMOJI_TABLE_INFO_KEY, Gson().toJson(gitmojiPatterns))
     }
 
-    fun setConfigRegexTableInfo(tableInfo: RegexTableInfo) {
-        val projectInstance = PropertiesComponent.getInstance()
-        projectInstance.setValue(OPEN_GIT_EMOJI_TABLE_INFO_KEY, Gson().toJson(tableInfo))
-    }
-
-    fun getConfigTriggerCondition(): Boolean {
+    fun getConfigTriggerWithColon(): Boolean {
         val projectInstance = PropertiesComponent.getInstance()
         return projectInstance.getValue(OPEN_GIT_EMOJI_TC_TEXT_KEY)?.toBoolean() ?: false
     }
 
-    fun setConfigTriggerCondition(v: Boolean) {
+    private fun applyConfigTriggerWithColon() {
         val projectInstance = PropertiesComponent.getInstance()
-        projectInstance.setValue(OPEN_GIT_EMOJI_TC_TEXT_KEY, v)
+        projectInstance.setValue(OPEN_GIT_EMOJI_TC_TEXT_KEY, triggerWithColon)
+    }
+
+    private fun isCompatibleWithOldConfigurations(): Boolean {
+        val projectInstance = PropertiesComponent.getInstance()
+        return projectInstance.getValue(OPEN_COMPATIBLE_WITH_OLD_CONFIG)?.toBoolean() ?: false
+    }
+
+    private fun applyCompatibleWithOldConfigurations() {
+        val projectInstance = PropertiesComponent.getInstance()
+        projectInstance.setValue(OPEN_GIT_EMOJI_TC_TEXT_KEY, true)
     }
 
     fun gms(): List<GM> {
@@ -93,6 +88,49 @@ object OpenGitmojiContext {
                 }
             }
         }
+    }
+
+    class ListTypeToken : TypeToken<MutableList<GitmojiPattern>>()
+
+    private fun compatibleWithOldConfigurations() {
+        if (isCompatibleWithOldConfigurations() && getConfigGitmojiPatterns().isNotEmpty()) {
+            return
+        }
+
+        val language = OpenGMContext.getLanguage()
+        val inputModel = OpenGMContext.getInputModel()
+        val triggerCondition = OpenGMContext.getTriggerCondition()
+        val suffixText = OpenGMContext.getSuffixText()
+        var str = ""
+
+        str += when (inputModel) {
+            GMInputModel.EMOJI -> {
+                OpenGitmojiUtils.G
+            }
+
+            GMInputModel.CODE -> {
+                OpenGitmojiUtils.GU
+            }
+
+            GMInputModel.EMOJI_WITH_DESC -> {
+                if (GMLanguage.ZH == language) "${OpenGitmojiUtils.G} ${OpenGitmojiUtils.DESC_CN}" else "${OpenGitmojiUtils.G} ${OpenGitmojiUtils.DESC}"
+            }
+
+            GMInputModel.CODE_WITH_DESC -> {
+                if (GMLanguage.ZH == language) "${OpenGitmojiUtils.GU} ${OpenGitmojiUtils.DESC_CN}" else "${OpenGitmojiUtils.GU} ${OpenGitmojiUtils.DESC}"
+            }
+        }
+        str += suffixText
+
+        // 兼容旧配置
+        this.triggerWithColon = triggerCondition
+        this.gitmojiPatterns.add(GitmojiPattern(str, true))
+        applyConfigTriggerWithColon()
+        applyConfigGitmojiPatterns()
+
+        OpenGMContext.unsetAllValue()
+
+        applyCompatibleWithOldConfigurations()
     }
 
 }

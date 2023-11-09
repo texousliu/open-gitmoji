@@ -1,11 +1,9 @@
 package com.github.texousliu.opengitmoji.contributor
 
-import com.github.texousliu.opengitmoji.context.OpenGMContext
+import com.github.texousliu.opengitmoji.context.OpenGitmojiContext
 import com.intellij.codeInsight.completion.InsertHandler
 import com.intellij.codeInsight.completion.InsertionContext
 import com.intellij.codeInsight.lookup.LookupElement
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 class OpenGitmojiInsertHandler : InsertHandler<LookupElement> {
 
@@ -23,7 +21,7 @@ class OpenGitmojiInsertHandler : InsertHandler<LookupElement> {
         } else if (s.contains(rtz)) {
             s = s.replace(rtz, replaceText)
         }
-        return s.replace(OpenGMContext.REPLACE_SUFFIX_MARK, "");
+        return s.replace(OpenGitmojiContext.REPLACE_SUFFIX_MARK, "")
     }
 
 }

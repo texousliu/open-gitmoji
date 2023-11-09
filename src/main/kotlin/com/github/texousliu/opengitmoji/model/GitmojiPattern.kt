@@ -1,10 +1,10 @@
 package com.github.texousliu.opengitmoji.model
 
-class RegexTableRowInfo(val regex : String, val enable : Boolean) {
+class GitmojiPattern(var regex : String, var enable : Boolean) : Cloneable {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other is RegexTableRowInfo) {
+        if (other is GitmojiPattern) {
             return this.regex == other.regex
         }
         return false
@@ -16,6 +16,10 @@ class RegexTableRowInfo(val regex : String, val enable : Boolean) {
 
     override fun toString(): String {
         return "{\"regex\":\"${this.regex}\",\"enable\":\"${this.enable}\"}"
+    }
+
+    public override fun clone(): GitmojiPattern {
+        return GitmojiPattern(regex, enable)
     }
 
 }

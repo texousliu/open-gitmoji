@@ -2,7 +2,7 @@ package com.github.texousliu.opengitmoji.contributor
 
 import com.github.texousliu.opengitmoji.context.OpenGitmojiContext
 import com.github.texousliu.opengitmoji.model.GM
-import com.github.texousliu.opengitmoji.model.RegexTableRowInfo
+import com.github.texousliu.opengitmoji.model.GitmojiPattern
 import com.github.texousliu.opengitmoji.utils.OpenGitmojiUtils
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElementBuilder
@@ -29,22 +29,22 @@ class OpenGitmojiCompletionContributor : CompletionContributor() {
                         if (parameters.editor.isOneLineMode) return
                         val doc = parameters.editor.document.charsSequence
                         if (doc.isEmpty()) return
-                        if (OpenGitmojiContext.getConfigTriggerCondition()) {
+                        if (OpenGitmojiContext.getConfigTriggerWithColon()) {
                             val str = result.prefixMatcher.prefix
                             if (str.isEmpty()) return
                             if (!doc.contains(":$str") && !doc.contains("：$str")) return
                         }
 
-                        val regexRows = OpenGitmojiContext.getConfigRegexTableInfoObj()
+                        val gitmojiPatterns = OpenGitmojiContext.getConfigGitmojiPatterns()
 
                         OpenGitmojiContext.gms().forEach { gm ->
-                            regexRows.rows.stream().filter { it.enable }.forEach { row ->
+                            gitmojiPatterns.stream().filter { it.enable }.forEach { row ->
                                 val str = lookupString(gm, row)
                                 result.addElement(LookupElementBuilder
                                         .create(gm, "${str}${OpenGitmojiContext.REPLACE_SUFFIX_MARK}")
                                         .withPresentableText(str)
-//                                                .withTailText(gm.name)
-                                        .withTypeText(gm.code)
+//                                        .withTailText(gm.description)
+                                        .withTypeText(gm.description)
                                         .withLookupStrings(
                                                 listOf(
                                                         gm.code.lowercase(),
@@ -63,7 +63,7 @@ class OpenGitmojiCompletionContributor : CompletionContributor() {
                 })
     }
 
-    private fun lookupString(it: GM, regex: RegexTableRowInfo): String {
+    private fun lookupString(it: GM, regex: GitmojiPattern): String {
         return OpenGitmojiUtils.replace(regex.regex, it)
     }
 

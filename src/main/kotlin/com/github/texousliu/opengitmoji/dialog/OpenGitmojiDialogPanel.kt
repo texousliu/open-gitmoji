@@ -2,19 +2,19 @@
 package com.github.texousliu.opengitmoji.dialog
 
 import com.github.texousliu.opengitmoji.context.OpenGitmojiContext
-import com.github.texousliu.opengitmoji.model.RegexTableRowInfo
+import com.github.texousliu.opengitmoji.model.GitmojiPattern
 import com.github.texousliu.opengitmoji.utils.OpenGitmojiUtils
-import com.intellij.ide.IdeBundle
-import com.intellij.ide.todo.TodoFilter
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.ValidationInfo
-import com.intellij.psi.search.TodoPattern
 import com.intellij.ui.DoubleClickListener
+import com.intellij.ui.TableUtil
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBTextField
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.RightGap
+import com.intellij.ui.dsl.builder.RowLayout
+import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.ui.dsl.gridLayout.VerticalAlign
 import com.intellij.ui.table.JBTable
@@ -23,64 +23,66 @@ import java.awt.event.MouseEvent
 import javax.swing.JComponent
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
-import javax.swing.table.DefaultTableModel
 import javax.swing.table.TableCellEditor
 
 
-@Suppress("DialogTitleCapitalization")
-fun openGitmojiDialogPanel(): DialogPanel {
+class OpenGitmojiDialogPanel {
+
     val checkBox = JBCheckBox("Get prompt through text starting with ':' or '：'. Such as ':s'")
-    checkBox.isSelected = OpenGitmojiContext.getConfigTriggerCondition()
+    val gitmojiPatterns = mutableListOf<GitmojiPattern>()
+    val jbTableModel = PatternsTableModel(gitmojiPatterns)
+    val jbTable = JBTable(jbTableModel)
 
-    val jbTableModel = DefaultTableModel(arrayOf("regex", "demo", "enable"), 0)
-    val jbTable = object : JBTable(jbTableModel){
-        override fun isCellEditable(row: Int, column: Int): Boolean {
-            return false
-        }
+    val dialogPanel = openGitmojiDialogPanel()
+
+    init {
+        jbTable.setShowGrid(false)
+        object : DoubleClickListener() {
+            override fun onDoubleClick(event: MouseEvent): Boolean {
+                editSelectedRegex()
+                return true
+            }
+        }.installOn(jbTable)
     }
-    jbTable.setShowGrid(false)
 
-    object : DoubleClickListener() {
-        override fun onDoubleClick(event: MouseEvent): Boolean {
-            editSelectedRegex(jbTable)
-            return true
-        }
-    }
-
-    return panel {
-        group("Input") {
-            row {
-                cell(checkBox)
-                        .gap(RightGap.SMALL)
-                        .actionListener { event, component -> OpenGitmojiContext.setTriggerCondition(component.isSelected) }
-                        .onReset {
-                            checkBox.isSelected = OpenGitmojiContext.getConfigTriggerCondition()
-                        }.resizableColumn()
-            }.layout(RowLayout.PARENT_GRID)
-                    .rowComment("Optimize input habits and reduce trouble caused by unnecessary prompts")
-        }.resizableColumn()
-
-        group("Prompt List") {
-            row {
-                label("Configure Gitmoji filling expression and generate a filling content list through the expression for users to choose.")
-            }.layout(RowLayout.PARENT_GRID)
-            row {
-                cell(createPromptListTable(jbTable))
-                        .gap(RightGap.SMALL)
-                        .onReset {
-                            (jbTable.model as DefaultTableModel).rowCount = 0
-                            OpenGitmojiContext.getConfigRegexTableInfoObj().rows.forEach {
-                                (jbTable.model as DefaultTableModel).addRow(arrayOf(it.regex, OpenGitmojiUtils.demo(it.regex), it.enable))
+    private fun openGitmojiDialogPanel(): DialogPanel {
+        return panel {
+            group("Input") {
+                row {
+                    cell(checkBox)
+                            .gap(RightGap.SMALL)
+//                            .actionListener { event, component -> OpenGitmojiContext.setTriggerCondition(component.isSelected) }
+                            .onReset {
+                                checkBox.isSelected = OpenGitmojiContext.getConfigTriggerWithColon()
                             }
-                        }.resizableColumn()
-                        .horizontalAlign(HorizontalAlign.FILL)
-                        .verticalAlign(VerticalAlign.FILL)
-            }.layout(RowLayout.PARENT_GRID).resizableRow()
+                }.rowComment("Optimize input habits and reduce trouble caused by unnecessary prompts")
+            }
+
+            group("Prompt List") {
+                row("Configure Gitmoji filling expression and generate a filling content list through the expression for users to choose.") { }
+                row {
+                    cell(createPromptListTable())
+                            .gap(RightGap.SMALL)
+                            .onReset {
+                                gitmojiPatterns.clear()
+                                OpenGitmojiContext.getGitmojiPatterns().forEach {
+                                    gitmojiPatterns.add(it.clone())
+                                }
+                                jbTableModel.fireTableDataChanged()
+
+//                                (jbTable.model as DefaultTableModel).rowCount = 0
+//                                OpenGitmojiContext.getConfigRegexTableInfoObj().rows.forEach {
+//                                    (jbTable.model as DefaultTableModel).addRow(arrayOf(it.regex, OpenGitmojiUtils.demo(it.regex), it.enable))
+//                                }
+                            }.resizableColumn()
+                            .horizontalAlign(HorizontalAlign.FILL)
+                            .verticalAlign(VerticalAlign.FILL)
+                }.layout(RowLayout.PARENT_GRID).resizableRow()
+            }
         }
     }
-}
 
-fun editSelectedRegex(jbTable: JBTable) {
+    private fun editSelectedRegex() {
 //    val jbTableModel = jbTable.model as DefaultTableModel
 //    stopEditing(jbTable)
 //    val selectedIndex: Int = jbTable.getSelectedRow()
@@ -108,95 +110,97 @@ fun editSelectedRegex(jbTable: JBTable) {
 //            myFiltersModel.fireTableRowsUpdated(i, i)
 //        }
 //    }
-}
+    }
 
-fun stopEditing(jbTable: JBTable) {
-    if (jbTable.isEditing()) {
-        val editor: TableCellEditor = jbTable.getCellEditor()
-        if (editor != null) {
-            editor.stopCellEditing()
+    private fun stopEditing() {
+        if (jbTable.isEditing()) {
+            val editor: TableCellEditor = jbTable.getCellEditor()
+            if (editor != null) {
+                editor.stopCellEditing()
+            }
         }
     }
-}
 
-fun createPromptListTable(jbTable: JBTable): JComponent {
-    jbTable.columnModel.getColumn(0).preferredWidth = 250
-    jbTable.columnModel.getColumn(1).preferredWidth = 250
-    jbTable.columnModel.getColumn(2).preferredWidth = 50
+    private fun createPromptListTable(): JComponent {
+        jbTable.columnModel.getColumn(0).preferredWidth = 250
+        jbTable.columnModel.getColumn(1).preferredWidth = 250
+        jbTable.columnModel.getColumn(2).preferredWidth = 50
 
-    val panel = ToolbarDecorator.createDecorator(jbTable)
-            .setAddAction {
-                val regexDialog = AddRegexDialogWrapper()
-                if (regexDialog.showAndGet()) {
-                    val load = regexDialog.load()
-                    (jbTable.model as DefaultTableModel).addRow(load)
-                    setRegexTableInfoRow(load[0] as String, load[2] as Boolean)
+        val panel = ToolbarDecorator.createDecorator(jbTable)
+                .setAddAction {
+                    stopEditing()
+                    val regexDialog = AddRegexDialogWrapper()
+                    if (regexDialog.showAndGet()) {
+                        val load = regexDialog.load()
+                        gitmojiPatterns.add(GitmojiPattern(load[0] as String, load[2] as Boolean))
+
+                        val index: Int = gitmojiPatterns.size - 1
+                        jbTableModel.fireTableRowsInserted(index, index)
+                        jbTable.selectionModel.setSelectionInterval(index, index)
+                        jbTable.scrollRectToVisible(jbTable.getCellRect(index, 0, true))
+
+//                        (jbTable.model as DefaultTableModel).addRow(load)
+//                        setRegexTableInfoRow(load[0] as String, load[2] as Boolean)
+                    }
+                }.setEditAction(null)
+                .setMoveUpAction(null)
+                .setMoveDownAction(null)
+                .setRemoveAction {
+//                    val row = jbTable.selectedRow
+//                    (jbTable.model as DefaultTableModel).removeRow(row)
+//                    removeRegexTableInfoRow(row)
+
+                    stopEditing()
+                    val selectedIndex: Int = jbTable.selectedRow
+                    if (selectedIndex >= 0 && selectedIndex < jbTableModel.rowCount) {
+                        TableUtil.removeSelectedItems(jbTable)
+                    }
+                }.createPanel()
+        panel.preferredSize = Dimension(0, 400)
+        return panel
+    }
+
+    private class AddRegexDialogWrapper : DialogWrapper(true) {
+
+        var enable = JBCheckBox("Enable Regex")
+        var regex = JBTextField(30)
+        var demo = JBTextField(30)
+
+        init {
+            title = "Regex Info"
+            regex.document.addDocumentListener(object : DocumentListener {
+                override fun insertUpdate(e: DocumentEvent?) {
+                    generatorDemo(regex.text)
                 }
-            }.setEditAction(null)
-            .setMoveUpAction(null)
-            .setMoveDownAction(null)
-            .setRemoveAction {
-                val row = jbTable.selectedRow
-                (jbTable.model as DefaultTableModel).removeRow(row)
-                removeRegexTableInfoRow(row)
-            }.createPanel()
-    panel.preferredSize = Dimension(0, 400)
-    return panel
-}
 
-fun setRegexTableInfoRow(regex: String, enable: Boolean) {
-    val regexTableInfoObj = OpenGitmojiContext.getRegexTableInfoObj()
-    regexTableInfoObj.add(RegexTableRowInfo(regex, enable))
-    OpenGitmojiContext.setRegexTableInfo(regexTableInfoObj)
-}
+                override fun removeUpdate(e: DocumentEvent?) {
+                    generatorDemo(regex.text)
+                }
 
-fun removeRegexTableInfoRow(index: Int) {
-    val regexTableInfoObj = OpenGitmojiContext.getRegexTableInfoObj()
-    regexTableInfoObj.removeAt(index)
-    OpenGitmojiContext.setRegexTableInfo(regexTableInfoObj)
-}
+                override fun changedUpdate(e: DocumentEvent?) {
+                    generatorDemo(regex.text)
+                }
 
-class AddRegexDialogWrapper : DialogWrapper(true) {
+            })
+            demo.isEditable = false
+            enable.isSelected = true
+            init()
+        }
 
-    var enable = JBCheckBox("Enable Regex")
-    var regex = JBTextField(30)
-    var demo = JBTextField(30)
+        fun generatorDemo(regex: String) {
+            demo.text = OpenGitmojiUtils.demo(regex)
+        }
 
-    init {
-        title = "Regex Info"
-        regex.document.addDocumentListener(object : DocumentListener {
-            override fun insertUpdate(e: DocumentEvent?) {
-                generatorDemo(regex.text)
-            }
-
-            override fun removeUpdate(e: DocumentEvent?) {
-                generatorDemo(regex.text)
-            }
-
-            override fun changedUpdate(e: DocumentEvent?) {
-                generatorDemo(regex.text)
-            }
-
-        })
-        demo.isEditable = false
-        enable.isSelected = true
-        init()
-    }
-
-    fun generatorDemo(regex: String) {
-        demo.text = OpenGitmojiUtils.demo(regex)
-    }
-
-    override fun createCenterPanel(): JComponent {
-        return panel {
-            row {
-                cell(enable).gap(RightGap.SMALL)
-                // 添加帮助图标
-                contextHelp("Configure whether the regular expression takes effect. Some expressions do not need to take effect in real time, so this configuration item is provided.", "Enable regex help")
-            }
-            row("Regex: ") {
-                cell(regex).horizontalAlign(HorizontalAlign.FILL)
-                        .comment("""
+        override fun createCenterPanel(): JComponent {
+            return panel {
+                row {
+                    cell(enable).gap(RightGap.SMALL)
+                    // 添加帮助图标
+                    contextHelp("Configure whether the regular expression takes effect. Some expressions do not need to take effect in real time, so this configuration item is provided.", "Enable regex help")
+                }
+                row("Regex: ") {
+                    cell(regex).horizontalAlign(HorizontalAlign.FILL)
+                            .comment("""
                             Prompt list expression configuration. The system provides the following placeholders by default:<br>
                             #{G}: Fill in gitmoji <br>
                             #{GU}: Fill in gimoji unicode <br>
@@ -205,22 +209,24 @@ class AddRegexDialogWrapper : DialogWrapper(true) {
                             #{DATE}: Fill in the current date <br>
                             #{TIME}: fill in the current time
                         """.trimIndent())
-            }.layout(RowLayout.PARENT_GRID)
-            row("Demo: ") {
-                cell(demo).horizontalAlign(HorizontalAlign.FILL)
-            }.layout(RowLayout.PARENT_GRID)
+                }.layout(RowLayout.PARENT_GRID)
+                row("Demo: ") {
+                    cell(demo).horizontalAlign(HorizontalAlign.FILL)
+                }.layout(RowLayout.PARENT_GRID)
+            }
         }
-    }
 
-    fun load(): Array<Any> {
-        return arrayOf(regex.text, demo.text, enable.isSelected)
-    }
-
-    override fun doValidate(): ValidationInfo? {
-        if (regex.text == null || regex.text.trim().isEmpty()) {
-            return ValidationInfo("Regex is required")
+        fun load(): Array<Any> {
+            return arrayOf(regex.text, demo.text, enable.isSelected)
         }
-        return super.doValidate()
+
+        override fun doValidate(): ValidationInfo? {
+            if (regex.text == null || regex.text.trim().isEmpty()) {
+                return ValidationInfo("Regex is required")
+            }
+            return super.doValidate()
+        }
+
     }
 
 }
