@@ -72,7 +72,7 @@ object OpenGitmojiContext {
 
     private fun applyCompatibleWithOldConfigurations() {
         val projectInstance = PropertiesComponent.getInstance()
-        projectInstance.setValue(OPEN_GIT_EMOJI_TC_TEXT_KEY, true)
+        projectInstance.setValue(OPEN_COMPATIBLE_WITH_OLD_CONFIG, true)
     }
 
     fun gms(): List<GM> {
@@ -93,7 +93,7 @@ object OpenGitmojiContext {
     class ListTypeToken : TypeToken<MutableList<GitmojiPattern>>()
 
     private fun compatibleWithOldConfigurations() {
-        if (isCompatibleWithOldConfigurations() && getConfigGitmojiPatterns().isNotEmpty()) {
+        if (isCompatibleWithOldConfigurations() || getConfigGitmojiPatterns().isNotEmpty()) {
             return
         }
 
