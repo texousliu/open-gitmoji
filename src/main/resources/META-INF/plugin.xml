@@ -25,7 +25,9 @@
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
-        <projectConfigurable instance="com.github.texousliu.opengitmoji.config.OpenGitmojiConfiguration" groupId="other"
+        <projectConfigurable displayName="Open Gitmoji Settings"
+                             instance="com.github.texousliu.opengitmoji.config.OpenGitmojiConfiguration"
+                             groupId="other"
                              id="open.texousliu.config.settings.gm.OpenGitmojiSettings"/>
     </extensions>
 
