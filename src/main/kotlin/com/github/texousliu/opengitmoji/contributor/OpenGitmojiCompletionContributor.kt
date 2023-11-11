@@ -29,13 +29,13 @@ class OpenGitmojiCompletionContributor : CompletionContributor() {
                         if (parameters.editor.isOneLineMode) return
                         val doc = parameters.editor.document.charsSequence
                         if (doc.isEmpty()) return
-                        if (OpenGitmojiContext.getConfigTriggerWithColon()) {
+                        if (OpenGitmojiContext.getTriggerWithColon()) {
                             val str = result.prefixMatcher.prefix
                             if (str.isEmpty()) return
                             if (!doc.contains(":$str") && !doc.contains("：$str")) return
                         }
 
-                        val gitmojiPatterns = OpenGitmojiContext.getConfigGitmojiPatterns()
+                        val gitmojiPatterns = OpenGitmojiContext.getGitmojiPatterns()
 
                         OpenGitmojiContext.gms().forEach { gm ->
                             gitmojiPatterns.stream().filter { it.enable }.forEach { row ->

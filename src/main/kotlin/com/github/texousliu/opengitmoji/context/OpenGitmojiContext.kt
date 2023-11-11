@@ -20,6 +20,7 @@ object OpenGitmojiContext {
     init {
         compatibleWithOldConfigurations()
         loadGM()
+        reset()
     }
 
     fun reset() {
@@ -44,7 +45,7 @@ object OpenGitmojiContext {
         return triggerWithColon
     }
 
-    fun getConfigGitmojiPatterns(): MutableList<GitmojiPattern> {
+    private fun getConfigGitmojiPatterns(): MutableList<GitmojiPattern> {
         val projectInstance = PropertiesComponent.getInstance()
         return Gson().fromJson(projectInstance.getValue(OPEN_GIT_EMOJI_TABLE_INFO_KEY)
                 ?: Gson().toJson(mutableListOf<GitmojiPattern>()), ListTypeToken().type)
@@ -55,7 +56,7 @@ object OpenGitmojiContext {
         projectInstance.setValue(OPEN_GIT_EMOJI_TABLE_INFO_KEY, Gson().toJson(gitmojiPatterns))
     }
 
-    fun getConfigTriggerWithColon(): Boolean {
+    private fun getConfigTriggerWithColon(): Boolean {
         val projectInstance = PropertiesComponent.getInstance()
         return projectInstance.getValue(OPEN_GIT_EMOJI_TC_TEXT_KEY)?.toBoolean() ?: false
     }
