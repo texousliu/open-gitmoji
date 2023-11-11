@@ -1,8 +1,8 @@
 package com.github.texousliu.opengitmoji.model
 
-enum class GMLanguage(val description: String) {
+enum class GMLanguage {
 
-    ZH("zh_CN"),
-    EN("en_US");
+    ZH,
+    EN;
 
 }

@@ -17,6 +17,7 @@ class OpenGitmojiConfiguration : SearchableConfigurable {
         if (config.size != panel.gitmojiPatterns.size) return true
         for ((index, gitmojiPattern) in panel.gitmojiPatterns.withIndex()) {
             if (config[index] != gitmojiPattern) return true
+            if (config[index].enable != gitmojiPattern.enable) return true
         }
         return false
     }

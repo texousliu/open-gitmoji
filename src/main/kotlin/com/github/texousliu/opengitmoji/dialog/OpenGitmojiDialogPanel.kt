@@ -30,8 +30,8 @@ class OpenGitmojiDialogPanel {
 
     val checkBox = JBCheckBox("Get prompt through text starting with ':' or '：'. Such as ':s'")
     val gitmojiPatterns = mutableListOf<GitmojiPattern>()
-    val jbTableModel = PatternsTableModel(gitmojiPatterns)
-    val jbTable = JBTable(jbTableModel)
+    private val jbTableModel = PatternsTableModel(gitmojiPatterns)
+    private val jbTable = JBTable(jbTableModel)
 
     val dialogPanel = openGitmojiDialogPanel()
 
@@ -39,7 +39,7 @@ class OpenGitmojiDialogPanel {
         jbTable.setShowGrid(false)
         object : DoubleClickListener() {
             override fun onDoubleClick(event: MouseEvent): Boolean {
-                editSelectedRegex()
+                editSelectedPattern()
                 return true
             }
         }.installOn(jbTable)
@@ -51,9 +51,8 @@ class OpenGitmojiDialogPanel {
                 row {
                     cell(checkBox)
                             .gap(RightGap.SMALL)
-//                            .actionListener { event, component -> OpenGitmojiContext.setTriggerCondition(component.isSelected) }
                             .onReset {
-                                checkBox.isSelected = OpenGitmojiContext.getConfigTriggerWithColon()
+                                checkBox.isSelected = OpenGitmojiContext.getTriggerWithColon()
                             }
                 }.rowComment("Optimize input habits and reduce trouble caused by unnecessary prompts")
             }
@@ -69,54 +68,10 @@ class OpenGitmojiDialogPanel {
                                     gitmojiPatterns.add(it.clone())
                                 }
                                 jbTableModel.fireTableDataChanged()
-
-//                                (jbTable.model as DefaultTableModel).rowCount = 0
-//                                OpenGitmojiContext.getConfigRegexTableInfoObj().rows.forEach {
-//                                    (jbTable.model as DefaultTableModel).addRow(arrayOf(it.regex, OpenGitmojiUtils.demo(it.regex), it.enable))
-//                                }
                             }.resizableColumn()
                             .horizontalAlign(HorizontalAlign.FILL)
                             .verticalAlign(VerticalAlign.FILL)
                 }.layout(RowLayout.PARENT_GRID).resizableRow()
-            }
-        }
-    }
-
-    private fun editSelectedRegex() {
-//    val jbTableModel = jbTable.model as DefaultTableModel
-//    stopEditing(jbTable)
-//    val selectedIndex: Int = jbTable.getSelectedRow()
-//    if (selectedIndex < 0 || selectedIndex >= jbTableModel.getRowCount()) {
-//        return
-//    }
-//    // 获取选择的内容
-//    val
-//    val rowInfo = OpenGitmojiContext.getRegexTableInfoObj().rows.get(selectedIndex)
-//    val dialog = PatternDialog(myPanel, pattern, selectedIndex, myPatterns)
-//    dialog.setTitle(IdeBundle.message("title.edit.todo.pattern"))
-//    if (!dialog.showAndGet()) {
-//        return
-//    }
-//    myPatterns.set(selectedIndex, pattern)
-//    myPatternsModel.fireTableRowsUpdated(selectedIndex, selectedIndex)
-//    myPatternsTable.getSelectionModel().setSelectionInterval(selectedIndex, selectedIndex)
-//    // Update model with patterns
-//    // Update model with patterns
-//    for (i in 0 until myFilters.size()) {
-//        val filter: TodoFilter = myFilters.get(i)
-//        if (filter.contains(sourcePattern)) {
-//            filter.removeTodoPattern(sourcePattern)
-//            filter.addTodoPattern(pattern)
-//            myFiltersModel.fireTableRowsUpdated(i, i)
-//        }
-//    }
-    }
-
-    private fun stopEditing() {
-        if (jbTable.isEditing()) {
-            val editor: TableCellEditor = jbTable.getCellEditor()
-            if (editor != null) {
-                editor.stopCellEditing()
             }
         }
     }
@@ -128,46 +83,105 @@ class OpenGitmojiDialogPanel {
 
         val panel = ToolbarDecorator.createDecorator(jbTable)
                 .setAddAction {
-                    stopEditing()
-                    val regexDialog = AddRegexDialogWrapper()
-                    if (regexDialog.showAndGet()) {
-                        val load = regexDialog.load()
-                        gitmojiPatterns.add(GitmojiPattern(load[0] as String, load[2] as Boolean))
-
-                        val index: Int = gitmojiPatterns.size - 1
-                        jbTableModel.fireTableRowsInserted(index, index)
-                        jbTable.selectionModel.setSelectionInterval(index, index)
-                        jbTable.scrollRectToVisible(jbTable.getCellRect(index, 0, true))
-
-//                        (jbTable.model as DefaultTableModel).addRow(load)
-//                        setRegexTableInfoRow(load[0] as String, load[2] as Boolean)
-                    }
-                }.setEditAction(null)
-                .setMoveUpAction(null)
-                .setMoveDownAction(null)
+                    addPattern()
+                }.setEditAction {
+                    editSelectedPattern()
+                }
+                .setMoveUpAction {
+                    moveUpPattern()
+                }
+                .setMoveDownAction {
+                    moveDownPattern()
+                }
                 .setRemoveAction {
-//                    val row = jbTable.selectedRow
-//                    (jbTable.model as DefaultTableModel).removeRow(row)
-//                    removeRegexTableInfoRow(row)
-
-                    stopEditing()
-                    val selectedIndex: Int = jbTable.selectedRow
-                    if (selectedIndex >= 0 && selectedIndex < jbTableModel.rowCount) {
-                        TableUtil.removeSelectedItems(jbTable)
-                    }
+                    removePattern()
                 }.createPanel()
         panel.preferredSize = Dimension(0, 400)
         return panel
     }
 
-    private class AddRegexDialogWrapper : DialogWrapper(true) {
+    private fun addPattern() {
+        stopEditing()
+        val addPatternDialog = PatternInfoDialogWrapper()
+        if (addPatternDialog.showAndGet()) {
+            gitmojiPatterns.add(addPatternDialog.load())
 
-        var enable = JBCheckBox("Enable Regex")
+            val index: Int = gitmojiPatterns.size - 1
+            jbTableModel.fireTableRowsInserted(index, index)
+            jbTable.selectionModel.setSelectionInterval(index, index)
+            jbTable.scrollRectToVisible(jbTable.getCellRect(index, 0, true))
+        }
+    }
+
+    private fun editSelectedPattern() {
+        stopEditing()
+        val selectedIndex: Int = jbTable.selectedRow
+        if (selectedIndex < 0 || selectedIndex >= jbTableModel.rowCount) {
+            return
+        }
+        // 获取选择的内容
+        val selectPattern = gitmojiPatterns[selectedIndex]
+
+        val dialog = PatternInfoDialogWrapper(selectPattern.regex, selectPattern.enable)
+        dialog.title = "Edit Pattern"
+        if (!dialog.showAndGet()) {
+            return
+        }
+        gitmojiPatterns[selectedIndex] = dialog.load()
+        jbTableModel.fireTableRowsUpdated(selectedIndex, selectedIndex)
+        jbTable.selectionModel.setSelectionInterval(selectedIndex, selectedIndex)
+    }
+
+    private fun removePattern() {
+        stopEditing()
+        val selectedIndex: Int = jbTable.selectedRow
+        if (selectedIndex >= 0 && selectedIndex < jbTableModel.rowCount) {
+            TableUtil.removeSelectedItems(jbTable)
+        }
+    }
+
+    private fun moveUpPattern() {
+        movePattern(-1)
+    }
+
+    private fun moveDownPattern() {
+        movePattern(1)
+    }
+
+    private fun movePattern(step: Int) {
+        stopEditing()
+        val selectedIndex: Int = jbTable.selectedRow
+        val swap = selectedIndex + step
+        // 获取选择的内容
+        val selectPattern = gitmojiPatterns[selectedIndex]
+        gitmojiPatterns[selectedIndex] = gitmojiPatterns[swap]
+        gitmojiPatterns[swap] = selectPattern
+
+        jbTableModel.fireTableRowsUpdated(swap.coerceAtMost(selectedIndex), swap.coerceAtLeast(selectedIndex))
+        jbTable.selectionModel.setSelectionInterval(swap, swap)
+    }
+
+
+    private fun stopEditing() {
+        if (jbTable.isEditing) {
+            val editor: TableCellEditor = jbTable.cellEditor
+            editor.stopCellEditing()
+        }
+    }
+
+    private class PatternInfoDialogWrapper() : DialogWrapper(true) {
+
+        var enable = JBCheckBox("Enable pattern")
         var regex = JBTextField(30)
         var demo = JBTextField(30)
 
+        constructor(regex: String, enable: Boolean) : this() {
+            this.enable.isSelected = enable
+            this.regex.text = regex
+        }
+
         init {
-            title = "Regex Info"
+            title = "Add Pattern"
             regex.document.addDocumentListener(object : DocumentListener {
                 override fun insertUpdate(e: DocumentEvent?) {
                     generatorDemo(regex.text)
@@ -216,8 +230,8 @@ class OpenGitmojiDialogPanel {
             }
         }
 
-        fun load(): Array<Any> {
-            return arrayOf(regex.text, demo.text, enable.isSelected)
+        fun load(): GitmojiPattern {
+            return GitmojiPattern(regex.text, enable.isSelected)
         }
 
         override fun doValidate(): ValidationInfo? {

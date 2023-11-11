@@ -4,7 +4,15 @@
 
 ## Unreleased
 
-## 2.0.1 - 2023-11-09
+## 231.2.0.3
+
+- 完善配置界面，添加编辑及移动功能
+
+## 231.2.0.2
+
+- 拆分版本
+
+## 2.0.1
 
 - refactor configuration（重构配置界面）
 - Custom prompt list, real-time rendering of inserted text（自定义提示列表，实时渲染插入文本）

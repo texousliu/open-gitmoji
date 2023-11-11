@@ -1,15 +1,17 @@
 package com.github.texousliu.opengitmoji.model
 
+import com.google.gson.annotations.SerializedName
 import com.intellij.openapi.util.IconLoader
 import javax.swing.Icon
 
 class GM(
-    val emoji: String,
-    val entity: String,
-    val code: String,
-    val name: String,
-    val description: String,
-    val cn_description: String
+        val emoji: String,
+        val entity: String,
+        val code: String,
+        val name: String,
+        val description: String,
+        @SerializedName("cn_description")
+        val cnDescription: String
 ) {
 
     private lateinit var _icon: Icon

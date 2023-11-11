@@ -22,7 +22,7 @@ object OpenGitmojiUtils {
 
     fun replace(script: String, gm: GM): String {
         val params = mapOf(G to gm.emoji, GU to gm.code,
-                DESC to gm.description, DESC_CN to gm.cn_description,
+                DESC to gm.description, DESC_CN to gm.cnDescription,
                 DATE to date(), TIME to time())
         return replace(script, params)
     }
