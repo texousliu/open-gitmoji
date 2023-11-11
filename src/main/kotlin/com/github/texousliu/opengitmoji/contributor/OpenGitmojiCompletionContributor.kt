@@ -49,7 +49,7 @@ class OpenGitmojiCompletionContributor : CompletionContributor() {
                                                 listOf(
                                                         gm.code.lowercase(),
                                                         gm.description.lowercase(),
-                                                        gm.cn_description.lowercase(),
+                                                        gm.cnDescription.lowercase(),
                                                         gm.name.lowercase(),
                                                         gm.entity.lowercase()
                                                 )

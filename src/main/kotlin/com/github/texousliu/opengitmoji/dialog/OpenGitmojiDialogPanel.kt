@@ -30,8 +30,8 @@ class OpenGitmojiDialogPanel {
 
     val checkBox = JBCheckBox("Get prompt through text starting with ':' or '：'. Such as ':s'")
     val gitmojiPatterns = mutableListOf<GitmojiPattern>()
-    val jbTableModel = PatternsTableModel(gitmojiPatterns)
-    val jbTable = JBTable(jbTableModel)
+    private val jbTableModel = PatternsTableModel(gitmojiPatterns)
+    private val jbTable = JBTable(jbTableModel)
 
     val dialogPanel = openGitmojiDialogPanel()
 
@@ -113,11 +113,9 @@ class OpenGitmojiDialogPanel {
     }
 
     private fun stopEditing() {
-        if (jbTable.isEditing()) {
-            val editor: TableCellEditor = jbTable.getCellEditor()
-            if (editor != null) {
-                editor.stopCellEditing()
-            }
+        if (jbTable.isEditing) {
+            val editor: TableCellEditor = jbTable.cellEditor
+            editor.stopCellEditing()
         }
     }
 
@@ -129,7 +127,7 @@ class OpenGitmojiDialogPanel {
         val panel = ToolbarDecorator.createDecorator(jbTable)
                 .setAddAction {
                     stopEditing()
-                    val regexDialog = AddRegexDialogWrapper()
+                    val regexDialog = PatternInfoDialogWrapper()
                     if (regexDialog.showAndGet()) {
                         val load = regexDialog.load()
                         gitmojiPatterns.add(GitmojiPattern(load[0] as String, load[2] as Boolean))
@@ -160,14 +158,14 @@ class OpenGitmojiDialogPanel {
         return panel
     }
 
-    private class AddRegexDialogWrapper : DialogWrapper(true) {
+    private class PatternInfoDialogWrapper : DialogWrapper(true) {
 
-        var enable = JBCheckBox("Enable Regex")
+        var enable = JBCheckBox("Enable pattern")
         var regex = JBTextField(30)
         var demo = JBTextField(30)
 
         init {
-            title = "Regex Info"
+            title = "Pattern Info"
             regex.document.addDocumentListener(object : DocumentListener {
                 override fun insertUpdate(e: DocumentEvent?) {
                     generatorDemo(regex.text)

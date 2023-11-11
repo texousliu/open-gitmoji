@@ -1,7 +1,7 @@
 package com.github.texousliu.opengitmoji.context
 
-import com.github.texousliu.opengitmoji.model.*
-import com.google.gson.Gson
+import com.github.texousliu.opengitmoji.model.GMInputModel
+import com.github.texousliu.opengitmoji.model.GMLanguage
 import com.intellij.ide.util.PropertiesComponent
 
 const val OPEN_GM_INPUT_MODEL_KEY = "open.texousliu.config.settings.gm.OpenGMSettings.OpenGMInputModelKey"
