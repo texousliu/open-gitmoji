@@ -12,11 +12,10 @@ import com.intellij.ui.TableUtil
 import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBTextField
+import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.panel
-import com.intellij.ui.dsl.gridLayout.HorizontalAlign
-import com.intellij.ui.dsl.gridLayout.VerticalAlign
 import com.intellij.ui.table.JBTable
 import java.awt.Dimension
 import java.awt.event.MouseEvent
@@ -75,8 +74,7 @@ class OpenGitmojiDialogPanel {
 //                                    (jbTable.model as DefaultTableModel).addRow(arrayOf(it.regex, OpenGitmojiUtils.demo(it.regex), it.enable))
 //                                }
                             }.resizableColumn()
-                            .horizontalAlign(HorizontalAlign.FILL)
-                            .verticalAlign(VerticalAlign.FILL)
+                            .align(Align.FILL)
                 }.layout(RowLayout.PARENT_GRID).resizableRow()
             }
         }
@@ -197,7 +195,7 @@ class OpenGitmojiDialogPanel {
                     contextHelp("Configure whether the regular expression takes effect. Some expressions do not need to take effect in real time, so this configuration item is provided.", "Enable regex help")
                 }
                 row("Regex: ") {
-                    cell(regex).horizontalAlign(HorizontalAlign.FILL)
+                    cell(regex).align(Align.FILL)
                             .comment("""
                             Prompt list expression configuration. The system provides the following placeholders by default:<br>
                             #{G}: Fill in gitmoji <br>
@@ -209,7 +207,7 @@ class OpenGitmojiDialogPanel {
                         """.trimIndent())
                 }.layout(RowLayout.PARENT_GRID)
                 row("Demo: ") {
-                    cell(demo).horizontalAlign(HorizontalAlign.FILL)
+                    cell(demo).align(Align.FILL)
                 }.layout(RowLayout.PARENT_GRID)
             }
         }
