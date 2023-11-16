@@ -43,7 +43,8 @@ intellij {
 
 // Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
 changelog {
-    version.set(properties("pluginVersion"))
+    val v = properties("pluginVersion")
+    version.set(v.substring(v.indexOf(".") + 1))
     groups.set(emptyList())
     header.set(provider { version.get() })
     headerParserRegex.set("""(\d+\.\d+(\.\d+)*)""".toRegex())

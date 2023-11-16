@@ -39,11 +39,11 @@ class PatternsTableModel(private var gitmojiPatterns: MutableList<GitmojiPattern
         val pattern = gitmojiPatterns[row]
         return when (column) {
             0 -> {
-                pattern.regex
+                pattern.pattern
             }
 
             1 -> {
-                demo(pattern.regex)
+                demo(pattern.pattern)
             }
 
             2 -> {
@@ -60,7 +60,7 @@ class PatternsTableModel(private var gitmojiPatterns: MutableList<GitmojiPattern
         val pattern = gitmojiPatterns[row]
         when (column) {
             0 -> {
-                pattern.regex = (value as String?)!!
+                pattern.pattern = (value as String?)!!
             }
 
             1 -> {}

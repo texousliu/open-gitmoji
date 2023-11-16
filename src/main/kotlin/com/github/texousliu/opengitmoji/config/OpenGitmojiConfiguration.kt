@@ -1,6 +1,7 @@
 package com.github.texousliu.opengitmoji.config
 
 import com.github.texousliu.opengitmoji.context.OpenGitmojiContext
+import com.github.texousliu.opengitmoji.context.OpenGitmojiCustomContext
 import com.github.texousliu.opengitmoji.dialog.OpenGitmojiDialogPanel
 import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.ui.DialogPanel
@@ -22,8 +23,17 @@ class OpenGitmojiConfiguration : SearchableConfigurable {
         return false
     }
 
+    private fun customEmojiFolderModified(): Boolean {
+        return panel.customFolderTextField.text != OpenGitmojiContext.getCustomEmojiFolder()
+    }
+
+    private fun triggerWithColonModified(): Boolean {
+        return OpenGitmojiContext.getTriggerWithColon() != panel.triggerWithColonCheckBox.isSelected
+    }
+
     override fun isModified(): Boolean = tableModified()
-            || OpenGitmojiContext.getTriggerWithColon() != panel.checkBox.isSelected
+            || triggerWithColonModified()
+            || customEmojiFolderModified()
 
 
     override fun getDisplayName(): String = "Open Gitmoji Settings"
@@ -31,7 +41,13 @@ class OpenGitmojiConfiguration : SearchableConfigurable {
     override fun getId(): String = "open.texousliu.config.settings.gm.OpenGitmojiSettings"
 
     override fun apply() {
-        OpenGitmojiContext.apply(panel.gitmojiPatterns, panel.checkBox.isSelected)
+        val customFolderChange = customEmojiFolderModified()
+        OpenGitmojiContext.apply(panel.gitmojiPatterns,
+                panel.triggerWithColonCheckBox.isSelected, panel.customFolderTextField.text)
+        if (customFolderChange) {
+            // 重载 gitmoji
+            OpenGitmojiCustomContext.loadCustomEmojis()
+        }
     }
 
     override fun reset() {

@@ -1,6 +1,7 @@
 package com.github.texousliu.opengitmoji.contributor
 
 import com.github.texousliu.opengitmoji.context.OpenGitmojiContext
+import com.github.texousliu.opengitmoji.context.OpenGitmojiCustomContext
 import com.github.texousliu.opengitmoji.model.GM
 import com.github.texousliu.opengitmoji.model.GitmojiPattern
 import com.github.texousliu.opengitmoji.utils.OpenGitmojiUtils
@@ -37,34 +38,39 @@ class OpenGitmojiCompletionContributor : CompletionContributor() {
 
                         val gitmojiPatterns = OpenGitmojiContext.getGitmojiPatterns()
 
-                        OpenGitmojiContext.gms().forEach { gm ->
-                            gitmojiPatterns.stream().filter { it.enable }.forEach { row ->
-                                val str = lookupString(gm, row)
-                                result.addElement(LookupElementBuilder
-                                        .create(gm, "${str}${OpenGitmojiContext.REPLACE_SUFFIX_MARK}")
-                                        .withPresentableText(str)
-//                                        .withTailText(gm.description)
-                                        .withTypeText(gm.description)
-                                        .withLookupStrings(
-                                                listOf(
-                                                        gm.code.lowercase(),
-                                                        gm.description.lowercase(),
-                                                        gm.cnDescription.lowercase(),
-                                                        gm.name.lowercase(),
-                                                        gm.entity.lowercase()
-                                                )
-                                        )
-                                        .withIcon(gm.getIcon())
-                                        .withInsertHandler(openGitmojiInsertHandler)
-                                )
-                            }
-                        }
+                        // 预置 git emoji
+                        OpenGitmojiContext.gms().forEach { gm -> gmToPrompt(gm, result, gitmojiPatterns) }
+                        // 自定义 git emoji
+                        OpenGitmojiCustomContext.gms().forEach{ gm -> gmToPrompt(gm, result, gitmojiPatterns) }
                     }
                 })
     }
 
-    private fun lookupString(it: GM, regex: GitmojiPattern): String {
-        return OpenGitmojiUtils.replace(regex.regex, it)
+    private fun gmToPrompt(gm: GM, result: CompletionResultSet, gitmojiPatterns: MutableList<GitmojiPattern>) {
+        gitmojiPatterns.stream().filter { it.enable }.forEach { row ->
+            val str = lookupString(gm, row)
+            result.addElement(LookupElementBuilder
+                    .create(gm, "${str}${OpenGitmojiContext.REPLACE_SUFFIX_MARK}")
+                    .withPresentableText(str)
+//                                        .withTailText(gm.description)
+                    .withTypeText(gm.description)
+                    .withLookupStrings(
+                            listOf(
+                                    gm.code.lowercase(),
+                                    gm.description.lowercase(),
+                                    gm.cnDescription.lowercase(),
+                                    gm.name.lowercase(),
+                                    gm.entity.lowercase()
+                            )
+                    )
+                    .withIcon(gm.getIcon())
+                    .withInsertHandler(openGitmojiInsertHandler)
+            )
+        }
+    }
+
+    private fun lookupString(it: GM, pattern: GitmojiPattern): String {
+        return OpenGitmojiUtils.replace(pattern.pattern, it)
     }
 
 }

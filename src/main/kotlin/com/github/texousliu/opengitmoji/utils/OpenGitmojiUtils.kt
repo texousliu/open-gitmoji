@@ -14,7 +14,7 @@ object OpenGitmojiUtils {
     private const val DATE = "#{DATE}"
     private const val TIME = "#{TIME}"
 
-    private val REGEX = arrayOf(G, GU, DESC, DESC_CN, DATE, TIME)
+    private val PATTERNS = arrayOf(G, GU, DESC, DESC_CN, DATE, TIME)
 
     fun demo(script: String): String {
         return replace(script, OpenGitmojiContext.gms()[0])
@@ -29,8 +29,8 @@ object OpenGitmojiUtils {
 
     private fun replace(script: String, replace: Map<String, String>): String {
         var r = script
-        for (regex1 in REGEX) {
-            r = r.replace(regex1, replace[regex1] ?: regex1)
+        for (pattern in PATTERNS) {
+            r = r.replace(pattern, replace[pattern] ?: pattern)
         }
         return r
     }

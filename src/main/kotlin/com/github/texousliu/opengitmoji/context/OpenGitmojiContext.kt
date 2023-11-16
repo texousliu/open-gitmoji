@@ -8,14 +8,17 @@ import com.intellij.ide.util.PropertiesComponent
 
 const val OPEN_GIT_EMOJI_TABLE_INFO_KEY = "open.texousliu.config.settings.gm.OpenGitmojiSettings.OpenGMTableInfoKey"
 const val OPEN_GIT_EMOJI_TC_TEXT_KEY = "open.texousliu.config.settings.gm.OpenGitmojiSettings.OpenGMTCTextKey"
+const val OPEN_GIT_EMOJI_CUSTOM_FOLDER_KEY = "open.texousliu.config.settings.gm.OpenGitmojiSettings.OpenGMCustomFolderKey"
 const val OPEN_COMPATIBLE_WITH_OLD_CONFIG = "open.texousliu.config.settings.gm.OpenGitmojiSettings.OpenGMCompatible"
 
 object OpenGitmojiContext {
 
     const val REPLACE_SUFFIX_MARK = "$$:$$"
     private val gmList = ArrayList<GM>()
+    private val customEmojiList = ArrayList<GM>()
     private var gitmojiPatterns = mutableListOf<GitmojiPattern>()
     private var triggerWithColon = true
+    private var customEmojiFolder = ""
 
     init {
         compatibleWithOldConfigurations()
@@ -26,15 +29,19 @@ object OpenGitmojiContext {
     fun reset() {
         triggerWithColon = getConfigTriggerWithColon()
         gitmojiPatterns = getConfigGitmojiPatterns()
+        customEmojiFolder = getConfigCustomEmojiFolder()
     }
 
-    fun apply(gitmojiPatterns: MutableList<GitmojiPattern>, triggerCondition: Boolean) {
+    fun apply(gitmojiPatterns: MutableList<GitmojiPattern>,
+              triggerCondition: Boolean, customEmojiFolder : String) {
         this.gitmojiPatterns.clear()
         this.gitmojiPatterns.addAll(gitmojiPatterns)
         this.triggerWithColon = triggerCondition
+        this.customEmojiFolder = customEmojiFolder
 
         applyConfigGitmojiPatterns()
         applyConfigTriggerWithColon()
+        applyConfigCustomEmojiFolder()
     }
 
     fun getGitmojiPatterns(): MutableList<GitmojiPattern> {
@@ -43,6 +50,10 @@ object OpenGitmojiContext {
 
     fun getTriggerWithColon(): Boolean {
         return triggerWithColon
+    }
+
+    fun getCustomEmojiFolder() : String {
+        return customEmojiFolder
     }
 
     private fun getConfigGitmojiPatterns(): MutableList<GitmojiPattern> {
@@ -64,6 +75,16 @@ object OpenGitmojiContext {
     private fun applyConfigTriggerWithColon() {
         val projectInstance = PropertiesComponent.getInstance()
         projectInstance.setValue(OPEN_GIT_EMOJI_TC_TEXT_KEY, triggerWithColon)
+    }
+
+    private fun getConfigCustomEmojiFolder(): String {
+        val projectInstance = PropertiesComponent.getInstance()
+        return projectInstance.getValue(OPEN_GIT_EMOJI_CUSTOM_FOLDER_KEY) ?: ""
+    }
+
+    private fun applyConfigCustomEmojiFolder() {
+        val projectInstance = PropertiesComponent.getInstance()
+        projectInstance.setValue(OPEN_GIT_EMOJI_CUSTOM_FOLDER_KEY, customEmojiFolder)
     }
 
     private fun isCompatibleWithOldConfigurations(): Boolean {

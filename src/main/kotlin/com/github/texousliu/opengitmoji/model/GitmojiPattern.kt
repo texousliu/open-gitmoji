@@ -1,25 +1,25 @@
 package com.github.texousliu.opengitmoji.model
 
-class GitmojiPattern(var regex : String, var enable : Boolean) : Cloneable {
+class GitmojiPattern(var pattern : String, var enable : Boolean) : Cloneable {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other is GitmojiPattern) {
-            return this.regex == other.regex
+            return this.pattern == other.pattern
         }
         return false
     }
 
     override fun hashCode(): Int {
-        return this.regex.hashCode()
+        return this.pattern.hashCode()
     }
 
     override fun toString(): String {
-        return "{\"regex\":\"${this.regex}\",\"enable\":\"${this.enable}\"}"
+        return "{\"pattern\":\"${this.pattern}\",\"enable\":\"${this.enable}\"}"
     }
 
     public override fun clone(): GitmojiPattern {
-        return GitmojiPattern(regex, enable)
+        return GitmojiPattern(pattern, enable)
     }
 
 }
