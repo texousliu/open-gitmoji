@@ -1,6 +1,6 @@
 package com.github.texousliu.opengitmoji.model
 
-enum class GMInputModel {
+enum class OpenEmojiInputModel {
 
     EMOJI,
     CODE,
