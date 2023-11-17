@@ -68,15 +68,10 @@ class OpenGitmojiDialogPanel {
                             .onReset {
                                 chooseComponent.text = OpenGitmojiContext.getCustomEmojiFolder()
                             }
-//                textFieldWithBrowseButton("Choose Custom Emoji Folder", null, FileChooserDescriptorFactory.createSingleFolderDescriptor())
-//                        .text(OpenGitmojiContext.getCustomEmojiFolder())
-//                        .resizableColumn()
-//                        .align(Align.FILL)
-                }.rowComment("Configure your own emojis beyond additional system presets")
+                }.rowComment("Configure your own emojis beyond additional system presets. <a href='https://github.com/texousliu/open-gitmoji'>Documents</a>")
             }
 
             group("Prompt List") {
-//                row("Configure Gitmoji filling expression and generate a filling content list through the expression for users to choose.") { }
                 row("Configure prompt item expression") { }
                 row {
                     cell(createPromptListTable())

@@ -3,6 +3,7 @@
 # Open Gitmoji Changelog
 
 ## Unreleased
+- 自定义 emoji 扩展
 
 ## 231.2.0.3
 

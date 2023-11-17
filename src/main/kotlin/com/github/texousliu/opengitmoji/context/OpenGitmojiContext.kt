@@ -13,9 +13,9 @@ const val OPEN_COMPATIBLE_WITH_OLD_CONFIG = "open.texousliu.config.settings.gm.O
 
 object OpenGitmojiContext {
 
+    const val EMOJI_FILE_NAME = "emojis.json"
     const val REPLACE_SUFFIX_MARK = "$$:$$"
     private val gmList = ArrayList<GM>()
-    private val customEmojiList = ArrayList<GM>()
     private var gitmojiPatterns = mutableListOf<GitmojiPattern>()
     private var triggerWithColon = true
     private var customEmojiFolder = ""
@@ -102,11 +102,11 @@ object OpenGitmojiContext {
     }
 
     private fun loadGM() {
-        javaClass.getResourceAsStream("/gitmojis.json").use { inputStream ->
+        javaClass.getResourceAsStream("/${EMOJI_FILE_NAME}").use { inputStream ->
             if (inputStream != null) {
                 val text = inputStream.bufferedReader().readText()
                 Gson().fromJson(text, GMList::class.java).also {
-                    it.gitmojis.forEach(gmList::add)
+                    it.emojis.forEach(gmList::add)
                 }
             }
         }

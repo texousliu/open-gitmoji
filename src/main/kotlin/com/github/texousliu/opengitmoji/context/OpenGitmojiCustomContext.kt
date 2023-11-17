@@ -22,14 +22,16 @@ object OpenGitmojiCustomContext {
         customEmojiList.clear()
         if (OpenGitmojiContext.getCustomEmojiFolder().trim().isEmpty()) return
 
-        val file = File(OpenGitmojiContext.getCustomEmojiFolder() + "/gitmojis.json")
+        val file = File(OpenGitmojiContext.getCustomEmojiFolder() + "/${OpenGitmojiContext.EMOJI_FILE_NAME}")
         if (file.exists()) {
             file.inputStream().use { inputStream ->
                 val text = inputStream.bufferedReader().readText()
                 Gson().fromJson(text, GMList::class.java).also { gmList ->
-                    gmList.gitmojis.forEach { gm ->
-                        gm.custom()
-                        customEmojiList.add(gm)
+                    if (gmList?.emojis != null) {
+                        gmList.emojis.forEach { gm ->
+                            gm.custom()
+                            customEmojiList.add(gm)
+                        }
                     }
                 }
             }
