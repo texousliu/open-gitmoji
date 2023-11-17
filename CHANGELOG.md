@@ -4,6 +4,7 @@
 
 ## Unreleased
 - 自定义 emoji 扩展
+- commit 界面添加自定义emoji刷新按钮
 
 ## 231.2.0.3
 

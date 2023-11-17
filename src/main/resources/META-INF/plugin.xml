@@ -18,6 +18,16 @@
         ]]>
     </change-notes>
 
+    <actions>
+        <action id="OpenEmoji.GitCommitEmojiRefreshAction"
+                class="com.github.texousliu.opengitmoji.config.GitCommitEmojiRefreshAction"
+                text="Refresh Custom Emojis" icon="AllIcons.Actions.Refresh"
+                description="Refresh custom emojis">
+<!--            <keyboard-shortcut first-keystroke="ctrl alt g" keymap="$default" />-->
+            <add-to-group group-id="Vcs.MessageActionGroup" anchor="first" />
+        </action>
+    </actions>
+
     <extensions defaultExtensionNs="com.intellij">
         <completion.contributor language="TEXT"
                                 order="first, before commitCompletion"

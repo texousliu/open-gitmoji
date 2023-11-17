@@ -16,15 +16,15 @@
     - description-cn（#{DESC_CN}）
     - date（已有）（#{DATE}）
     - time（已有）（#{TIME}）
-- [ ] 自定义 gitmoji 支持
+- [X] 自定义 gitmoji 支持
 
 ## 使用演示
 
 ### 非`:`形式
-![非`:`形式](doc/Open%20Emoji%20Finish.gif)
+![非`:`形式](doc/images/Open%20Emoji%20Finish.gif)
 
 ### `:`形式
-![`:`形式](doc/Open%20Emoji%20Colon%20Finish.gif)
+![`:`形式](doc/images/Open%20Emoji%20Colon%20Finish.gif)
 
 
 ### Plugin config（插件配置）
