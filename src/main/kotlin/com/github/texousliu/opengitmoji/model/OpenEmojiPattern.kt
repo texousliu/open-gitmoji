@@ -1,10 +1,10 @@
 package com.github.texousliu.opengitmoji.model
 
-class GitmojiPattern(var pattern : String, var enable : Boolean) : Cloneable {
+class OpenEmojiPattern(var pattern : String, var enable : Boolean) : Cloneable {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other is GitmojiPattern) {
+        if (other is OpenEmojiPattern) {
             return this.pattern == other.pattern
         }
         return false
@@ -18,8 +18,8 @@ class GitmojiPattern(var pattern : String, var enable : Boolean) : Cloneable {
         return "{\"pattern\":\"${this.pattern}\",\"enable\":\"${this.enable}\"}"
     }
 
-    public override fun clone(): GitmojiPattern {
-        return GitmojiPattern(pattern, enable)
+    public override fun clone(): OpenEmojiPattern {
+        return OpenEmojiPattern(pattern, enable)
     }
 
 }

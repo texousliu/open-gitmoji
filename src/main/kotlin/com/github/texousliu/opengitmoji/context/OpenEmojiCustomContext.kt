@@ -1,32 +1,31 @@
 package com.github.texousliu.opengitmoji.context
 
-import com.github.texousliu.opengitmoji.model.GM
-import com.github.texousliu.opengitmoji.model.GMList
+import com.github.texousliu.opengitmoji.model.OpenEmoji
+import com.github.texousliu.opengitmoji.model.OpenEmojiList
 import com.google.gson.Gson
 import java.io.File
 
-// TODO 界面上添加刷新按钮直接刷新文件夹
-object OpenGitmojiCustomContext {
+object OpenEmojiCustomContext {
 
-    private val customEmojiList = ArrayList<GM>()
+    private val customEmojiList = ArrayList<OpenEmoji>()
 
     init {
         loadCustomEmojis()
     }
 
-    fun gms(): List<GM> {
+    fun gms(): List<OpenEmoji> {
         return customEmojiList
     }
 
     fun loadCustomEmojis() {
         customEmojiList.clear()
-        if (OpenGitmojiContext.getCustomEmojiFolder().trim().isEmpty()) return
+        if (OpenEmojiContext.getCustomEmojiFolder().trim().isEmpty()) return
 
-        val file = File(OpenGitmojiContext.getCustomEmojiFolder() + "/${OpenGitmojiContext.EMOJI_FILE_NAME}")
+        val file = File(OpenEmojiContext.getCustomEmojiFolder() + "/${OpenEmojiContext.EMOJI_FILE_NAME}")
         if (file.exists()) {
             file.inputStream().use { inputStream ->
                 val text = inputStream.bufferedReader().readText()
-                Gson().fromJson(text, GMList::class.java).also { gmList ->
+                Gson().fromJson(text, OpenEmojiList::class.java).also { gmList ->
                     if (gmList?.emojis != null) {
                         gmList.emojis.forEach { gm ->
                             gm.custom()

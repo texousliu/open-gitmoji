@@ -1,7 +1,7 @@
 package com.github.texousliu.opengitmoji.context
 
 import com.github.texousliu.opengitmoji.model.*
-import com.github.texousliu.opengitmoji.utils.OpenGitmojiUtils
+import com.github.texousliu.opengitmoji.utils.OpenEmojiUtils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.intellij.ide.util.PropertiesComponent
@@ -11,12 +11,12 @@ const val OPEN_GIT_EMOJI_TC_TEXT_KEY = "open.texousliu.config.settings.gm.OpenGi
 const val OPEN_GIT_EMOJI_CUSTOM_FOLDER_KEY = "open.texousliu.config.settings.gm.OpenGitmojiSettings.OpenGMCustomFolderKey"
 const val OPEN_COMPATIBLE_WITH_OLD_CONFIG = "open.texousliu.config.settings.gm.OpenGitmojiSettings.OpenGMCompatible"
 
-object OpenGitmojiContext {
+object OpenEmojiContext {
 
     const val EMOJI_FILE_NAME = "emojis.json"
     const val REPLACE_SUFFIX_MARK = "$$:$$"
-    private val gmList = ArrayList<GM>()
-    private var gitmojiPatterns = mutableListOf<GitmojiPattern>()
+    private val openEmojiList = ArrayList<OpenEmoji>()
+    private var openEmojiPatterns = mutableListOf<OpenEmojiPattern>()
     private var triggerWithColon = true
     private var customEmojiFolder = ""
 
@@ -28,24 +28,24 @@ object OpenGitmojiContext {
 
     fun reset() {
         triggerWithColon = getConfigTriggerWithColon()
-        gitmojiPatterns = getConfigGitmojiPatterns()
+        openEmojiPatterns = getConfigEmojiPatterns()
         customEmojiFolder = getConfigCustomEmojiFolder()
     }
 
-    fun apply(gitmojiPatterns: MutableList<GitmojiPattern>,
+    fun apply(openEmojiPatterns: MutableList<OpenEmojiPattern>,
               triggerCondition: Boolean, customEmojiFolder : String) {
-        this.gitmojiPatterns.clear()
-        this.gitmojiPatterns.addAll(gitmojiPatterns)
+        this.openEmojiPatterns.clear()
+        this.openEmojiPatterns.addAll(openEmojiPatterns)
         this.triggerWithColon = triggerCondition
         this.customEmojiFolder = customEmojiFolder
 
-        applyConfigGitmojiPatterns()
+        applyConfigEmojiPatterns()
         applyConfigTriggerWithColon()
         applyConfigCustomEmojiFolder()
     }
 
-    fun getGitmojiPatterns(): MutableList<GitmojiPattern> {
-        return gitmojiPatterns
+    fun getEmojiPatterns(): MutableList<OpenEmojiPattern> {
+        return openEmojiPatterns
     }
 
     fun getTriggerWithColon(): Boolean {
@@ -56,15 +56,15 @@ object OpenGitmojiContext {
         return customEmojiFolder
     }
 
-    private fun getConfigGitmojiPatterns(): MutableList<GitmojiPattern> {
+    private fun getConfigEmojiPatterns(): MutableList<OpenEmojiPattern> {
         val projectInstance = PropertiesComponent.getInstance()
         return Gson().fromJson(projectInstance.getValue(OPEN_GIT_EMOJI_TABLE_INFO_KEY)
-                ?: Gson().toJson(mutableListOf<GitmojiPattern>()), ListTypeToken().type)
+                ?: Gson().toJson(mutableListOf<OpenEmojiPattern>()), ListTypeToken().type)
     }
 
-    private fun applyConfigGitmojiPatterns() {
+    private fun applyConfigEmojiPatterns() {
         val projectInstance = PropertiesComponent.getInstance()
-        projectInstance.setValue(OPEN_GIT_EMOJI_TABLE_INFO_KEY, Gson().toJson(gitmojiPatterns))
+        projectInstance.setValue(OPEN_GIT_EMOJI_TABLE_INFO_KEY, Gson().toJson(openEmojiPatterns))
     }
 
     private fun getConfigTriggerWithColon(): Boolean {
@@ -97,60 +97,60 @@ object OpenGitmojiContext {
         projectInstance.setValue(OPEN_COMPATIBLE_WITH_OLD_CONFIG, true)
     }
 
-    fun gms(): List<GM> {
-        return gmList
+    fun gms(): List<OpenEmoji> {
+        return openEmojiList
     }
 
     private fun loadGM() {
         javaClass.getResourceAsStream("/${EMOJI_FILE_NAME}").use { inputStream ->
             if (inputStream != null) {
                 val text = inputStream.bufferedReader().readText()
-                Gson().fromJson(text, GMList::class.java).also {
-                    it.emojis.forEach(gmList::add)
+                Gson().fromJson(text, OpenEmojiList::class.java).also {
+                    it.emojis.forEach(openEmojiList::add)
                 }
             }
         }
     }
 
-    class ListTypeToken : TypeToken<MutableList<GitmojiPattern>>()
+    class ListTypeToken : TypeToken<MutableList<OpenEmojiPattern>>()
 
     private fun compatibleWithOldConfigurations() {
-        if (isCompatibleWithOldConfigurations() || getConfigGitmojiPatterns().isNotEmpty()) {
+        if (isCompatibleWithOldConfigurations() || getConfigEmojiPatterns().isNotEmpty()) {
             return
         }
 
-        val language = OpenGMContext.getLanguage()
-        val inputModel = OpenGMContext.getInputModel()
-        val triggerCondition = OpenGMContext.getTriggerCondition()
-        val suffixText = OpenGMContext.getSuffixText()
+        val language = OpenEmojiContextDisabled.getLanguage()
+        val inputModel = OpenEmojiContextDisabled.getInputModel()
+        val triggerCondition = OpenEmojiContextDisabled.getTriggerCondition()
+        val suffixText = OpenEmojiContextDisabled.getSuffixText()
         var str = ""
 
         str += when (inputModel) {
-            GMInputModel.EMOJI -> {
-                OpenGitmojiUtils.G
+            OpenEmojiInputModel.EMOJI -> {
+                OpenEmojiUtils.G
             }
 
-            GMInputModel.CODE -> {
-                OpenGitmojiUtils.GU
+            OpenEmojiInputModel.CODE -> {
+                OpenEmojiUtils.GU
             }
 
-            GMInputModel.EMOJI_WITH_DESC -> {
-                if (GMLanguage.ZH == language) "${OpenGitmojiUtils.G} ${OpenGitmojiUtils.DESC_CN}" else "${OpenGitmojiUtils.G} ${OpenGitmojiUtils.DESC}"
+            OpenEmojiInputModel.EMOJI_WITH_DESC -> {
+                if (OpenEmojiLanguage.ZH == language) "${OpenEmojiUtils.G} ${OpenEmojiUtils.DESC_CN}" else "${OpenEmojiUtils.G} ${OpenEmojiUtils.DESC}"
             }
 
-            GMInputModel.CODE_WITH_DESC -> {
-                if (GMLanguage.ZH == language) "${OpenGitmojiUtils.GU} ${OpenGitmojiUtils.DESC_CN}" else "${OpenGitmojiUtils.GU} ${OpenGitmojiUtils.DESC}"
+            OpenEmojiInputModel.CODE_WITH_DESC -> {
+                if (OpenEmojiLanguage.ZH == language) "${OpenEmojiUtils.GU} ${OpenEmojiUtils.DESC_CN}" else "${OpenEmojiUtils.GU} ${OpenEmojiUtils.DESC}"
             }
         }
         str += suffixText
 
         // 兼容旧配置
         this.triggerWithColon = triggerCondition
-        this.gitmojiPatterns.add(GitmojiPattern(str, true))
+        this.openEmojiPatterns.add(OpenEmojiPattern(str, true))
         applyConfigTriggerWithColon()
-        applyConfigGitmojiPatterns()
+        applyConfigEmojiPatterns()
 
-        OpenGMContext.unsetAllValue()
+        OpenEmojiContextDisabled.unsetAllValue()
 
         applyCompatibleWithOldConfigurations()
     }

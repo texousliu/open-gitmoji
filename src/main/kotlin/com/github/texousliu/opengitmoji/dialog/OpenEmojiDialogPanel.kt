@@ -1,9 +1,8 @@
-// Copyright 2000-2021 JetBrains s.r.o. and contributors. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file.
 package com.github.texousliu.opengitmoji.dialog
 
-import com.github.texousliu.opengitmoji.context.OpenGitmojiContext
-import com.github.texousliu.opengitmoji.model.GitmojiPattern
-import com.github.texousliu.opengitmoji.utils.OpenGitmojiUtils
+import com.github.texousliu.opengitmoji.context.OpenEmojiContext
+import com.github.texousliu.opengitmoji.model.OpenEmojiPattern
+import com.github.texousliu.opengitmoji.utils.OpenEmojiUtils
 import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.project.Project
@@ -31,12 +30,12 @@ import javax.swing.event.DocumentListener
 import javax.swing.table.TableCellEditor
 
 
-class OpenGitmojiDialogPanel {
+class OpenEmojiDialogPanel {
 
     val triggerWithColonCheckBox = JBCheckBox("Get prompt through text starting with ':' or '：'. Such as ':s'")
-    val gitmojiPatterns = mutableListOf<GitmojiPattern>()
+    val openEmojiPatterns = mutableListOf<OpenEmojiPattern>()
     val customFolderTextField = JBTextField()
-    private val jbTableModel = PatternsTableModel(gitmojiPatterns)
+    private val jbTableModel = OpenEmojiPatternsTableModel(openEmojiPatterns)
     private val jbTable = JBTable(jbTableModel)
     private val chooseComponent = TextFieldWithBrowseButton(customFolderTextField)
 
@@ -60,13 +59,13 @@ class OpenGitmojiDialogPanel {
                     cell(triggerWithColonCheckBox)
                             .gap(RightGap.SMALL)
                             .onReset {
-                                triggerWithColonCheckBox.isSelected = OpenGitmojiContext.getTriggerWithColon()
+                                triggerWithColonCheckBox.isSelected = OpenEmojiContext.getTriggerWithColon()
                             }
                 }.rowComment("Optimize input habits and reduce trouble caused by unnecessary prompts")
                 row("Custom Emoji Folder:") {
                     cell(chooseComponent).resizableColumn().align(Align.FILL)
                             .onReset {
-                                chooseComponent.text = OpenGitmojiContext.getCustomEmojiFolder()
+                                chooseComponent.text = OpenEmojiContext.getCustomEmojiFolder()
                             }
                 }.rowComment("Configure your own emojis beyond additional system presets. <a href='https://github.com/texousliu/open-gitmoji'>Documents</a>")
             }
@@ -77,9 +76,9 @@ class OpenGitmojiDialogPanel {
                     cell(createPromptListTable())
                             .gap(RightGap.SMALL)
                             .onReset {
-                                gitmojiPatterns.clear()
-                                OpenGitmojiContext.getGitmojiPatterns().forEach {
-                                    gitmojiPatterns.add(it.clone())
+                                openEmojiPatterns.clear()
+                                OpenEmojiContext.getEmojiPatterns().forEach {
+                                    openEmojiPatterns.add(it.clone())
                                 }
                                 jbTableModel.fireTableDataChanged()
                             }.resizableColumn()
@@ -138,9 +137,9 @@ class OpenGitmojiDialogPanel {
         stopEditing()
         val addPatternDialog = PatternInfoDialogWrapper()
         if (addPatternDialog.showAndGet()) {
-            gitmojiPatterns.add(addPatternDialog.load())
+            openEmojiPatterns.add(addPatternDialog.load())
 
-            val index: Int = gitmojiPatterns.size - 1
+            val index: Int = openEmojiPatterns.size - 1
             jbTableModel.fireTableRowsInserted(index, index)
             jbTable.selectionModel.setSelectionInterval(index, index)
             jbTable.scrollRectToVisible(jbTable.getCellRect(index, 0, true))
@@ -154,14 +153,14 @@ class OpenGitmojiDialogPanel {
             return
         }
         // 获取选择的内容
-        val selectPattern = gitmojiPatterns[selectedIndex]
+        val selectPattern = openEmojiPatterns[selectedIndex]
 
         val dialog = PatternInfoDialogWrapper(selectPattern.pattern, selectPattern.enable)
         dialog.title = "Edit Pattern"
         if (!dialog.showAndGet()) {
             return
         }
-        gitmojiPatterns[selectedIndex] = dialog.load()
+        openEmojiPatterns[selectedIndex] = dialog.load()
         jbTableModel.fireTableRowsUpdated(selectedIndex, selectedIndex)
         jbTable.selectionModel.setSelectionInterval(selectedIndex, selectedIndex)
     }
@@ -187,9 +186,9 @@ class OpenGitmojiDialogPanel {
         val selectedIndex: Int = jbTable.selectedRow
         val swap = selectedIndex + step
         // 获取选择的内容
-        val selectPattern = gitmojiPatterns[selectedIndex]
-        gitmojiPatterns[selectedIndex] = gitmojiPatterns[swap]
-        gitmojiPatterns[swap] = selectPattern
+        val selectPattern = openEmojiPatterns[selectedIndex]
+        openEmojiPatterns[selectedIndex] = openEmojiPatterns[swap]
+        openEmojiPatterns[swap] = selectPattern
 
         jbTableModel.fireTableRowsUpdated(swap.coerceAtMost(selectedIndex), swap.coerceAtLeast(selectedIndex))
         jbTable.selectionModel.setSelectionInterval(swap, swap)
@@ -236,7 +235,7 @@ class OpenGitmojiDialogPanel {
         }
 
         fun generatorDemo(pattern: String) {
-            example.text = OpenGitmojiUtils.demo(pattern)
+            example.text = OpenEmojiUtils.demo(pattern)
         }
 
         override fun createCenterPanel(): JComponent {
@@ -257,9 +256,6 @@ class OpenGitmojiDialogPanel {
                             #{DATE}: Fill in the current date <br>
                             #{TIME}: fill in the current time
                         """.trimIndent(), 50)
-//                    cell(enable).gap(RightGap.COLUMNS)
-                    // 添加帮助图标
-//                    contextHelp("Configure whether the regular expression takes effect. Some expressions do not need to take effect in real time, so this configuration item is provided.", "Enable regex help")
                 }.layout(RowLayout.PARENT_GRID)
                 row("Example: ") {
                     cell(example).align(Align.FILL)
@@ -267,8 +263,8 @@ class OpenGitmojiDialogPanel {
             }
         }
 
-        fun load(): GitmojiPattern {
-            return GitmojiPattern(pattern.text, enable.isSelected)
+        fun load(): OpenEmojiPattern {
+            return OpenEmojiPattern(pattern.text, enable.isSelected)
         }
 
         override fun doValidate(): ValidationInfo? {
@@ -276,24 +272,6 @@ class OpenGitmojiDialogPanel {
                 return ValidationInfo("Pattern is required")
             }
             return super.doValidate()
-        }
-
-    }
-
-    private class CustomEmojiBrowseFolderListener internal constructor(title: @DialogTitle String?,
-                                                                       description: @NlsContexts.Label String?,
-                                                                       textField: TextFieldWithBrowseButton?,
-                                                                       project: Project?,
-                                                                       fileChooserDescriptor: FileChooserDescriptor?)
-        : BrowseFolderActionListener<JTextField?>(title, description, textField, project, fileChooserDescriptor, TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT) {
-
-        override fun getInitialFile(): VirtualFile? {
-            return super.getInitialFile()
-        }
-
-        override fun actionPerformed(e: ActionEvent?) {
-            println("123")
-            super.actionPerformed(e)
         }
 
     }

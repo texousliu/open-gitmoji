@@ -2,13 +2,16 @@
 
 ## Features
 - [x] Keywords emoji tips and input（Emoji 提示及插入）.
-- [x] Language config（语言配置）.
+- [x] ~~Language config（语言配置）.~~
 - [x] custom prompt typography（自定义提示排版）.
+  - 配置路径：File | Settings | Open Gitmoji Settings | Prompt List
 - [x] start with `:`（`:`开头才提示配置）
-- [x] suffix text supported（添加结束文本）
+  - 配置路径：File | Settings | Open Gitmoji Settings | Custom
+- [x] ~~suffix text supported（添加结束文本）~~
 - [X] 选项列表配置列表，
-  - 通过配置来添加选项展示（没有配置时默认有一个 gitmoji-unicode + description-cn）
-  - 添加多个则一个 gitmoji 展示多行
+  - 配置路径：File | Settings | Open Gitmoji Settings | Prompt List
+  - 通过配置来添加选项展示（必须配置，没有配置时没有提示）
+  - 添加多个则一个 emoji 根据规则展示多行
   - 添加占位符支持
     - gitmoji（#{G）
     - gitmoji-unicode（#{GU）
@@ -17,13 +20,14 @@
     - date（已有）（#{DATE}）
     - time（已有）（#{TIME}）
 - [X] 自定义 gitmoji 支持
+  - 配置路径：File | Settings | Open Gitmoji Settings | Custom
 
 ## 使用演示
 
-### 非`:`形式
+### 非`:`形式（Old）
 ![非`:`形式](doc/images/Open%20Emoji%20Finish.gif)
 
-### `:`形式
+### `:`形式（Old）
 ![`:`形式](doc/images/Open%20Emoji%20Colon%20Finish.gif)
 
 
