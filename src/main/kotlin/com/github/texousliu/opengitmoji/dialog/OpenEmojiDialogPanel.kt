@@ -77,9 +77,6 @@ class OpenEmojiDialogPanel {
                             .horizontalAlign(HorizontalAlign.FILL)
                 }.layout(RowLayout.PARENT_GRID).resizableRow()
             }
-
-            separator()
-
         }
     }
 
