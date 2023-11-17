@@ -1,11 +1,11 @@
 package com.github.texousliu.opengitmoji.contributor
 
-import com.github.texousliu.opengitmoji.context.OpenGitmojiContext
+import com.github.texousliu.opengitmoji.context.OpenEmojiContext
 import com.intellij.codeInsight.completion.InsertHandler
 import com.intellij.codeInsight.completion.InsertionContext
 import com.intellij.codeInsight.lookup.LookupElement
 
-class OpenGitmojiInsertHandler : InsertHandler<LookupElement> {
+class OpenEmojiInsertHandler : InsertHandler<LookupElement> {
 
     override fun handleInsert(context: InsertionContext, item: LookupElement) {
         val text = replace(context.document.text, item.lookupString)
@@ -21,7 +21,7 @@ class OpenGitmojiInsertHandler : InsertHandler<LookupElement> {
         } else if (s.contains(rtz)) {
             s = s.replace(rtz, replaceText)
         }
-        return s.replace(OpenGitmojiContext.REPLACE_SUFFIX_MARK, "")
+        return s.replace(OpenEmojiContext.REPLACE_SUFFIX_MARK, "")
     }
 
 }

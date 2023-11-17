@@ -1,11 +1,11 @@
 package com.github.texousliu.opengitmoji.dialog
 
-import com.github.texousliu.opengitmoji.model.GitmojiPattern
-import com.github.texousliu.opengitmoji.utils.OpenGitmojiUtils.demo
+import com.github.texousliu.opengitmoji.model.OpenEmojiPattern
+import com.github.texousliu.opengitmoji.utils.OpenEmojiUtils.demo
 import com.intellij.util.ui.ItemRemovable
 import javax.swing.table.AbstractTableModel
 
-class PatternsTableModel(private var gitmojiPatterns: MutableList<GitmojiPattern>) : AbstractTableModel(), ItemRemovable {
+class OpenEmojiPatternsTableModel(private var openEmojiPatterns: MutableList<OpenEmojiPattern>) : AbstractTableModel(), ItemRemovable {
 
     private val ourColumnNames = arrayOf(
             "Pattern",
@@ -28,7 +28,7 @@ class PatternsTableModel(private var gitmojiPatterns: MutableList<GitmojiPattern
     }
 
     override fun getRowCount(): Int {
-        return gitmojiPatterns.size
+        return openEmojiPatterns.size
     }
 
     override fun isCellEditable(rowIndex: Int, columnIndex: Int): Boolean {
@@ -36,14 +36,14 @@ class PatternsTableModel(private var gitmojiPatterns: MutableList<GitmojiPattern
     }
 
     override fun getValueAt(row: Int, column: Int): Any {
-        val pattern = gitmojiPatterns[row]
+        val pattern = openEmojiPatterns[row]
         return when (column) {
             0 -> {
-                pattern.regex
+                pattern.pattern
             }
 
             1 -> {
-                demo(pattern.regex)
+                demo(pattern.pattern)
             }
 
             2 -> {
@@ -57,10 +57,10 @@ class PatternsTableModel(private var gitmojiPatterns: MutableList<GitmojiPattern
     }
 
     override fun setValueAt(value: Any?, row: Int, column: Int) {
-        val pattern = gitmojiPatterns[row]
+        val pattern = openEmojiPatterns[row]
         when (column) {
             0 -> {
-                pattern.regex = (value as String?)!!
+                pattern.pattern = (value as String?)!!
             }
 
             1 -> {}
@@ -75,7 +75,7 @@ class PatternsTableModel(private var gitmojiPatterns: MutableList<GitmojiPattern
     }
 
     override fun removeRow(index: Int) {
-        gitmojiPatterns.removeAt(index)
+        openEmojiPatterns.removeAt(index)
         fireTableRowsDeleted(index, index)
     }
 
