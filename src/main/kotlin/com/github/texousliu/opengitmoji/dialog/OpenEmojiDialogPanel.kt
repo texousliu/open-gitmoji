@@ -3,28 +3,20 @@ package com.github.texousliu.opengitmoji.dialog
 import com.github.texousliu.opengitmoji.context.OpenEmojiContext
 import com.github.texousliu.opengitmoji.model.OpenEmojiPattern
 import com.github.texousliu.opengitmoji.utils.OpenEmojiUtils
-import com.intellij.openapi.fileChooser.FileChooserDescriptor
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
-import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.*
-import com.intellij.openapi.ui.ComponentWithBrowseButton.BrowseFolderActionListener
-import com.intellij.openapi.util.NlsContexts
-import com.intellij.openapi.util.NlsContexts.DialogTitle
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.*
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBTextField
-import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.gridLayout.HorizontalAlign
 import com.intellij.ui.scale.JBUIScale.scale
 import com.intellij.ui.table.JBTable
 import java.awt.Dimension
-import java.awt.event.ActionEvent
 import java.awt.event.MouseEvent
 import javax.swing.JComponent
-import javax.swing.JTextField
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.table.TableCellEditor
@@ -63,7 +55,7 @@ class OpenEmojiDialogPanel {
                             }
                 }.rowComment("Optimize input habits and reduce trouble caused by unnecessary prompts")
                 row("Custom Emoji Folder:") {
-                    cell(chooseComponent).resizableColumn().align(Align.FILL)
+                    cell(chooseComponent).resizableColumn().horizontalAlign(HorizontalAlign.FILL)
                             .onReset {
                                 chooseComponent.text = OpenEmojiContext.getCustomEmojiFolder()
                             }
@@ -82,7 +74,7 @@ class OpenEmojiDialogPanel {
                                 }
                                 jbTableModel.fireTableDataChanged()
                             }.resizableColumn()
-                            .align(Align.FILL)
+                            .horizontalAlign(HorizontalAlign.FILL)
                 }.layout(RowLayout.PARENT_GRID).resizableRow()
             }
 
@@ -246,7 +238,7 @@ class OpenEmojiDialogPanel {
                     contextHelp("Configure whether the regular expression takes effect. Some expressions do not need to take effect in real time, so this configuration item is provided.", "Enable pattern help")
                 }
                 row("Pattern: ") {
-                    cell(pattern).align(Align.FILL)
+                    cell(pattern).horizontalAlign(HorizontalAlign.FILL)
                             .comment("""
                             The system provides the following placeholders by default:<br>
                             #{G}: Fill in gitmoji <br>
@@ -258,7 +250,7 @@ class OpenEmojiDialogPanel {
                         """.trimIndent(), 50)
                 }.layout(RowLayout.PARENT_GRID)
                 row("Example: ") {
-                    cell(example).align(Align.FILL)
+                    cell(example).horizontalAlign(HorizontalAlign.FILL)
                 }.layout(RowLayout.PARENT_GRID)
             }
         }
