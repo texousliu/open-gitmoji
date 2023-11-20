@@ -9,7 +9,7 @@ class OpenEmojiPatternsTableModel(private var openEmojiPatterns: MutableList<Ope
 
     private val ourColumnNames = arrayOf(
             "Pattern",
-            "Demo",
+            "Example",
             "Enable"
     )
     private val ourColumnClasses = arrayOf<Class<*>>(String::class.java, String::class.java, Boolean::class.java)
