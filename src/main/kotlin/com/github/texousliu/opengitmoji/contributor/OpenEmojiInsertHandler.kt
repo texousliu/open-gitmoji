@@ -1,6 +1,6 @@
 package com.github.texousliu.opengitmoji.contributor
 
-import com.github.texousliu.opengitmoji.context.OpenEmojiContext
+import com.github.texousliu.opengitmoji.utils.OpenEmojiUtils
 import com.intellij.codeInsight.completion.InsertHandler
 import com.intellij.codeInsight.completion.InsertionContext
 import com.intellij.codeInsight.lookup.LookupElement
@@ -21,7 +21,7 @@ class OpenEmojiInsertHandler : InsertHandler<LookupElement> {
         } else if (s.contains(rtz)) {
             s = s.replace(rtz, replaceText)
         }
-        return s.replace(OpenEmojiContext.REPLACE_SUFFIX_MARK, "")
+        return s.replace(OpenEmojiUtils.REPLACE_SUFFIX_MARK, "")
     }
 
 }

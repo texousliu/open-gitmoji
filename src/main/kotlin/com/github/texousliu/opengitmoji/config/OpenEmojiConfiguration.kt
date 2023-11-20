@@ -1,8 +1,8 @@
 package com.github.texousliu.opengitmoji.config
 
 import com.github.texousliu.opengitmoji.context.OpenEmojiContext
-import com.github.texousliu.opengitmoji.context.OpenEmojiCustomContext
 import com.github.texousliu.opengitmoji.dialog.OpenEmojiDialogPanel
+import com.github.texousliu.opengitmoji.persistence.OpenEmojiPersistent
 import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.ui.DialogPanel
 import javax.swing.JComponent
@@ -11,50 +11,55 @@ import javax.swing.JComponent
 class OpenEmojiConfiguration : SearchableConfigurable {
 
     private val panel = OpenEmojiDialogPanel()
-    private val gmSettingsPanel: DialogPanel = panel.dialogPanel
+    private val emojiSettingsPanel: DialogPanel = panel.emojiSettingsPanel
 
-    private fun tableModified(): Boolean {
-        val config = OpenEmojiContext.getEmojiPatterns()
-        if (config.size != panel.openEmojiPatterns.size) return true
-        for ((index, emojiPattern) in panel.openEmojiPatterns.withIndex()) {
+    private fun emojiPatternsModified(): Boolean {
+        val config = OpenEmojiPersistent.getInstance().getOpenEmojiPatterns()
+        if (config.size != panel.emojiPatterns.size) return true
+        for ((index, emojiPattern) in panel.emojiPatterns.withIndex()) {
             if (config[index] != emojiPattern) return true
             if (config[index].enable != emojiPattern.enable) return true
         }
         return false
     }
 
-    private fun customEmojiFolderModified(): Boolean {
-        return panel.customFolderTextField.text != OpenEmojiContext.getCustomEmojiFolder()
+    private fun customEmojiDirectoryModified(): Boolean {
+        return panel.customEmojiDirectoryTextField.text != OpenEmojiPersistent.getInstance().getCustomEmojiDirectory()
     }
 
     private fun triggerWithColonModified(): Boolean {
-        return OpenEmojiContext.getTriggerWithColon() != panel.triggerWithColonCheckBox.isSelected
+        return panel.triggerWithColonCheckBox.isSelected != OpenEmojiPersistent.getInstance().getTriggerWithColon()
     }
 
-    override fun isModified(): Boolean = tableModified()
-            || triggerWithColonModified()
-            || customEmojiFolderModified()
+    override fun disposeUIResources() {
+        panel.disposeUIResources()
+    }
+
+    override fun isModified(): Boolean =
+        triggerWithColonModified() || customEmojiDirectoryModified() || emojiPatternsModified()
 
 
-    override fun getDisplayName(): String = "Open Gitmoji Settings"
+    override fun getDisplayName(): String = "Open Emoji Settings"
 
-    override fun getId(): String = "open.texousliu.config.settings.gm.OpenGitmojiSettings"
+    override fun getId(): String = "com.github.texousliu.emoji.settings.OpenEmojiSettings"
 
     override fun apply() {
-        val customFolderChange = customEmojiFolderModified()
-        OpenEmojiContext.apply(panel.openEmojiPatterns,
-                panel.triggerWithColonCheckBox.isSelected, panel.customFolderTextField.text)
-        if (customFolderChange) {
-            // 重载自定义 emoji
-            OpenEmojiCustomContext.loadCustomEmojis()
+        if (customEmojiDirectoryModified()) {
+            OpenEmojiPersistent.getInstance().setCustomEmojiDirectory(panel.customEmojiDirectoryTextField.text)
+            OpenEmojiContext.loadCustomEmojis()
+        }
+        if (triggerWithColonModified()) {
+            OpenEmojiPersistent.getInstance().setTriggerWithColon(panel.triggerWithColonCheckBox.isSelected)
+        }
+        if (emojiPatternsModified()) {
+            OpenEmojiPersistent.getInstance().setOpenEmojiPatterns(panel.emojiPatterns)
         }
     }
 
     override fun reset() {
-        OpenEmojiContext.reset()
-        gmSettingsPanel.reset()
+        emojiSettingsPanel.reset()
     }
 
-    override fun createComponent(): JComponent = gmSettingsPanel
+    override fun createComponent(): JComponent = emojiSettingsPanel
 
 }

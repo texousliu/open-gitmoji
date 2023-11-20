@@ -1,19 +1,19 @@
 package com.github.texousliu.opengitmoji.model
 
-import com.github.texousliu.opengitmoji.context.OpenEmojiContext
+import com.github.texousliu.opengitmoji.persistence.OpenEmojiPersistent
 import com.google.gson.annotations.SerializedName
 import com.intellij.openapi.util.IconLoader
 import javax.swing.Icon
 import javax.swing.ImageIcon
 
 class OpenEmoji(
-        val emoji: String,
-        val entity: String,
-        val code: String,
-        val name: String,
-        val description: String,
-        @SerializedName("cn_description")
-        val cnDescription: String
+    val emoji: String,
+    val entity: String,
+    val code: String,
+    val name: String,
+    val description: String,
+    @SerializedName("cn_description")
+    val cnDescription: String
 ) {
 
     private var isCustom = false
@@ -33,7 +33,11 @@ class OpenEmoji(
 
     private fun getCustomIcon(): Icon {
         try {
-            return ImageIcon(OpenEmojiContext.getCustomEmojiFolder() + "/icons/${code.replace(":".toRegex(), "")}.png")
+            return ImageIcon(
+                "${
+                    OpenEmojiPersistent.getInstance().getCustomEmojiDirectory()
+                }/icons/${code.replace(":".toRegex(), "")}.png"
+            )
         } catch (e: Exception) {
             TODO("Not yet implemented")
         }
