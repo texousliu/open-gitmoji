@@ -1,8 +1,8 @@
-package com.github.texousliu.opengitmoji.utils
+package com.github.texousliu.open.emoji.utils
 
-import com.github.texousliu.opengitmoji.context.OpenEmojiContext
-import com.github.texousliu.opengitmoji.model.OpenEmoji
-import com.github.texousliu.opengitmoji.model.OpenEmojiPattern
+import com.github.texousliu.open.emoji.context.OpenEmojiContext
+import com.github.texousliu.open.emoji.model.OpenEmoji
+import com.github.texousliu.open.emoji.model.OpenEmojiPattern
 import com.google.gson.reflect.TypeToken
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -26,9 +26,11 @@ object OpenEmojiUtils {
     }
 
     fun replace(pattern: String, emoji: OpenEmoji): String {
-        val params = mapOf(G to emoji.emoji, GU to emoji.code,
-                DESC to emoji.description, DESC_CN to emoji.cnDescription,
-                DATE to date(), TIME to time())
+        val params = mapOf(
+            G to emoji.emoji, GU to emoji.code,
+            DESC to emoji.description, DESC_CN to emoji.cnDescription,
+            DATE to date(), TIME to time()
+        )
         return replace(pattern, params)
     }
 

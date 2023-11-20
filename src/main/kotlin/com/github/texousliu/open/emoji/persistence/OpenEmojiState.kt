@@ -1,6 +1,6 @@
-package com.github.texousliu.opengitmoji.persistence
+package com.github.texousliu.open.emoji.persistence
 
-import com.github.texousliu.opengitmoji.model.OpenEmojiPattern
+import com.github.texousliu.open.emoji.model.OpenEmojiPattern
 import com.intellij.util.xmlb.annotations.OptionTag
 
 /**

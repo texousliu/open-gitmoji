@@ -1,6 +1,6 @@
-package com.github.texousliu.opengitmoji.model
+package com.github.texousliu.open.emoji.model
 
-import com.github.texousliu.opengitmoji.persistence.OpenEmojiPersistent
+import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
 import com.google.gson.annotations.SerializedName
 import com.intellij.openapi.util.IconLoader
 import javax.swing.Icon

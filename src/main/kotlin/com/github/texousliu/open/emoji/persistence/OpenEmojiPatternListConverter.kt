@@ -1,7 +1,7 @@
-package com.github.texousliu.opengitmoji.persistence
+package com.github.texousliu.open.emoji.persistence
 
-import com.github.texousliu.opengitmoji.model.OpenEmojiPattern
-import com.github.texousliu.opengitmoji.utils.OpenEmojiUtils
+import com.github.texousliu.open.emoji.model.OpenEmojiPattern
+import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
 import com.google.gson.Gson
 import com.intellij.util.xmlb.Converter
 

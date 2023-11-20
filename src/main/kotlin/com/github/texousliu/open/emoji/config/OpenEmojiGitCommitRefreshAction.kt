@@ -1,6 +1,6 @@
-package com.github.texousliu.opengitmoji.config
+package com.github.texousliu.open.emoji.config
 
-import com.github.texousliu.opengitmoji.context.OpenEmojiContext
+import com.github.texousliu.open.emoji.context.OpenEmojiContext
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 

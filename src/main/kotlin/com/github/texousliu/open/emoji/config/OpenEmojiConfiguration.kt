@@ -1,8 +1,8 @@
-package com.github.texousliu.opengitmoji.config
+package com.github.texousliu.open.emoji.config
 
-import com.github.texousliu.opengitmoji.context.OpenEmojiContext
-import com.github.texousliu.opengitmoji.dialog.OpenEmojiDialogPanel
-import com.github.texousliu.opengitmoji.persistence.OpenEmojiPersistent
+import com.github.texousliu.open.emoji.context.OpenEmojiContext
+import com.github.texousliu.open.emoji.dialog.OpenEmojiDialogPanel
+import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
 import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.ui.DialogPanel
 import javax.swing.JComponent
@@ -38,8 +38,7 @@ class OpenEmojiConfiguration : SearchableConfigurable {
     override fun isModified(): Boolean =
         triggerWithColonModified() || customEmojiDirectoryModified() || emojiPatternsModified()
 
-
-    override fun getDisplayName(): String = "Open Emoji Settings"
+    override fun getDisplayName(): String = "Open Gitmoji Settings"
 
     override fun getId(): String = "com.github.texousliu.emoji.settings.OpenEmojiSettings"
 

@@ -1,10 +1,10 @@
-package com.github.texousliu.opengitmoji.contributor
+package com.github.texousliu.open.emoji.contributor
 
-import com.github.texousliu.opengitmoji.context.OpenEmojiContext
-import com.github.texousliu.opengitmoji.model.OpenEmoji
-import com.github.texousliu.opengitmoji.model.OpenEmojiPattern
-import com.github.texousliu.opengitmoji.persistence.OpenEmojiPersistent
-import com.github.texousliu.opengitmoji.utils.OpenEmojiUtils
+import com.github.texousliu.open.emoji.context.OpenEmojiContext
+import com.github.texousliu.open.emoji.model.OpenEmoji
+import com.github.texousliu.open.emoji.model.OpenEmojiPattern
+import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
+import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElementBuilder
 import com.intellij.patterns.PlatformPatterns

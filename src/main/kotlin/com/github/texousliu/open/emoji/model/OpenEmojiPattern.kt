@@ -1,4 +1,4 @@
-package com.github.texousliu.opengitmoji.model
+package com.github.texousliu.open.emoji.model
 
 class OpenEmojiPattern(var pattern: String = "", var enable: Boolean = true) : Cloneable {
 

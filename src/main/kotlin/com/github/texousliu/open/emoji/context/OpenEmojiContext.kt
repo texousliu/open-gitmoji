@@ -1,9 +1,9 @@
-package com.github.texousliu.opengitmoji.context
+package com.github.texousliu.open.emoji.context
 
-import com.github.texousliu.opengitmoji.model.OpenEmoji
-import com.github.texousliu.opengitmoji.model.OpenEmojiList
-import com.github.texousliu.opengitmoji.persistence.OpenEmojiPersistent
-import com.github.texousliu.opengitmoji.utils.OpenEmojiUtils
+import com.github.texousliu.open.emoji.model.OpenEmoji
+import com.github.texousliu.open.emoji.model.OpenEmojiList
+import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
+import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
 import com.google.gson.Gson
 import java.io.File
 

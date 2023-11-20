@@ -1,6 +1,6 @@
-package com.github.texousliu.opengitmoji.contributor
+package com.github.texousliu.open.emoji.contributor
 
-import com.github.texousliu.opengitmoji.utils.OpenEmojiUtils
+import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
 import com.intellij.codeInsight.completion.InsertHandler
 import com.intellij.codeInsight.completion.InsertionContext
 import com.intellij.codeInsight.lookup.LookupElement

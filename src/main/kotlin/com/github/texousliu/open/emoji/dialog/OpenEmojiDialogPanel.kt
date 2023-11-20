@@ -1,8 +1,8 @@
-package com.github.texousliu.opengitmoji.dialog
+package com.github.texousliu.open.emoji.dialog
 
-import com.github.texousliu.opengitmoji.model.OpenEmojiPattern
-import com.github.texousliu.opengitmoji.persistence.OpenEmojiPersistent
-import com.github.texousliu.opengitmoji.utils.OpenEmojiUtils
+import com.github.texousliu.open.emoji.model.OpenEmojiPattern
+import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
+import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.ui.*
 import com.intellij.ui.*
