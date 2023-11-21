@@ -44,10 +44,6 @@ class OpenEmojiDialogPanel {
         configureStartDirectoryField()
     }
 
-    fun disposeUIResources() {
-        emojiPatternsTableModel.removeTableModelListener(emojiPatternsTable)
-    }
-
     private fun emojiSettingsDialogPanel(): DialogPanel {
         return panel {
             group("Custom") {

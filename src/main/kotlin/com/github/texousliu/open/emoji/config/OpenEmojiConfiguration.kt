@@ -31,10 +31,6 @@ class OpenEmojiConfiguration : SearchableConfigurable {
         return panel.triggerWithColonCheckBox.isSelected != OpenEmojiPersistent.getInstance().getTriggerWithColon()
     }
 
-    override fun disposeUIResources() {
-        panel.disposeUIResources()
-    }
-
     override fun isModified(): Boolean =
         triggerWithColonModified() || customEmojiDirectoryModified() || emojiPatternsModified()
 

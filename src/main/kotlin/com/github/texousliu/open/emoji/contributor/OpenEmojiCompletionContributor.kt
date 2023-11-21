@@ -36,9 +36,9 @@ class OpenEmojiCompletionContributor : CompletionContributor() {
                         if (!doc.contains(":$str") && !doc.contains("：$str")) return
                     }
 
-                    val emojiPatterns = OpenEmojiPersistent.getInstance().getOpenEmojiPatterns()
+                    var emojiPatterns = OpenEmojiPersistent.getInstance().getOpenEmojiPatterns()
                     if (emojiPatterns.isEmpty()) {
-                        emojiPatterns.add(OpenEmojiPersistent.getInstance().getDefaultOpenEmojiPattern())
+                        emojiPatterns = mutableListOf(OpenEmojiPersistent.getInstance().getDefaultOpenEmojiPattern())
                     }
                     // 预置 git emoji
                     OpenEmojiContext.emojis().forEach { emoji -> emojiToPrompt(emoji, result, emojiPatterns) }
