@@ -56,7 +56,7 @@ class OpenEmojiDialogPanel {
                             }
                 }.rowComment("Optimize input habits and reduce trouble caused by unnecessary prompts")
                 row("Custom Emoji Folder:") {
-                    cell(customEmojiDirectoryComponent).resizableColumn().align(Align.FILL)
+                    cell(customEmojiDirectoryComponent).resizableColumn().horizontalAlign(HorizontalAlign.FILL)
                             .onReset {
                                 customEmojiDirectoryComponent.text =
                                         OpenEmojiPersistent.getInstance().getCustomEmojiDirectory()
