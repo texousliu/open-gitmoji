@@ -1,8 +1,8 @@
-package com.github.texousliu.opengitmoji.dialog
+package com.github.texousliu.open.emoji.dialog
 
-import com.github.texousliu.opengitmoji.context.OpenEmojiContext
-import com.github.texousliu.opengitmoji.model.OpenEmojiPattern
-import com.github.texousliu.opengitmoji.utils.OpenEmojiUtils
+import com.github.texousliu.open.emoji.model.OpenEmojiPattern
+import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
+import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.ui.*
 import com.intellij.ui.*
@@ -25,39 +25,41 @@ import javax.swing.table.TableCellEditor
 class OpenEmojiDialogPanel {
 
     val triggerWithColonCheckBox = JBCheckBox("Get prompt through text starting with ':' or '：'. Such as ':s'")
-    val openEmojiPatterns = mutableListOf<OpenEmojiPattern>()
-    val customFolderTextField = JBTextField()
-    private val jbTableModel = OpenEmojiPatternsTableModel(openEmojiPatterns)
-    private val jbTable = JBTable(jbTableModel)
-    private val chooseComponent = TextFieldWithBrowseButton(customFolderTextField)
+    val emojiPatterns = mutableListOf<OpenEmojiPattern>()
+    val customEmojiDirectoryTextField = JBTextField()
+    private val emojiPatternsTableModel = OpenEmojiPatternsTableModel(emojiPatterns)
+    private val emojiPatternsTable = JBTable(emojiPatternsTableModel)
+    private val customEmojiDirectoryComponent = TextFieldWithBrowseButton(customEmojiDirectoryTextField)
 
-    val dialogPanel = openGitmojiDialogPanel()
+    val emojiSettingsPanel = emojiSettingsDialogPanel()
 
     init {
-        jbTable.setShowGrid(false)
+        emojiPatternsTable.setShowGrid(false)
         object : DoubleClickListener() {
             override fun onDoubleClick(event: MouseEvent): Boolean {
                 editSelectedPattern()
                 return true
             }
-        }.installOn(jbTable)
+        }.installOn(emojiPatternsTable)
         configureStartDirectoryField()
     }
 
-    private fun openGitmojiDialogPanel(): DialogPanel {
+    private fun emojiSettingsDialogPanel(): DialogPanel {
         return panel {
             group("Custom") {
                 row {
                     cell(triggerWithColonCheckBox)
                             .gap(RightGap.SMALL)
                             .onReset {
-                                triggerWithColonCheckBox.isSelected = OpenEmojiContext.getTriggerWithColon()
+                                triggerWithColonCheckBox.isSelected =
+                                        OpenEmojiPersistent.getInstance().getTriggerWithColon()
                             }
                 }.rowComment("Optimize input habits and reduce trouble caused by unnecessary prompts")
                 row("Custom Emoji Folder:") {
-                    cell(chooseComponent).resizableColumn().horizontalAlign(HorizontalAlign.FILL)
+                    cell(customEmojiDirectoryComponent).resizableColumn().align(Align.FILL)
                             .onReset {
-                                chooseComponent.text = OpenEmojiContext.getCustomEmojiFolder()
+                                customEmojiDirectoryComponent.text =
+                                        OpenEmojiPersistent.getInstance().getCustomEmojiDirectory()
                             }
                 }.rowComment("Configure your own emojis beyond additional system presets. <a href='https://github.com/texousliu/open-gitmoji'>Documents</a>")
             }
@@ -68,11 +70,11 @@ class OpenEmojiDialogPanel {
                     cell(createPromptListTable())
                             .gap(RightGap.SMALL)
                             .onReset {
-                                openEmojiPatterns.clear()
-                                OpenEmojiContext.getEmojiPatterns().forEach {
-                                    openEmojiPatterns.add(it.clone())
+                                emojiPatterns.clear()
+                                OpenEmojiPersistent.getInstance().getOpenEmojiPatterns().forEach {
+                                    emojiPatterns.add(it.clone())
                                 }
-                                jbTableModel.fireTableDataChanged()
+                                emojiPatternsTableModel.fireTableDataChanged()
                             }.resizableColumn()
                             .horizontalAlign(HorizontalAlign.FILL)
                 }.layout(RowLayout.PARENT_GRID).resizableRow()
@@ -81,7 +83,7 @@ class OpenEmojiDialogPanel {
     }
 
     private fun configureStartDirectoryField() {
-        chooseComponent.addBrowseFolderListener(
+        customEmojiDirectoryComponent.addBrowseFolderListener(
                 "Choose Custom Emoji Folder",
                 "Choose custom emoji folder",
                 null,
@@ -91,19 +93,23 @@ class OpenEmojiDialogPanel {
     }
 
     private fun createPromptListTable(): JComponent {
-        val patternColumn = jbTable.columnModel.getColumn(0)
+        val tableHeader = emojiPatternsTable.tableHeader
+        val headerFontMetrics = tableHeader.getFontMetrics(tableHeader.font)
+
+        val patternColumn = emojiPatternsTable.columnModel.getColumn(0)
         patternColumn.preferredWidth = scale(150)
 
-        val exampleColumn = jbTable.columnModel.getColumn(1)
+        val exampleColumn = emojiPatternsTable.columnModel.getColumn(1)
         exampleColumn.preferredWidth = scale(250)
 
-        val enableColumn = jbTable.columnModel.getColumn(2)
-        enableColumn.maxWidth = scale(50)
+        val enableColumn = emojiPatternsTable.columnModel.getColumn(2)
+        val enableWidth = headerFontMetrics.stringWidth(emojiPatternsTable.getColumnName(2)) + scale(20)
+        enableColumn.maxWidth = scale(enableWidth)
         enableColumn.minWidth = enableColumn.maxWidth
         enableColumn.cellRenderer = BooleanTableCellRenderer()
         enableColumn.cellEditor = BooleanTableCellEditor()
 
-        val panel = ToolbarDecorator.createDecorator(jbTable)
+        val panel = ToolbarDecorator.createDecorator(emojiPatternsTable)
                 .setAddAction {
                     addPattern()
                 }.setEditAction {
@@ -126,39 +132,39 @@ class OpenEmojiDialogPanel {
         stopEditing()
         val addPatternDialog = PatternInfoDialogWrapper()
         if (addPatternDialog.showAndGet()) {
-            openEmojiPatterns.add(addPatternDialog.load())
+            emojiPatterns.add(addPatternDialog.load())
 
-            val index: Int = openEmojiPatterns.size - 1
-            jbTableModel.fireTableRowsInserted(index, index)
-            jbTable.selectionModel.setSelectionInterval(index, index)
-            jbTable.scrollRectToVisible(jbTable.getCellRect(index, 0, true))
+            val index: Int = emojiPatterns.size - 1
+            emojiPatternsTableModel.fireTableRowsInserted(index, index)
+            emojiPatternsTable.selectionModel.setSelectionInterval(index, index)
+            emojiPatternsTable.scrollRectToVisible(emojiPatternsTable.getCellRect(index, 0, true))
         }
     }
 
     private fun editSelectedPattern() {
         stopEditing()
-        val selectedIndex: Int = jbTable.selectedRow
-        if (selectedIndex < 0 || selectedIndex >= jbTableModel.rowCount) {
+        val selectedIndex: Int = emojiPatternsTable.selectedRow
+        if (selectedIndex < 0 || selectedIndex >= emojiPatternsTableModel.rowCount) {
             return
         }
         // 获取选择的内容
-        val selectPattern = openEmojiPatterns[selectedIndex]
+        val selectPattern = emojiPatterns[selectedIndex]
 
         val dialog = PatternInfoDialogWrapper(selectPattern.pattern, selectPattern.enable)
         dialog.title = "Edit Pattern"
         if (!dialog.showAndGet()) {
             return
         }
-        openEmojiPatterns[selectedIndex] = dialog.load()
-        jbTableModel.fireTableRowsUpdated(selectedIndex, selectedIndex)
-        jbTable.selectionModel.setSelectionInterval(selectedIndex, selectedIndex)
+        emojiPatterns[selectedIndex] = dialog.load()
+        emojiPatternsTableModel.fireTableRowsUpdated(selectedIndex, selectedIndex)
+        emojiPatternsTable.selectionModel.setSelectionInterval(selectedIndex, selectedIndex)
     }
 
     private fun removePattern() {
         stopEditing()
-        val selectedIndex: Int = jbTable.selectedRow
-        if (selectedIndex >= 0 && selectedIndex < jbTableModel.rowCount) {
-            TableUtil.removeSelectedItems(jbTable)
+        val selectedIndex: Int = emojiPatternsTable.selectedRow
+        if (selectedIndex >= 0 && selectedIndex < emojiPatternsTableModel.rowCount) {
+            TableUtil.removeSelectedItems(emojiPatternsTable)
         }
     }
 
@@ -172,21 +178,24 @@ class OpenEmojiDialogPanel {
 
     private fun movePattern(step: Int) {
         stopEditing()
-        val selectedIndex: Int = jbTable.selectedRow
+        val selectedIndex: Int = emojiPatternsTable.selectedRow
         val swap = selectedIndex + step
         // 获取选择的内容
-        val selectPattern = openEmojiPatterns[selectedIndex]
-        openEmojiPatterns[selectedIndex] = openEmojiPatterns[swap]
-        openEmojiPatterns[swap] = selectPattern
+        val selectPattern = emojiPatterns[selectedIndex]
+        emojiPatterns[selectedIndex] = emojiPatterns[swap]
+        emojiPatterns[swap] = selectPattern
 
-        jbTableModel.fireTableRowsUpdated(swap.coerceAtMost(selectedIndex), swap.coerceAtLeast(selectedIndex))
-        jbTable.selectionModel.setSelectionInterval(swap, swap)
+        emojiPatternsTableModel.fireTableRowsUpdated(
+                swap.coerceAtMost(selectedIndex),
+                swap.coerceAtLeast(selectedIndex)
+        )
+        emojiPatternsTable.selectionModel.setSelectionInterval(swap, swap)
     }
 
 
     private fun stopEditing() {
-        if (jbTable.isEditing) {
-            val editor: TableCellEditor = jbTable.cellEditor
+        if (emojiPatternsTable.isEditing) {
+            val editor: TableCellEditor = emojiPatternsTable.cellEditor
             editor.stopCellEditing()
         }
     }
@@ -232,19 +241,24 @@ class OpenEmojiDialogPanel {
                 row {
                     cell(enable)
                     // 添加帮助图标
-                    contextHelp("Configure whether the regular expression takes effect. Some expressions do not need to take effect in real time, so this configuration item is provided.", "Enable pattern help")
+                    contextHelp(
+                            "Configure whether the regular expression takes effect. Some expressions do not need to take effect in real time, so this configuration item is provided.",
+                            "Enable pattern help"
+                    )
                 }
                 row("Pattern: ") {
-                    cell(pattern).horizontalAlign(HorizontalAlign.FILL)
-                            .comment("""
+                    cell(pattern).horizontalAlign(HorizontalAlign.FILL).focused()
+                            .comment(
+                                    """
                             The system provides the following placeholders by default:<br>
-                            #{G}: Fill in gitmoji <br>
-                            #{GU}: Fill in gimoji unicode <br>
-                            #{DESC}: Fill in gitmoji description (English) <br>
-                            #{DESC_CN}: Fill in gitmoji description (Chinese) <br>
-                            #{DATE}: Fill in the current date <br>
-                            #{TIME}: fill in the current time
-                        """.trimIndent(), 50)
+                            #{G}: Replace with emoji <br>
+                            #{GU}: Replace with emoji unicode <br>
+                            #{DESC}: Replace with emoji description (English) <br>
+                            #{DESC_CN}: Replace with emoji description (Chinese) <br>
+                            #{DATE}: Replace with the current system date <br>
+                            #{TIME}: Replace with the current system time
+                        """.trimIndent(), 50
+                            )
                 }.layout(RowLayout.PARENT_GRID)
                 row("Example: ") {
                     cell(example).horizontalAlign(HorizontalAlign.FILL)

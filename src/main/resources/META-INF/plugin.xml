@@ -20,7 +20,7 @@
 
     <actions>
         <action id="OpenEmoji.GitCommitEmojiRefreshAction"
-                class="com.github.texousliu.opengitmoji.config.OpenEmojiGitCommitRefreshAction"
+                class="com.github.texousliu.open.emoji.config.OpenEmojiGitCommitRefreshAction"
                 text="Refresh Custom Emojis" icon="AllIcons.Actions.Refresh"
                 description="Refresh custom emojis">
 <!--            <keyboard-shortcut first-keystroke="ctrl alt g" keymap="$default" />-->
@@ -31,14 +31,14 @@
     <extensions defaultExtensionNs="com.intellij">
         <completion.contributor language="TEXT"
                                 order="first, before commitCompletion"
-                                implementationClass="com.github.texousliu.opengitmoji.contributor.OpenEmojiCompletionContributor"/>
+                                implementationClass="com.github.texousliu.open.emoji.contributor.OpenEmojiCompletionContributor"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
         <projectConfigurable displayName="Open Gitmoji Settings"
-                             instance="com.github.texousliu.opengitmoji.config.OpenEmojiConfiguration"
+                             instance="com.github.texousliu.open.emoji.config.OpenEmojiConfiguration"
                              groupId="other"
-                             id="open.texousliu.config.settings.gm.OpenGitmojiSettings"/>
+                             id="com.github.texousliu.emoji.settings.OpenEmojiSettings"/>
     </extensions>
 
 </idea-plugin>
