@@ -1,6 +1,6 @@
-package com.github.texousliu.opengitmoji.model
+package com.github.texousliu.open.emoji.model
 
-class OpenEmojiPattern(var pattern : String, var enable : Boolean) : Cloneable {
+class OpenEmojiPattern(var pattern: String = "", var enable: Boolean = true) : Cloneable {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

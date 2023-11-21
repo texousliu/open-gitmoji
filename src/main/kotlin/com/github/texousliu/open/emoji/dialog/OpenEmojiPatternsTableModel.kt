@@ -1,16 +1,17 @@
-package com.github.texousliu.opengitmoji.dialog
+package com.github.texousliu.open.emoji.dialog
 
-import com.github.texousliu.opengitmoji.model.OpenEmojiPattern
-import com.github.texousliu.opengitmoji.utils.OpenEmojiUtils.demo
+import com.github.texousliu.open.emoji.model.OpenEmojiPattern
+import com.github.texousliu.open.emoji.utils.OpenEmojiUtils.demo
 import com.intellij.util.ui.ItemRemovable
 import javax.swing.table.AbstractTableModel
 
-class OpenEmojiPatternsTableModel(private var openEmojiPatterns: MutableList<OpenEmojiPattern>) : AbstractTableModel(), ItemRemovable {
+class OpenEmojiPatternsTableModel(private var openEmojiPatterns: MutableList<OpenEmojiPattern>) : AbstractTableModel(),
+    ItemRemovable {
 
     private val ourColumnNames = arrayOf(
-            "Pattern",
-            "Demo",
-            "Enable"
+        "Pattern",
+        "Example",
+        "Enable"
     )
     private val ourColumnClasses = arrayOf<Class<*>>(String::class.java, String::class.java, Boolean::class.java)
 
