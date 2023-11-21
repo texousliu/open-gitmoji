@@ -49,18 +49,18 @@ class OpenEmojiDialogPanel {
             group("Custom") {
                 row {
                     cell(triggerWithColonCheckBox)
-                        .gap(RightGap.SMALL)
-                        .onReset {
-                            triggerWithColonCheckBox.isSelected =
-                                OpenEmojiPersistent.getInstance().getTriggerWithColon()
-                        }
+                            .gap(RightGap.SMALL)
+                            .onReset {
+                                triggerWithColonCheckBox.isSelected =
+                                        OpenEmojiPersistent.getInstance().getTriggerWithColon()
+                            }
                 }.rowComment("Optimize input habits and reduce trouble caused by unnecessary prompts")
                 row("Custom Emoji Folder:") {
                     cell(customEmojiDirectoryComponent).resizableColumn().align(Align.FILL)
-                        .onReset {
-                            customEmojiDirectoryComponent.text =
-                                OpenEmojiPersistent.getInstance().getCustomEmojiDirectory()
-                        }
+                            .onReset {
+                                customEmojiDirectoryComponent.text =
+                                        OpenEmojiPersistent.getInstance().getCustomEmojiDirectory()
+                            }
                 }.rowComment("Configure your own emojis beyond additional system presets. <a href='https://github.com/texousliu/open-gitmoji'>Documents</a>")
             }
 
@@ -68,15 +68,15 @@ class OpenEmojiDialogPanel {
                 row("Configure prompt item expression") { }
                 row {
                     cell(createPromptListTable())
-                        .gap(RightGap.SMALL)
-                        .onReset {
-                            emojiPatterns.clear()
-                            OpenEmojiPersistent.getInstance().getOpenEmojiPatterns().forEach {
-                                emojiPatterns.add(it.clone())
-                            }
-                            emojiPatternsTableModel.fireTableDataChanged()
-                        }.resizableColumn()
-                        .align(Align.FILL)
+                            .gap(RightGap.SMALL)
+                            .onReset {
+                                emojiPatterns.clear()
+                                OpenEmojiPersistent.getInstance().getOpenEmojiPatterns().forEach {
+                                    emojiPatterns.add(it.clone())
+                                }
+                                emojiPatternsTableModel.fireTableDataChanged()
+                            }.resizableColumn()
+                            .align(Align.FILL)
                 }.layout(RowLayout.PARENT_GRID).resizableRow()
             }
         }
@@ -84,15 +84,18 @@ class OpenEmojiDialogPanel {
 
     private fun configureStartDirectoryField() {
         customEmojiDirectoryComponent.addBrowseFolderListener(
-            "Choose Custom Emoji Folder",
-            "Choose custom emoji folder",
-            null,
-            FileChooserDescriptorFactory.createSingleFolderDescriptor(),
-            TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
+                "Choose Custom Emoji Folder",
+                "Choose custom emoji folder",
+                null,
+                FileChooserDescriptorFactory.createSingleFolderDescriptor(),
+                TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
         )
     }
 
     private fun createPromptListTable(): JComponent {
+        val tableHeader = emojiPatternsTable.tableHeader
+        val headerFontMetrics = tableHeader.getFontMetrics(tableHeader.font)
+
         val patternColumn = emojiPatternsTable.columnModel.getColumn(0)
         patternColumn.preferredWidth = scale(150)
 
@@ -100,26 +103,27 @@ class OpenEmojiDialogPanel {
         exampleColumn.preferredWidth = scale(250)
 
         val enableColumn = emojiPatternsTable.columnModel.getColumn(2)
-        enableColumn.maxWidth = scale(50)
+        val enableWidth = headerFontMetrics.stringWidth(emojiPatternsTable.getColumnName(2)) + scale(20)
+        enableColumn.maxWidth = scale(enableWidth)
         enableColumn.minWidth = enableColumn.maxWidth
         enableColumn.cellRenderer = BooleanTableCellRenderer()
         enableColumn.cellEditor = BooleanTableCellEditor()
 
         val panel = ToolbarDecorator.createDecorator(emojiPatternsTable)
-            .setAddAction {
-                addPattern()
-            }.setEditAction {
-                editSelectedPattern()
-            }
-            .setMoveUpAction {
-                moveUpPattern()
-            }
-            .setMoveDownAction {
-                moveDownPattern()
-            }
-            .setRemoveAction {
-                removePattern()
-            }.createPanel()
+                .setAddAction {
+                    addPattern()
+                }.setEditAction {
+                    editSelectedPattern()
+                }
+                .setMoveUpAction {
+                    moveUpPattern()
+                }
+                .setMoveDownAction {
+                    moveDownPattern()
+                }
+                .setRemoveAction {
+                    removePattern()
+                }.createPanel()
         panel.preferredSize = Dimension(0, 300)
         return panel
     }
@@ -182,8 +186,8 @@ class OpenEmojiDialogPanel {
         emojiPatterns[swap] = selectPattern
 
         emojiPatternsTableModel.fireTableRowsUpdated(
-            swap.coerceAtMost(selectedIndex),
-            swap.coerceAtLeast(selectedIndex)
+                swap.coerceAtMost(selectedIndex),
+                swap.coerceAtLeast(selectedIndex)
         )
         emojiPatternsTable.selectionModel.setSelectionInterval(swap, swap)
     }
@@ -238,14 +242,14 @@ class OpenEmojiDialogPanel {
                     cell(enable)
                     // 添加帮助图标
                     contextHelp(
-                        "Configure whether the regular expression takes effect. Some expressions do not need to take effect in real time, so this configuration item is provided.",
-                        "Enable pattern help"
+                            "Configure whether the regular expression takes effect. Some expressions do not need to take effect in real time, so this configuration item is provided.",
+                            "Enable pattern help"
                     )
                 }
                 row("Pattern: ") {
                     cell(pattern).align(Align.FILL).focused()
-                        .comment(
-                            """
+                            .comment(
+                                    """
                             The system provides the following placeholders by default:<br>
                             #{G}: Replace with emoji <br>
                             #{GU}: Replace with emoji unicode <br>
@@ -254,7 +258,7 @@ class OpenEmojiDialogPanel {
                             #{DATE}: Replace with the current system date <br>
                             #{TIME}: Replace with the current system time
                         """.trimIndent(), 50
-                        )
+                            )
                 }.layout(RowLayout.PARENT_GRID)
                 row("Example: ") {
                     cell(example).align(Align.FILL)
