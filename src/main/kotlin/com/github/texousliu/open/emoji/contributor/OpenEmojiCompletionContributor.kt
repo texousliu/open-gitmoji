@@ -59,7 +59,7 @@ class OpenEmojiCompletionContributor : CompletionContributor() {
                 LookupElementBuilder
                     .create(emoji, "${str}${OpenEmojiUtils.REPLACE_SUFFIX_MARK}")
                     .withPresentableText(str)
-//                    .withTailText(openEmoji.description)
+                    //.withTailText(emoji.description)
                     .withTypeText(emoji.description)
                     .withLookupStrings(
                         listOf(

@@ -12,10 +12,10 @@ object OpenEmojiUtils {
     const val EMOJI_FILE_NAME = "emojis.json"
     const val REPLACE_SUFFIX_MARK = "$$:$$"
 
-    const val G = "#{G}"
-    const val GU = "#{GU}"
-    const val DESC = "#{DESC}"
-    const val DESC_CN = "#{DESC_CN}"
+    private const val G = "#{G}"
+    private const val GU = "#{GU}"
+    private const val DESC = "#{DESC}"
+    private const val DESC_CN = "#{DESC_CN}"
     private const val DATE = "#{DATE}"
     private const val TIME = "#{TIME}"
 
