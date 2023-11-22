@@ -2,15 +2,19 @@ package com.github.texousliu.open.emoji.dialog
 
 import com.github.texousliu.open.emoji.context.OpenEmojiContext
 import com.github.texousliu.open.emoji.model.OpenEmojiInfo
+import com.github.texousliu.open.emoji.model.OpenEmojiInfoType
+import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.ui.DialogPanel
-import com.intellij.openapi.ui.DialogWrapper
-import com.intellij.openapi.ui.ValidationInfo
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
+import com.intellij.openapi.ui.*
 import com.intellij.ui.*
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
-import com.intellij.ui.dsl.builder.*
+import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.RightGap
+import com.intellij.ui.dsl.builder.RowLayout
+import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.scale.JBUIScale.scale
 import com.intellij.ui.table.JBTable
 import java.awt.Dimension
@@ -21,9 +25,15 @@ import javax.swing.table.TableCellEditor
 
 class OpenEmojiInfoDialogPanel {
 
-    val emojiInfos = mutableListOf<OpenEmojiInfo>()
-    private val emojiInfoTableModel = OpenEmojiInfoTableModel(emojiInfos)
+    private val headerGap = scale(20)
+
+    val emojiInfoList = mutableListOf<OpenEmojiInfo>()
+    private val emojiInfoTableModel = OpenEmojiInfoTableModel(emojiInfoList)
     private val emojiInfoTable = JBTable(emojiInfoTableModel)
+    private val refreshAction = JBLabel(AllIcons.Actions.Refresh)
+
+    val customEmojiDirectoryTextField = JBTextField()
+    private val customEmojiDirectoryComponent = TextFieldWithBrowseButton(customEmojiDirectoryTextField)
 
     val emojiInfoSettingsPanel = emojiInfoSettingsDialogPanel()
 
@@ -35,18 +45,39 @@ class OpenEmojiInfoDialogPanel {
                 return true
             }
         }.installOn(emojiInfoTable)
+
+        object : ClickListener() {
+            override fun onClick(event: MouseEvent, clickCount: Int): Boolean {
+                OpenEmojiPersistent.getInstance().refreshPersistent()
+                return true
+            }
+        }.installOn(refreshAction)
+
+        configureStartDirectoryField()
     }
 
     private fun emojiInfoSettingsDialogPanel(): DialogPanel {
         return panel {
-            row("List of all loaded emojis") { }
+            row("Custom Emoji Folder:") {
+                cell(customEmojiDirectoryComponent).resizableColumn().align(Align.FILL)
+                    .onChanged {
+                        customEmojiDirectoryChanged(it.text)
+                    }
+                    .onReset {
+                        customEmojiDirectoryComponent.text =
+                            OpenEmojiPersistent.getInstance().getCustomEmojiDirectory()
+                    }
+            }.rowComment("Configure your own emojis beyond additional system presets. <a href='https://github.com/texousliu/open-gitmoji'>Documents</a>")
+            row("List of all loaded emojis") {
+                cell(refreshAction)
+            }
             row {
                 cell(createEmojiConfigTable())
                     .gap(RightGap.SMALL)
                     .onReset {
-                        emojiInfos.clear()
-                        OpenEmojiContext.emojiInfos().forEach {
-                            emojiInfos.add(it.clone())
+                        emojiInfoList.clear()
+                        OpenEmojiPersistent.getInstance().getOpenEmojiInfoList().forEach {
+                            emojiInfoList.add(it.clone())
                         }
                         emojiInfoTableModel.fireTableDataChanged()
                     }.resizableColumn()
@@ -55,13 +86,31 @@ class OpenEmojiInfoDialogPanel {
         }
     }
 
+    private fun customEmojiDirectoryChanged(directory: String) {
+        stopEditing()
+        // 获取所有自定义 emoji
+        OpenEmojiContext.refreshEmojiInfoList(directory, emojiInfoList)
+        // 更新表格
+        emojiInfoTableModel.fireTableDataChanged()
+    }
+
+    private fun configureStartDirectoryField() {
+        customEmojiDirectoryComponent.addBrowseFolderListener(
+            "Choose Custom Emoji Folder",
+            "Choose custom emoji folder",
+            null,
+            FileChooserDescriptorFactory.createSingleFolderDescriptor(),
+            TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
+        )
+    }
+
     private fun createEmojiConfigTable(): JComponent {
         val tableHeader = emojiInfoTable.tableHeader
         val headerFontMetrics = tableHeader.getFontMetrics(tableHeader.font)
 
         val iconColumn = emojiInfoTable.columnModel.getColumn(0)
         val iconColumnWidth = headerFontMetrics.stringWidth(
-            emojiInfoTable.getColumnName(0) + scale(20)
+            emojiInfoTable.getColumnName(0) + headerGap
         )
         iconColumn.preferredWidth = iconColumnWidth
         iconColumn.minWidth = iconColumnWidth
@@ -73,8 +122,12 @@ class OpenEmojiInfoDialogPanel {
         val descriptionColumn = emojiInfoTable.columnModel.getColumn(2)
         descriptionColumn.preferredWidth = descriptionColumn.maxWidth
 
-        val enableColumn = emojiInfoTable.columnModel.getColumn(3)
-        val enableWidth = headerFontMetrics.stringWidth(emojiInfoTable.getColumnName(3)) + scale(20)
+        val typeColumn = emojiInfoTable.columnModel.getColumn(3)
+        typeColumn.minWidth = headerFontMetrics.stringWidth(OpenEmojiInfoType.OVERRIDE.name) + headerGap
+        typeColumn.cellRenderer = OpenEmojiInfoTypeTableCellRenderer()
+
+        val enableColumn = emojiInfoTable.columnModel.getColumn(4)
+        val enableWidth = headerFontMetrics.stringWidth(emojiInfoTable.getColumnName(4)) + headerGap
         enableColumn.maxWidth = scale(enableWidth)
         enableColumn.minWidth = enableColumn.maxWidth
         enableColumn.cellRenderer = BooleanTableCellRenderer()
@@ -99,9 +152,9 @@ class OpenEmojiInfoDialogPanel {
         stopEditing()
         val addEmojiDialog = EmojiConfigInfoDialogWrapper()
         if (addEmojiDialog.showAndGet()) {
-            emojiInfos.add(addEmojiDialog.load())
+            emojiInfoList.add(addEmojiDialog.load())
 
-            val index: Int = emojiInfos.size - 1
+            val index: Int = emojiInfoList.size - 1
             emojiInfoTableModel.fireTableRowsInserted(index, index)
             emojiInfoTable.selectionModel.setSelectionInterval(index, index)
             emojiInfoTable.scrollRectToVisible(emojiInfoTable.getCellRect(index, 0, true))
@@ -115,14 +168,14 @@ class OpenEmojiInfoDialogPanel {
             return
         }
         // 获取选择的内容
-        val selectConfig = emojiInfos[selectedIndex]
+        val selectConfig = emojiInfoList[selectedIndex]
 
         val dialog = EmojiConfigInfoDialogWrapper(selectConfig)
         dialog.title = "Edit Emoji"
         if (!dialog.showAndGet()) {
             return
         }
-        emojiInfos[selectedIndex] = dialog.load()
+        emojiInfoList[selectedIndex] = dialog.load()
         emojiInfoTableModel.fireTableRowsUpdated(selectedIndex, selectedIndex)
         emojiInfoTable.selectionModel.setSelectionInterval(selectedIndex, selectedIndex)
     }

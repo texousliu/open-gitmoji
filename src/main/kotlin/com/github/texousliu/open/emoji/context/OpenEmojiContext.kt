@@ -16,7 +16,7 @@ object OpenEmojiContext {
 
     init {
         loadEmojis()
-        loadCustomEmojis()
+        restoreCustomEmoji()
     }
 
     fun emojis(): List<OpenEmoji> {
@@ -27,31 +27,58 @@ object OpenEmojiContext {
         return customEmojiList
     }
 
-    fun emojiInfos(): List<OpenEmojiInfo> {
-        val emojiInfos = mutableListOf<OpenEmojiInfo>()
+    fun emojiInfoList(): List<OpenEmojiInfo> {
+        val emojiInfoList = mutableListOf<OpenEmojiInfo>()
         emojis().forEach {
-            emojiInfos.add(OpenEmojiInfo(it))
+            emojiInfoList.add(OpenEmojiInfo(it))
         }
 
         customEmojis().forEach {
             val openEmojiInfo = OpenEmojiInfo(it)
-            val indexOf = emojiInfos.indexOf(openEmojiInfo)
+            val indexOf = emojiInfoList.indexOf(openEmojiInfo)
             if (indexOf < 0) {
                 openEmojiInfo.type = OpenEmojiInfoType.CUSTOM
-                emojiInfos.add(openEmojiInfo)
+                emojiInfoList.add(openEmojiInfo)
             } else {
                 openEmojiInfo.type = OpenEmojiInfoType.OVERRIDE
-                emojiInfos[indexOf] = openEmojiInfo
+                emojiInfoList[indexOf] = openEmojiInfo
             }
         }
-        return emojiInfos
+        return emojiInfoList
     }
 
-    fun loadCustomEmojis() {
+    fun restoreCustomEmoji() {
         customEmojiList.clear()
-        val directory = OpenEmojiPersistent.getInstance().getCustomEmojiDirectory()
-        if (directory.trim().isEmpty()) return
+        customEmojiList.addAll(
+            loadCustomEmojisFromDirectory(
+                OpenEmojiPersistent.getInstance().getCustomEmojiDirectory()
+            )
+        )
+    }
 
+    fun refreshEmojiInfoList(directory: String, emojiInfoList: MutableList<OpenEmojiInfo>) {
+        // 获取所有自定义 emoji
+        val customEmojis = loadCustomEmojisFromDirectory(directory)
+        customEmojis.forEach {
+            val emojiInfo = OpenEmojiInfo(it)
+            val index = emojiInfoList.indexOf(emojiInfo)
+            if (index < 0) {
+                emojiInfo.type = OpenEmojiInfoType.CUSTOM
+                emojiInfoList.add(emojiInfo)
+            } else {
+                val oldEmojiInfo = emojiInfoList[index]
+                if (oldEmojiInfo.type != OpenEmojiInfoType.CUSTOM) {
+                    emojiInfo.type = OpenEmojiInfoType.OVERRIDE
+                    emojiInfo.enable = oldEmojiInfo.enable
+                    emojiInfoList[index] = emojiInfo
+                }
+            }
+        }
+    }
+
+    private fun loadCustomEmojisFromDirectory(directory: String): MutableList<OpenEmoji> {
+        val result = mutableListOf<OpenEmoji>()
+        if (directory.trim().isEmpty()) return result
         val file = File("${directory}/${OpenEmojiUtils.EMOJI_FILE_NAME}")
         if (file.exists()) {
             file.inputStream().use { inputStream ->
@@ -60,12 +87,13 @@ object OpenEmojiContext {
                     if (gmList?.emojis != null) {
                         gmList.emojis.forEach { gm ->
                             gm.custom()
-                            customEmojiList.add(gm)
+                            result.add(gm)
                         }
                     }
                 }
             }
         }
+        return result
     }
 
     private fun loadEmojis() {

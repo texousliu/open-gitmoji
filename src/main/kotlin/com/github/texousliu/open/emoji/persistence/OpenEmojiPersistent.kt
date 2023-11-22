@@ -1,5 +1,7 @@
 package com.github.texousliu.open.emoji.persistence
 
+import com.github.texousliu.open.emoji.context.OpenEmojiContext
+import com.github.texousliu.open.emoji.model.OpenEmojiInfo
 import com.github.texousliu.open.emoji.model.OpenEmojiPattern
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.*
@@ -26,6 +28,10 @@ class OpenEmojiPersistent : PersistentStateComponent<OpenEmojiPersistent> {
     @Property
     @OptionTag(converter = OpenEmojiPatternListConverter::class)
     private var openEmojiPatterns: MutableList<OpenEmojiPattern> = mutableListOf()
+
+    @Property
+    @OptionTag(converter = OpenEmojiPatternListConverter::class)
+    private var openEmojiInfoList: MutableList<OpenEmojiInfo> = mutableListOf()
 
     private val defaultOpenEmojiPattern: OpenEmojiPattern =
             OpenEmojiPattern("#{G} [#{DATE}] #{DESC_CN}: ", true)
@@ -63,8 +69,24 @@ class OpenEmojiPersistent : PersistentStateComponent<OpenEmojiPersistent> {
         this.openEmojiPatterns = openEmojiPatterns ?: mutableListOf()
     }
 
+    fun getOpenEmojiInfoList(): MutableList<OpenEmojiInfo> {
+        return openEmojiInfoList
+    }
+
+    fun setOpenEmojiInfoList(openEmojiInfoList: MutableList<OpenEmojiInfo>?) {
+        this.openEmojiInfoList = openEmojiInfoList ?: mutableListOf()
+    }
+
     fun getDefaultOpenEmojiPattern(): OpenEmojiPattern {
         return defaultOpenEmojiPattern
+    }
+
+    fun refreshPersistent() {
+        OpenEmojiContext.restoreCustomEmoji()
+        val storage = getInstance().getOpenEmojiInfoList()
+        val directory = getInstance().getCustomEmojiDirectory()
+        OpenEmojiContext.refreshEmojiInfoList(directory, storage)
+        getInstance().setOpenEmojiInfoList(storage)
     }
 
     override fun getState(): OpenEmojiPersistent {
@@ -75,6 +97,11 @@ class OpenEmojiPersistent : PersistentStateComponent<OpenEmojiPersistent> {
         this.triggerWithColon = state.triggerWithColon
         this.customEmojiDirectory = state.customEmojiDirectory
         this.openEmojiPatterns = state.openEmojiPatterns
+        this.openEmojiInfoList = state.openEmojiInfoList
+        // 默认 emoji 列表
+        if (openEmojiInfoList.isEmpty()) {
+            openEmojiInfoList.addAll(OpenEmojiContext.emojiInfoList())
+        }
     }
 
 }

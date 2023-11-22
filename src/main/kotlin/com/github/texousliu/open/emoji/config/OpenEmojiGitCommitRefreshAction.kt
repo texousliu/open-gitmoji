@@ -1,6 +1,6 @@
 package com.github.texousliu.open.emoji.config
 
-import com.github.texousliu.open.emoji.context.OpenEmojiContext
+import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 
@@ -11,7 +11,7 @@ class OpenEmojiGitCommitRefreshAction : AnAction() {
     }
 
     override fun actionPerformed(actionEvent: AnActionEvent) {
-        OpenEmojiContext.loadCustomEmojis()
+        OpenEmojiPersistent.getInstance().refreshPersistent()
     }
 
 }

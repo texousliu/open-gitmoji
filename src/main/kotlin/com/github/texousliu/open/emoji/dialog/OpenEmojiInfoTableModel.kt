@@ -12,10 +12,17 @@ class OpenEmojiInfoTableModel(private var openEmojiInfos: MutableList<OpenEmojiI
         "Icon",
         "Code",
         "Description",
+        "Type",
         "Enable",
     )
     private val ourColumnClasses =
-        arrayOf<Class<*>>(Icon::class.java, String::class.java, String::class.java, Boolean::class.java)
+        arrayOf<Class<*>>(
+            Icon::class.java,
+            String::class.java,
+            String::class.java,
+            String::class.java,
+            Boolean::class.java
+        )
 
 
     override fun getColumnName(column: Int): String {
@@ -27,7 +34,7 @@ class OpenEmojiInfoTableModel(private var openEmojiInfos: MutableList<OpenEmojiI
     }
 
     override fun getColumnCount(): Int {
-        return 4
+        return ourColumnNames.size
     }
 
     override fun getRowCount(): Int {
@@ -54,6 +61,10 @@ class OpenEmojiInfoTableModel(private var openEmojiInfos: MutableList<OpenEmojiI
             }
 
             3 -> {
+                config.type
+            }
+
+            4 -> {
                 config.enable
             }
 
@@ -76,6 +87,10 @@ class OpenEmojiInfoTableModel(private var openEmojiInfos: MutableList<OpenEmojiI
             }
 
             3 -> {
+
+            }
+
+            4 -> {
                 config.enable = (value as Boolean?)!!
             }
 
