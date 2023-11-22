@@ -8,11 +8,9 @@ import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.*
 import com.intellij.ui.components.JBCheckBox
+import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
-import com.intellij.ui.dsl.builder.Align
-import com.intellij.ui.dsl.builder.RightGap
-import com.intellij.ui.dsl.builder.RowLayout
-import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.builder.*
 import com.intellij.ui.scale.JBUIScale.scale
 import com.intellij.ui.table.JBTable
 import java.awt.Dimension
@@ -65,12 +63,12 @@ class OpenEmojiInfoDialogPanel {
         val iconColumnWidth = headerFontMetrics.stringWidth(
             emojiInfoTable.getColumnName(0) + scale(20)
         )
-        iconColumn.setPreferredWidth(iconColumnWidth)
-        iconColumn.setMinWidth(iconColumnWidth)
-        iconColumn.setCellRenderer(OpenEmojiIconTableCellRenderer())
+        iconColumn.preferredWidth = iconColumnWidth
+        iconColumn.minWidth = iconColumnWidth
+        iconColumn.cellRenderer = OpenEmojiIconTableCellRenderer()
 
         val codeColumn = emojiInfoTable.columnModel.getColumn(1)
-        codeColumn.preferredWidth = scale(100)
+        codeColumn.minWidth = scale(150)
 
         val descriptionColumn = emojiInfoTable.columnModel.getColumn(2)
         descriptionColumn.preferredWidth = descriptionColumn.maxWidth
@@ -147,7 +145,8 @@ class OpenEmojiInfoDialogPanel {
     private class EmojiConfigInfoDialogWrapper() : DialogWrapper(true) {
 
         var enable = JBCheckBox("Enable emoji")
-        var icon = AllIcons.Actions.Refresh
+        var icon = JBLabel(AllIcons.Actions.Refresh)
+        var type = JBTextField()
         var emoji = JBTextField()
         var entity = JBTextField()
         var code = JBTextField()
@@ -158,7 +157,8 @@ class OpenEmojiInfoDialogPanel {
 
         constructor(config: OpenEmojiInfo) : this() {
             this.enable.isSelected = config.enable
-            this.icon = config.getIcon()
+            this.icon.icon = config.getIcon()
+            this.type.text = config.type.name
             this.emoji.text = config.emoji
             this.entity.text = config.entity
             this.code.text = config.code
@@ -169,6 +169,7 @@ class OpenEmojiInfoDialogPanel {
 
         init {
             title = "Add Emoji"
+            type.isEditable = false
             emoji.isEditable = false
             entity.isEditable = false
             code.isEditable = false
@@ -182,8 +183,11 @@ class OpenEmojiInfoDialogPanel {
         override fun createCenterPanel(): JComponent {
             return panel {
                 row {
-                    cell(enable)
-                    icon(icon)
+                    cell(enable).gap(RightGap.SMALL)
+                    cell(icon)
+                }
+                row("Type: ") {
+                    cell(type).align(Align.FILL)
                 }
                 row {
                     label("Emoji: ")

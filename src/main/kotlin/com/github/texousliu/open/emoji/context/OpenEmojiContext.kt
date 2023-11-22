@@ -41,7 +41,7 @@ object OpenEmojiContext {
                 emojiInfos.add(openEmojiInfo)
             } else {
                 openEmojiInfo.type = OpenEmojiInfoType.OVERRIDE
-                emojiInfos.set(indexOf, openEmojiInfo)
+                emojiInfos[indexOf] = openEmojiInfo
             }
         }
         return emojiInfos

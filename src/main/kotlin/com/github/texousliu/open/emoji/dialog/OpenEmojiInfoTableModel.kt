@@ -27,7 +27,7 @@ class OpenEmojiInfoTableModel(private var openEmojiInfos: MutableList<OpenEmojiI
     }
 
     override fun getColumnCount(): Int {
-        return 3
+        return 4
     }
 
     override fun getRowCount(): Int {

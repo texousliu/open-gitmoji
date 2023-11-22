@@ -22,8 +22,7 @@ class OpenEmojiInfoConfiguration : SearchableConfigurable {
     }
 
     override fun reset() {
-
-
+        emojiInfoSettingsPanel.reset()
     }
 
     override fun createComponent(): JComponent = emojiInfoSettingsPanel
