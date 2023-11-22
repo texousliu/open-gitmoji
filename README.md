@@ -22,10 +22,19 @@
         - emoji-unicode（#{GU}）
         - description（#{DESC}）
         - description-cn（#{DESC_CN}）
-        - date（已有）（#{DATE}）
-        - time（已有）（#{TIME}）
+        - date（#{DATE}）
+        - time（#{TIME}）
 - [X] 自定义 emoji 支持.
     - 配置路径：`File | Settings | Other Settings | Open Gitmoji Settings | Custom`
+
+- [ ] emoji 展示界面
+  - [ ] emoji 列表
+  - [ ] emoji 编辑
+  - [ ] emoji json 拷贝
+  - [ ] emoji 刷新
+  - [ ] 自定义示例拷贝
+  - [ ] emoji 启用禁用
+  - [ ] emoji 查重(custom, override, default)
 
 ## 使用说明
 

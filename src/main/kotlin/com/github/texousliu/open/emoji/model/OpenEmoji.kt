@@ -8,7 +8,7 @@ import java.io.File
 import javax.swing.Icon
 import javax.swing.ImageIcon
 
-class OpenEmoji(
+open class OpenEmoji(
         val emoji: String,
         val entity: String,
         val code: String,
