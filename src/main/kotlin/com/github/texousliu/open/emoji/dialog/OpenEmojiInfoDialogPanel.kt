@@ -49,6 +49,7 @@ class OpenEmojiInfoDialogPanel {
         object : ClickListener() {
             override fun onClick(event: MouseEvent, clickCount: Int): Boolean {
                 OpenEmojiPersistent.getInstance().refreshPersistent()
+                emojiInfoTableModel.fireTableDataChanged()
                 return true
             }
         }.installOn(refreshAction)
@@ -69,7 +70,7 @@ class OpenEmojiInfoDialogPanel {
                     }
             }.rowComment("Configure your own emojis beyond additional system presets. <a href='https://github.com/texousliu/open-gitmoji'>Documents</a>")
             row("List of all loaded emojis") {
-                cell(refreshAction)
+                cell(refreshAction).resizableColumn().align(Align.FILL)
             }
             row {
                 cell(createEmojiConfigTable())
@@ -210,7 +211,6 @@ class OpenEmojiInfoDialogPanel {
 
         constructor(config: OpenEmojiInfo) : this() {
             this.enable.isSelected = config.enable
-            this.icon.icon = config.getIcon()
             this.type.text = config.type.name
             this.emoji.text = config.emoji
             this.entity.text = config.entity
@@ -218,6 +218,7 @@ class OpenEmojiInfoDialogPanel {
             this.name.text = config.name
             this.description.text = config.description
             this.cnDescription.text = config.cnDescription
+            this.icon.icon = config.getIcon()
         }
 
         init {

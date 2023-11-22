@@ -30,7 +30,7 @@ class OpenEmojiPersistent : PersistentStateComponent<OpenEmojiPersistent> {
     private var openEmojiPatterns: MutableList<OpenEmojiPattern> = mutableListOf()
 
     @Property
-    @OptionTag(converter = OpenEmojiPatternListConverter::class)
+    @OptionTag(converter = OpenEmojiInfoListConverter::class)
     private var openEmojiInfoList: MutableList<OpenEmojiInfo> = mutableListOf()
 
     private val defaultOpenEmojiPattern: OpenEmojiPattern =

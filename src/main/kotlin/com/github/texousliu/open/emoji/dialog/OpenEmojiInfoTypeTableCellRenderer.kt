@@ -24,11 +24,11 @@ class OpenEmojiInfoTypeTableCellRenderer : DefaultTableCellRenderer() {
     ): Component {
         super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column)
         foreground = when (value) {
-            OpenEmojiInfoType.OVERRIDE.name -> {
+            OpenEmojiInfoType.OVERRIDE -> {
                 JBColor.RED
             }
 
-            OpenEmojiInfoType.CUSTOM.name -> {
+            OpenEmojiInfoType.CUSTOM -> {
                 JBColor.GREEN
             }
 
