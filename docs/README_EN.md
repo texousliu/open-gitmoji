@@ -1,6 +1,8 @@
 # Open Gitmoji
 
-## [中文/Chinese](./README.md)
+## [中文/Chinese](../README.md)
+
+## [CHANGELOG](CHANGELOG.md)
 
 ## Features
 

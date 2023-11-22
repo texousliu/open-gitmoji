@@ -1,6 +1,8 @@
 # Open Gitmoji
 
-## [英文/English](./README_EN.md)
+## [英文/English](docs/README_EN.md)
+
+## [变更记录](docs/CHANGELOG.md)
 
 ## Features
 
