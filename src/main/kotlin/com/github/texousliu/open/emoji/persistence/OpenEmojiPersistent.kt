@@ -67,7 +67,8 @@ class OpenEmojiPersistent : PersistentStateComponent<OpenEmojiPersistent> {
     }
 
     fun setOpenEmojiPatterns(openEmojiPatterns: MutableList<OpenEmojiPattern>?) {
-        this.openEmojiPatterns = openEmojiPatterns ?: mutableListOf()
+        this.openEmojiPatterns.clear()
+        openEmojiPatterns?.forEach { this.openEmojiPatterns.add(it.clone()) }
     }
 
     fun getOpenEmojiInfoList(): MutableList<OpenEmojiInfo> {
@@ -75,8 +76,8 @@ class OpenEmojiPersistent : PersistentStateComponent<OpenEmojiPersistent> {
     }
 
     fun setOpenEmojiInfoList(openEmojiInfoList: MutableList<OpenEmojiInfo>?) {
-        this.openEmojiInfoList = openEmojiInfoList ?: mutableListOf()
-        this.openEmojiInfoList.forEach { it.changed = false }
+        this.openEmojiInfoList.clear()
+        openEmojiInfoList?.forEach { this.openEmojiInfoList.add(it.clone()) }
     }
 
     fun getDefaultOpenEmojiPattern(): OpenEmojiPattern {

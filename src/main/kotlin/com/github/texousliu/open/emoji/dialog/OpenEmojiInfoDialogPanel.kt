@@ -9,9 +9,14 @@ import com.github.texousliu.open.emoji.model.OpenEmojiInfoType
 import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
 import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.AnAction
+import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.ui.*
-import com.intellij.ui.*
+import com.intellij.ui.BooleanTableCellEditor
+import com.intellij.ui.DoubleClickListener
+import com.intellij.ui.TableUtil
+import com.intellij.ui.ToolbarDecorator
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
@@ -23,6 +28,7 @@ import com.intellij.ui.scale.JBUIScale.scale
 import com.intellij.ui.table.JBTable
 import java.awt.Dimension
 import java.awt.event.MouseEvent
+import javax.swing.Icon
 import javax.swing.JComponent
 import javax.swing.table.TableCellEditor
 
@@ -34,7 +40,6 @@ class OpenEmojiInfoDialogPanel {
     val emojiInfoList = mutableListOf<OpenEmojiInfo>()
     private val emojiInfoTableModel = OpenEmojiInfoTableModel(emojiInfoList)
     private val emojiInfoTable = JBTable(emojiInfoTableModel)
-    private val refreshAction = JBLabel(AllIcons.Actions.Refresh)
 
     val customEmojiDirectoryTextField = JBTextField()
     private val customEmojiDirectoryComponent = TextFieldWithBrowseButton(customEmojiDirectoryTextField)
@@ -49,21 +54,15 @@ class OpenEmojiInfoDialogPanel {
                 return true
             }
         }.installOn(emojiInfoTable)
-
-        object : ClickListener() {
-            override fun onClick(event: MouseEvent, clickCount: Int): Boolean {
-                customEmojiDirectoryChanged(customEmojiDirectoryComponent.text)
-                return true
-            }
-        }.installOn(refreshAction)
-
         configureStartDirectoryField()
     }
 
     private fun emojiInfoSettingsDialogPanel(): DialogPanel {
         return panel {
             row("Custom Emoji Folder:") {
-                cell(customEmojiDirectoryComponent).align(Align.FILL)
+                cell(customEmojiDirectoryComponent)
+                        .resizableColumn()
+                        .align(Align.FILL)
                         .onChanged {
                             customEmojiDirectoryChanged(it.text)
                         }
@@ -72,9 +71,6 @@ class OpenEmojiInfoDialogPanel {
                                     OpenEmojiPersistent.getInstance().getCustomEmojiDirectory()
                         }
             }.rowComment("Configure your own emojis beyond additional system presets. <a href='https://github.com/texousliu/open-gitmoji'>Documents</a>")
-            row("List of all loaded emojis") {
-                cell(refreshAction).gap(RightGap.SMALL)
-            }
             row {
                 cell(createEmojiConfigTable())
                         .onReset {
@@ -85,7 +81,7 @@ class OpenEmojiInfoDialogPanel {
                             emojiInfoTableModel.fireTableDataChanged()
                         }.resizableColumn()
                         .align(Align.FILL)
-            }.layout(RowLayout.PARENT_GRID).resizableRow()
+            }
         }
     }
 
@@ -148,7 +144,9 @@ class OpenEmojiInfoDialogPanel {
                 .setMoveDownAction(null)
                 .setRemoveAction {
                     removeEmoji()
-                }.createPanel()
+                }.addExtraActions(OpenEmojiInfoResetFromDiskAnAction(AllIcons.General.Reset, this),
+                        OpenEmojiInfoReloadCustomAnAction(AllIcons.Actions.BuildAutoReloadChanges, this))
+                .createPanel()
         panel.preferredSize = Dimension(0, 300)
         return panel
     }
@@ -223,6 +221,16 @@ class OpenEmojiInfoDialogPanel {
             emojiInfoTableModel.fireTableDataChanged()
         }
         return modify
+    }
+
+    fun resetToDefault() {
+        emojiInfoList.clear()
+        emojiInfoList.addAll(OpenEmojiUtils.emojiInfoList(customEmojiDirectoryComponent.text))
+        emojiInfoTableModel.fireTableDataChanged()
+    }
+
+    fun reloadCustom() {
+        customEmojiDirectoryChanged(customEmojiDirectoryComponent.text)
     }
 
     private class EmojiConfigInfoDialogWrapper() : DialogWrapper(true) {
@@ -311,6 +319,20 @@ class OpenEmojiInfoDialogPanel {
             return str == null || str.trim().isEmpty()
         }
 
+    }
+
+    private class OpenEmojiInfoResetFromDiskAnAction(icon: Icon,
+                                                     var panel: OpenEmojiInfoDialogPanel) : AnAction(icon) {
+        override fun actionPerformed(e: AnActionEvent) {
+            panel.resetToDefault()
+        }
+    }
+
+    private class OpenEmojiInfoReloadCustomAnAction(icon: Icon,
+                                                    var panel: OpenEmojiInfoDialogPanel) : AnAction(icon) {
+        override fun actionPerformed(e: AnActionEvent) {
+            panel.reloadCustom()
+        }
     }
 
 }

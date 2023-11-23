@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 import javax.swing.Icon
 
 open class OpenEmoji(
-    val emoji: String,
+    var emoji: String,
     val entity: String,
     val code: String,
     val name: String,
