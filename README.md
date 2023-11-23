@@ -35,6 +35,7 @@
   - [ ] 自定义示例拷贝
   - [ ] emoji 启用禁用
   - [ ] emoji 查重(custom, override, default)
+- [ ] MessageBound 支持
 
 ## 使用说明
 

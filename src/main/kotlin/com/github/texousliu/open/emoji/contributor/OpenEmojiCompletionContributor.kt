@@ -1,6 +1,5 @@
 package com.github.texousliu.open.emoji.contributor
 
-import com.github.texousliu.open.emoji.context.OpenEmojiContext
 import com.github.texousliu.open.emoji.model.OpenEmoji
 import com.github.texousliu.open.emoji.model.OpenEmojiPattern
 import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
@@ -41,9 +40,8 @@ class OpenEmojiCompletionContributor : CompletionContributor() {
                         emojiPatterns = mutableListOf(OpenEmojiPersistent.getInstance().getDefaultOpenEmojiPattern())
                     }
                     // 预置 git emoji
-                    OpenEmojiContext.emojis().forEach { emoji -> emojiToPrompt(emoji, result, emojiPatterns) }
-                    // 自定义 git emoji
-                    OpenEmojiContext.customEmojis().forEach { emoji -> emojiToPrompt(emoji, result, emojiPatterns) }
+                    OpenEmojiPersistent.getInstance().getOpenEmojiInfoList()
+                        .forEach { emoji -> emojiToPrompt(emoji, result, emojiPatterns) }
                 }
             })
     }

@@ -33,7 +33,7 @@ class OpenEmojiInfoConfiguration : SearchableConfigurable {
 
     override fun isModified(): Boolean = emojiInfoListModified() || customEmojiDirectoryModified()
 
-    override fun getDisplayName(): String = "Emoji List"
+    override fun getDisplayName(): String = "Emoji Info List"
 
     override fun getId(): String = "com.github.texousliu.emoji.settings.OpenEmojiInfoSettings"
 

@@ -1,9 +1,9 @@
 package com.github.texousliu.open.emoji.dialog
 
-import com.github.texousliu.open.emoji.context.OpenEmojiContext
 import com.github.texousliu.open.emoji.model.OpenEmojiInfo
 import com.github.texousliu.open.emoji.model.OpenEmojiInfoType
 import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
+import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.ui.*
@@ -48,8 +48,7 @@ class OpenEmojiInfoDialogPanel {
 
         object : ClickListener() {
             override fun onClick(event: MouseEvent, clickCount: Int): Boolean {
-                OpenEmojiPersistent.getInstance().refreshPersistent()
-                emojiInfoTableModel.fireTableDataChanged()
+                customEmojiDirectoryChanged(customEmojiDirectoryComponent.text)
                 return true
             }
         }.installOn(refreshAction)
@@ -60,7 +59,7 @@ class OpenEmojiInfoDialogPanel {
     private fun emojiInfoSettingsDialogPanel(): DialogPanel {
         return panel {
             row("Custom Emoji Folder:") {
-                cell(customEmojiDirectoryComponent).resizableColumn().align(Align.FILL)
+                cell(customEmojiDirectoryComponent).align(Align.FILL)
                     .onChanged {
                         customEmojiDirectoryChanged(it.text)
                     }
@@ -70,11 +69,10 @@ class OpenEmojiInfoDialogPanel {
                     }
             }.rowComment("Configure your own emojis beyond additional system presets. <a href='https://github.com/texousliu/open-gitmoji'>Documents</a>")
             row("List of all loaded emojis") {
-                cell(refreshAction).resizableColumn().align(Align.FILL)
+                cell(refreshAction).gap(RightGap.SMALL)
             }
             row {
                 cell(createEmojiConfigTable())
-                    .gap(RightGap.SMALL)
                     .onReset {
                         emojiInfoList.clear()
                         OpenEmojiPersistent.getInstance().getOpenEmojiInfoList().forEach {
@@ -90,7 +88,7 @@ class OpenEmojiInfoDialogPanel {
     private fun customEmojiDirectoryChanged(directory: String) {
         stopEditing()
         // 获取所有自定义 emoji
-        OpenEmojiContext.refreshEmojiInfoList(directory, emojiInfoList)
+        OpenEmojiUtils.emojiInfoListWithCustom(directory, emojiInfoList)
         // 更新表格
         emojiInfoTableModel.fireTableDataChanged()
     }

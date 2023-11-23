@@ -1,8 +1,9 @@
 package com.github.texousliu.open.emoji.persistence
 
-import com.github.texousliu.open.emoji.context.OpenEmojiContext
+import com.github.texousliu.open.emoji.context.OpenEmojiCache
 import com.github.texousliu.open.emoji.model.OpenEmojiInfo
 import com.github.texousliu.open.emoji.model.OpenEmojiPattern
+import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.*
 import com.intellij.util.xmlb.annotations.OptionTag
@@ -70,7 +71,7 @@ class OpenEmojiPersistent : PersistentStateComponent<OpenEmojiPersistent> {
     }
 
     fun getOpenEmojiInfoList(): MutableList<OpenEmojiInfo> {
-        return openEmojiInfoList
+        return if (openEmojiInfoList.isEmpty()) OpenEmojiCache.emojiInfoList() else openEmojiInfoList
     }
 
     fun setOpenEmojiInfoList(openEmojiInfoList: MutableList<OpenEmojiInfo>?) {
@@ -81,12 +82,11 @@ class OpenEmojiPersistent : PersistentStateComponent<OpenEmojiPersistent> {
         return defaultOpenEmojiPattern
     }
 
-    fun refreshPersistent() {
-        OpenEmojiContext.restoreCustomEmoji()
-        val storage = getInstance().getOpenEmojiInfoList()
-        val directory = getInstance().getCustomEmojiDirectory()
-        OpenEmojiContext.refreshEmojiInfoList(directory, storage)
-        getInstance().setOpenEmojiInfoList(storage)
+    fun refresh() {
+        // 刷新 context
+        OpenEmojiCache.refresh(customEmojiDirectory)
+        // 刷新存储
+        OpenEmojiUtils.emojiInfoListWithCustom(customEmojiDirectory, openEmojiInfoList)
     }
 
     override fun getState(): OpenEmojiPersistent {
@@ -98,10 +98,6 @@ class OpenEmojiPersistent : PersistentStateComponent<OpenEmojiPersistent> {
         this.customEmojiDirectory = state.customEmojiDirectory
         this.openEmojiPatterns = state.openEmojiPatterns
         this.openEmojiInfoList = state.openEmojiInfoList
-        // 默认 emoji 列表
-        if (openEmojiInfoList.isEmpty()) {
-            openEmojiInfoList.addAll(OpenEmojiContext.emojiInfoList())
-        }
     }
 
 }

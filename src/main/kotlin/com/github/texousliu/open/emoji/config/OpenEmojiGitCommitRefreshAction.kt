@@ -11,7 +11,7 @@ class OpenEmojiGitCommitRefreshAction : AnAction() {
     }
 
     override fun actionPerformed(actionEvent: AnActionEvent) {
-        OpenEmojiPersistent.getInstance().refreshPersistent()
+        OpenEmojiPersistent.getInstance().refresh()
     }
 
 }

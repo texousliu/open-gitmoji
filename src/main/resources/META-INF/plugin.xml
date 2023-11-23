@@ -39,7 +39,7 @@
                              instance="com.github.texousliu.open.emoji.config.OpenEmojiConfiguration"
                              groupId="other"
                              id="com.github.texousliu.emoji.settings.OpenEmojiSettings">
-            <configurable displayName="Emoji List"
+            <configurable displayName="Emoji Info List"
                           instance="com.github.texousliu.open.emoji.config.OpenEmojiInfoConfiguration"
                           id="com.github.texousliu.emoji.settings.OpenEmojiInfoSettings"/>
         </projectConfigurable>
