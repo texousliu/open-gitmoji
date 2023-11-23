@@ -32,7 +32,7 @@ class OpenEmojiInfoTypeTableCellRenderer(private val emojiInfoList: MutableList<
             }
 
             OpenEmojiInfoType.CUSTOM -> {
-                JBColor.GREEN
+                JBColor.CYAN
             }
 
             else -> {

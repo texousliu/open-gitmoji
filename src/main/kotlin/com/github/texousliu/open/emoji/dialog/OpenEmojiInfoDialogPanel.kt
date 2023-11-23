@@ -204,6 +204,7 @@ class OpenEmojiInfoDialogPanel {
         if (config.size != emojiInfoList.size) modify = true
         for (emojiInfo in emojiInfoList) {
             val indexOf = config.indexOf(emojiInfo)
+            emojiInfo.changed = false
             if (indexOf < 0) {
                 emojiInfo.changed = true
                 modify = true

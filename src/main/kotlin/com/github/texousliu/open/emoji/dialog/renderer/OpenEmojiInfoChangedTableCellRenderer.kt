@@ -16,7 +16,7 @@ interface OpenEmojiInfoChangedTableCellRenderer {
     ): Component {
         val openEmojiInfo = emojiInfoList[row]
         tableCellRendererComponent.background =
-                if (openEmojiInfo.changed) JBColor.CYAN
+                if (openEmojiInfo.changed) JBColor.GREEN
                 else if (isSelected) table!!.selectionBackground
                 else table!!.background
         return tableCellRendererComponent
