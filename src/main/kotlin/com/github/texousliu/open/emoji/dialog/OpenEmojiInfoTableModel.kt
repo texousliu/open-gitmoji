@@ -42,7 +42,7 @@ class OpenEmojiInfoTableModel(private var openEmojiInfos: MutableList<OpenEmojiI
     }
 
     override fun isCellEditable(rowIndex: Int, columnIndex: Int): Boolean {
-        return columnIndex == 3
+        return columnIndex == 4
     }
 
     override fun getValueAt(row: Int, column: Int): Any {

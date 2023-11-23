@@ -15,6 +15,7 @@ open class OpenEmoji(
 ) {
 
     private var isCustom = false
+    @Transient
     private lateinit var _icon: Icon
 
     fun getIcon(): Icon {

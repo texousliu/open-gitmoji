@@ -1,6 +1,7 @@
 package com.github.texousliu.open.emoji.contributor
 
 import com.github.texousliu.open.emoji.model.OpenEmoji
+import com.github.texousliu.open.emoji.model.OpenEmojiInfo
 import com.github.texousliu.open.emoji.model.OpenEmojiPattern
 import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
 import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
@@ -40,14 +41,14 @@ class OpenEmojiCompletionContributor : CompletionContributor() {
                         emojiPatterns = mutableListOf(OpenEmojiPersistent.getInstance().getDefaultOpenEmojiPattern())
                     }
                     // 预置 git emoji
-                    OpenEmojiPersistent.getInstance().getOpenEmojiInfoList()
+                    OpenEmojiPersistent.getInstance().getOpenEmojiInfoList().filter { it.enable }
                         .forEach { emoji -> emojiToPrompt(emoji, result, emojiPatterns) }
                 }
             })
     }
 
     private fun emojiToPrompt(
-        emoji: OpenEmoji,
+        emoji: OpenEmojiInfo,
         result: CompletionResultSet,
         emojiPatterns: MutableList<OpenEmojiPattern>
     ) {

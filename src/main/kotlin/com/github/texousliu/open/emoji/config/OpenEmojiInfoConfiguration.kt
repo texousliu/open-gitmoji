@@ -15,13 +15,13 @@ class OpenEmojiInfoConfiguration : SearchableConfigurable {
     private fun emojiInfoListModified(): Boolean {
         val config = OpenEmojiPersistent.getInstance().getOpenEmojiInfoList()
         if (config.size != panel.emojiInfoList.size) return true
-        for ((index, emojiInfo) in panel.emojiInfoList.withIndex()) {
-            val cei = config[index]
-            if (cei != emojiInfo) return true
+        for (emojiInfo in panel.emojiInfoList) {
+            val indexOf = config.indexOf(emojiInfo)
+            if (indexOf < 0) return true
+            val cei = config[indexOf]
             if (cei.enable != emojiInfo.enable
-                || cei.emoji != emojiInfo.emoji
-                || cei.type != emojiInfo.type
-            )
+                    || cei.emoji != emojiInfo.emoji
+                    || cei.type != emojiInfo.type)
                 return true
         }
         return false
@@ -31,7 +31,7 @@ class OpenEmojiInfoConfiguration : SearchableConfigurable {
         return panel.customEmojiDirectoryTextField.text != OpenEmojiPersistent.getInstance().getCustomEmojiDirectory()
     }
 
-    override fun isModified(): Boolean = emojiInfoListModified() || customEmojiDirectoryModified()
+    override fun isModified(): Boolean = panel.markModifiedEmojis() || customEmojiDirectoryModified()
 
     override fun getDisplayName(): String = "Emoji Info List"
 

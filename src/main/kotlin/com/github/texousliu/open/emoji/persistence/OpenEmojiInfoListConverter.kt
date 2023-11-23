@@ -1,7 +1,6 @@
 package com.github.texousliu.open.emoji.persistence
 
 import com.github.texousliu.open.emoji.model.OpenEmojiInfo
-import com.github.texousliu.open.emoji.model.OpenEmojiPattern
 import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
 import com.google.gson.Gson
 import com.intellij.util.xmlb.Converter
@@ -20,7 +19,7 @@ class OpenEmojiInfoListConverter : Converter<MutableList<OpenEmojiInfo>>() {
     }
 
     override fun fromString(value: String): MutableList<OpenEmojiInfo>? {
-        return Gson().fromJson(value, OpenEmojiUtils.ListTypeToken().type)
+        return Gson().fromJson(value, OpenEmojiUtils.OpenEmojiInfoListTypeToken().type)
     }
 
 }

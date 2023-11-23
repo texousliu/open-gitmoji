@@ -1,5 +1,9 @@
 package com.github.texousliu.open.emoji.dialog
 
+import com.github.texousliu.open.emoji.dialog.renderer.OpenEmojiInfoBooleanTableCellRenderer
+import com.github.texousliu.open.emoji.dialog.renderer.OpenEmojiInfoIconTableCellRenderer
+import com.github.texousliu.open.emoji.dialog.renderer.OpenEmojiInfoStringTableCellRenderer
+import com.github.texousliu.open.emoji.dialog.renderer.OpenEmojiInfoTypeTableCellRenderer
 import com.github.texousliu.open.emoji.model.OpenEmojiInfo
 import com.github.texousliu.open.emoji.model.OpenEmojiInfoType
 import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
@@ -60,27 +64,27 @@ class OpenEmojiInfoDialogPanel {
         return panel {
             row("Custom Emoji Folder:") {
                 cell(customEmojiDirectoryComponent).align(Align.FILL)
-                    .onChanged {
-                        customEmojiDirectoryChanged(it.text)
-                    }
-                    .onReset {
-                        customEmojiDirectoryComponent.text =
-                            OpenEmojiPersistent.getInstance().getCustomEmojiDirectory()
-                    }
+                        .onChanged {
+                            customEmojiDirectoryChanged(it.text)
+                        }
+                        .onReset {
+                            customEmojiDirectoryComponent.text =
+                                    OpenEmojiPersistent.getInstance().getCustomEmojiDirectory()
+                        }
             }.rowComment("Configure your own emojis beyond additional system presets. <a href='https://github.com/texousliu/open-gitmoji'>Documents</a>")
             row("List of all loaded emojis") {
                 cell(refreshAction).gap(RightGap.SMALL)
             }
             row {
                 cell(createEmojiConfigTable())
-                    .onReset {
-                        emojiInfoList.clear()
-                        OpenEmojiPersistent.getInstance().getOpenEmojiInfoList().forEach {
-                            emojiInfoList.add(it.clone())
-                        }
-                        emojiInfoTableModel.fireTableDataChanged()
-                    }.resizableColumn()
-                    .align(Align.FILL)
+                        .onReset {
+                            emojiInfoList.clear()
+                            OpenEmojiPersistent.getInstance().getOpenEmojiInfoList().forEach {
+                                emojiInfoList.add(it.clone())
+                            }
+                            emojiInfoTableModel.fireTableDataChanged()
+                        }.resizableColumn()
+                        .align(Align.FILL)
             }.layout(RowLayout.PARENT_GRID).resizableRow()
         }
     }
@@ -95,11 +99,11 @@ class OpenEmojiInfoDialogPanel {
 
     private fun configureStartDirectoryField() {
         customEmojiDirectoryComponent.addBrowseFolderListener(
-            "Choose Custom Emoji Folder",
-            "Choose custom emoji folder",
-            null,
-            FileChooserDescriptorFactory.createSingleFolderDescriptor(),
-            TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
+                "Choose Custom Emoji Folder",
+                "Choose custom emoji folder",
+                null,
+                FileChooserDescriptorFactory.createSingleFolderDescriptor(),
+                TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
         )
     }
 
@@ -109,40 +113,42 @@ class OpenEmojiInfoDialogPanel {
 
         val iconColumn = emojiInfoTable.columnModel.getColumn(0)
         val iconColumnWidth = headerFontMetrics.stringWidth(
-            emojiInfoTable.getColumnName(0) + headerGap
+                emojiInfoTable.getColumnName(0) + headerGap
         )
         iconColumn.preferredWidth = iconColumnWidth
         iconColumn.minWidth = iconColumnWidth
-        iconColumn.cellRenderer = OpenEmojiIconTableCellRenderer()
+        iconColumn.cellRenderer = OpenEmojiInfoIconTableCellRenderer(emojiInfoList)
 
         val codeColumn = emojiInfoTable.columnModel.getColumn(1)
         codeColumn.minWidth = scale(150)
+        codeColumn.cellRenderer = OpenEmojiInfoStringTableCellRenderer(emojiInfoList)
 
         val descriptionColumn = emojiInfoTable.columnModel.getColumn(2)
         descriptionColumn.preferredWidth = descriptionColumn.maxWidth
+        descriptionColumn.cellRenderer = OpenEmojiInfoStringTableCellRenderer(emojiInfoList)
 
         val typeColumn = emojiInfoTable.columnModel.getColumn(3)
         typeColumn.minWidth = headerFontMetrics.stringWidth(OpenEmojiInfoType.OVERRIDE.name) + headerGap
-        typeColumn.cellRenderer = OpenEmojiInfoTypeTableCellRenderer()
+        typeColumn.cellRenderer = OpenEmojiInfoTypeTableCellRenderer(emojiInfoList)
 
         val enableColumn = emojiInfoTable.columnModel.getColumn(4)
         val enableWidth = headerFontMetrics.stringWidth(emojiInfoTable.getColumnName(4)) + headerGap
         enableColumn.maxWidth = scale(enableWidth)
         enableColumn.minWidth = enableColumn.maxWidth
-        enableColumn.cellRenderer = BooleanTableCellRenderer()
+        enableColumn.cellRenderer = OpenEmojiInfoBooleanTableCellRenderer(emojiInfoList)
         enableColumn.cellEditor = BooleanTableCellEditor()
 
         val panel = ToolbarDecorator.createDecorator(emojiInfoTable)
-            .setAddAction {
-                addEmoji()
-            }.setEditAction {
-                editSelectedEmoji()
-            }
-            .setMoveUpAction(null)
-            .setMoveDownAction(null)
-            .setRemoveAction {
-                removeEmoji()
-            }.createPanel()
+                .setAddAction {
+                    addEmoji()
+                }.setEditAction {
+                    editSelectedEmoji()
+                }
+                .setMoveUpAction(null)
+                .setMoveDownAction(null)
+                .setRemoveAction {
+                    removeEmoji()
+                }.createPanel()
         panel.preferredSize = Dimension(0, 300)
         return panel
     }
@@ -192,6 +198,31 @@ class OpenEmojiInfoDialogPanel {
             val editor: TableCellEditor = emojiInfoTable.cellEditor
             editor.stopCellEditing()
         }
+    }
+
+    fun markModifiedEmojis(): Boolean {
+        var modify = false
+        val config = OpenEmojiPersistent.getInstance().getOpenEmojiInfoList()
+        if (config.size != emojiInfoList.size) modify = true
+        for (emojiInfo in emojiInfoList) {
+            val indexOf = config.indexOf(emojiInfo)
+            if (indexOf < 0) {
+                emojiInfo.changed = true
+                modify = true
+            } else {
+                val cei = config[indexOf]
+                if (cei.enable != emojiInfo.enable
+                        || cei.emoji != emojiInfo.emoji
+                        || cei.type != emojiInfo.type) {
+                    emojiInfo.changed = true
+                    modify = true
+                }
+            }
+        }
+        if (modify) {
+            emojiInfoTableModel.fireTableDataChanged()
+        }
+        return modify
     }
 
     private class EmojiConfigInfoDialogWrapper() : DialogWrapper(true) {
@@ -264,8 +295,8 @@ class OpenEmojiInfoDialogPanel {
 
         fun load(): OpenEmojiInfo {
             return OpenEmojiInfo(
-                emoji.text, entity.text, code.text,
-                name.text, description.text, cnDescription.text, enable.isSelected
+                    emoji.text, entity.text, code.text,
+                    name.text, description.text, cnDescription.text, enable.isSelected
             )
         }
 

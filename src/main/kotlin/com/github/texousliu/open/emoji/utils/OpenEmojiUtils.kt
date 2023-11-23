@@ -157,6 +157,7 @@ object OpenEmojiUtils {
         return current.format(formatter)
     }
 
-    class ListTypeToken : TypeToken<MutableList<OpenEmojiPattern>>()
+    class OpenEmojiPatternListTypeToken : TypeToken<MutableList<OpenEmojiPattern>>()
+    class OpenEmojiInfoListTypeToken : TypeToken<MutableList<OpenEmojiInfo>>()
 
 }
