@@ -12,7 +12,7 @@ class OpenEmojiInfo(
 ) : OpenEmoji(emoji, entity, code, name, description, cnDescription), Cloneable {
 
     @Transient
-    var changed : Boolean = false
+    var changed: Boolean = false
 
     constructor(emoji: OpenEmoji) : this(emoji, true, OpenEmojiInfoType.DEFAULT)
 
