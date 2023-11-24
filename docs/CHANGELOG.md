@@ -4,6 +4,11 @@
 
 ## Unreleased
 
+## 2.0.6
+
+- 添加 `Emoji Info List` 界面
+- 迁移 custom emoji folder 配置界面到 `Emoji Info List` 界面
+
 ## 2.0.5
 
 - 重构配置存储（不兼容以前的配置，默认会内置一个表达式）

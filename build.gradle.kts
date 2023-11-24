@@ -44,6 +44,7 @@ intellij {
 // Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
 changelog {
     val v = properties("pluginVersion")
+    path.set(projectDir.resolve("docs/CHANGELOG.md").canonicalPath)
     version.set(v.substring(v.indexOf(".") + 1))
     groups.set(emptyList())
     header.set(provider { version.get() })
@@ -72,15 +73,9 @@ tasks {
 
         // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
         pluginDescription.set(
-                projectDir.resolve("doc/PLUGIN_DESCRIPTION.md").readText().lines().run {
-                    val start = "<!-- Plugin description -->"
-                    val end = "<!-- Plugin description end -->"
-
-                    if (!containsAll(listOf(start, end))) {
-                        throw GradleException("Plugin description section not found in README.md:\n$start ... $end")
-                    }
-                    subList(indexOf(start) + 1, indexOf(end))
-                }.joinToString("\n").run { markdownToHTML(this) }
+                projectDir.resolve("docs/PLUGIN_DESCRIPTION.md")
+                    .readText()
+                    .run { markdownToHTML(this) }
         )
 
         // Get the latest available change notes from the changelog file

@@ -19,7 +19,7 @@ class OpenEmojiPatternListConverter : Converter<MutableList<OpenEmojiPattern>>()
     }
 
     override fun fromString(value: String): MutableList<OpenEmojiPattern>? {
-        return Gson().fromJson(value, OpenEmojiUtils.ListTypeToken().type)
+        return Gson().fromJson(value, OpenEmojiUtils.OpenEmojiPatternListTypeToken().type)
     }
 
 }
