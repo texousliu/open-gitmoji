@@ -1,19 +1,28 @@
 package com.github.texousliu.open.emoji.dialog
 
-import com.github.texousliu.open.emoji.model.OpenEmojiPattern
-import com.github.texousliu.open.emoji.utils.OpenEmojiUtils.demo
+import com.github.texousliu.open.emoji.model.OpenEmojiInfo
 import com.intellij.util.ui.ItemRemovable
+import javax.swing.Icon
 import javax.swing.table.AbstractTableModel
 
-class OpenEmojiPatternsTableModel(private var openEmojiPatterns: MutableList<OpenEmojiPattern>) : AbstractTableModel(),
+class OpenEmojiInfoTableModel(private var openEmojiInfos: MutableList<OpenEmojiInfo>) : AbstractTableModel(),
         ItemRemovable {
 
     private val ourColumnNames = arrayOf(
-            "Pattern",
-            "Example",
-            "Enable"
+            "Icon",
+            "Code",
+            "Description",
+            "Type",
+            "Enable",
     )
-    private val ourColumnClasses = arrayOf<Class<*>>(String::class.java, String::class.java, Boolean::class.java)
+    private val ourColumnClasses =
+            arrayOf<Class<*>>(
+                    Icon::class.java,
+                    String::class.java,
+                    String::class.java,
+                    String::class.java,
+                    Boolean::class.java
+            )
 
 
     override fun getColumnName(column: Int): String {
@@ -25,30 +34,38 @@ class OpenEmojiPatternsTableModel(private var openEmojiPatterns: MutableList<Ope
     }
 
     override fun getColumnCount(): Int {
-        return 3
+        return ourColumnNames.size
     }
 
     override fun getRowCount(): Int {
-        return openEmojiPatterns.size
+        return openEmojiInfos.size
     }
 
     override fun isCellEditable(rowIndex: Int, columnIndex: Int): Boolean {
-        return columnIndex == 2
+        return columnIndex == 4
     }
 
     override fun getValueAt(row: Int, column: Int): Any {
-        val pattern = openEmojiPatterns[row]
+        val config = openEmojiInfos[row]
         return when (column) {
             0 -> {
-                pattern.pattern
+                config.getIcon()
             }
 
             1 -> {
-                demo(pattern.pattern)
+                config.code
             }
 
             2 -> {
-                pattern.enable
+                config.description
+            }
+
+            3 -> {
+                config.type
+            }
+
+            4 -> {
+                config.enable
             }
 
             else -> {
@@ -58,15 +75,23 @@ class OpenEmojiPatternsTableModel(private var openEmojiPatterns: MutableList<Ope
     }
 
     override fun setValueAt(value: Any?, row: Int, column: Int) {
-        val pattern = openEmojiPatterns[row]
+        val config = openEmojiInfos[row]
         when (column) {
             0 -> {
-                pattern.pattern = (value as String?)!!
             }
 
-            1 -> {}
+            1 -> {
+            }
+
             2 -> {
-                pattern.enable = (value as Boolean?)!!
+            }
+
+            3 -> {
+
+            }
+
+            4 -> {
+                config.enable = (value as Boolean?)!!
             }
 
             else -> {
@@ -76,7 +101,7 @@ class OpenEmojiPatternsTableModel(private var openEmojiPatterns: MutableList<Ope
     }
 
     override fun removeRow(index: Int) {
-        openEmojiPatterns.removeAt(index)
+        openEmojiInfos.removeAt(index)
         fireTableRowsDeleted(index, index)
     }
 

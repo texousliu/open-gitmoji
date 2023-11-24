@@ -1,6 +1,5 @@
 package com.github.texousliu.open.emoji.config
 
-import com.github.texousliu.open.emoji.context.OpenEmojiContext
 import com.github.texousliu.open.emoji.dialog.OpenEmojiDialogPanel
 import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
 import com.intellij.openapi.options.SearchableConfigurable
@@ -23,26 +22,19 @@ class OpenEmojiConfiguration : SearchableConfigurable {
         return false
     }
 
-    private fun customEmojiDirectoryModified(): Boolean {
-        return panel.customEmojiDirectoryTextField.text != OpenEmojiPersistent.getInstance().getCustomEmojiDirectory()
-    }
 
     private fun triggerWithColonModified(): Boolean {
         return panel.triggerWithColonCheckBox.isSelected != OpenEmojiPersistent.getInstance().getTriggerWithColon()
     }
 
     override fun isModified(): Boolean =
-        triggerWithColonModified() || customEmojiDirectoryModified() || emojiPatternsModified()
+            triggerWithColonModified() || emojiPatternsModified()
 
     override fun getDisplayName(): String = "Open Gitmoji Settings"
 
     override fun getId(): String = "com.github.texousliu.emoji.settings.OpenEmojiSettings"
 
     override fun apply() {
-        if (customEmojiDirectoryModified()) {
-            OpenEmojiPersistent.getInstance().setCustomEmojiDirectory(panel.customEmojiDirectoryTextField.text)
-            OpenEmojiContext.loadCustomEmojis()
-        }
         if (triggerWithColonModified()) {
             OpenEmojiPersistent.getInstance().setTriggerWithColon(panel.triggerWithColonCheckBox.isSelected)
         }

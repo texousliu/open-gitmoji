@@ -3,8 +3,9 @@ package com.github.texousliu.open.emoji.dialog
 import com.github.texousliu.open.emoji.model.OpenEmojiPattern
 import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
 import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
-import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
-import com.intellij.openapi.ui.*
+import com.intellij.openapi.ui.DialogPanel
+import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.*
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBTextField
@@ -26,10 +27,8 @@ class OpenEmojiDialogPanel {
 
     val triggerWithColonCheckBox = JBCheckBox("Get prompt through text starting with ':' or '：'. Such as ':s'")
     val emojiPatterns = mutableListOf<OpenEmojiPattern>()
-    val customEmojiDirectoryTextField = JBTextField()
     private val emojiPatternsTableModel = OpenEmojiPatternsTableModel(emojiPatterns)
     private val emojiPatternsTable = JBTable(emojiPatternsTableModel)
-    private val customEmojiDirectoryComponent = TextFieldWithBrowseButton(customEmojiDirectoryTextField)
 
     val emojiSettingsPanel = emojiSettingsDialogPanel()
 
@@ -41,7 +40,6 @@ class OpenEmojiDialogPanel {
                 return true
             }
         }.installOn(emojiPatternsTable)
-        configureStartDirectoryField()
     }
 
     private fun emojiSettingsDialogPanel(): DialogPanel {
@@ -55,13 +53,6 @@ class OpenEmojiDialogPanel {
                                         OpenEmojiPersistent.getInstance().getTriggerWithColon()
                             }
                 }.rowComment("Optimize input habits and reduce trouble caused by unnecessary prompts")
-                row("Custom Emoji Folder:") {
-                    cell(customEmojiDirectoryComponent).resizableColumn().horizontalAlign(HorizontalAlign.FILL)
-                            .onReset {
-                                customEmojiDirectoryComponent.text =
-                                        OpenEmojiPersistent.getInstance().getCustomEmojiDirectory()
-                            }
-                }.rowComment("Configure your own emojis beyond additional system presets. <a href='https://github.com/texousliu/open-gitmoji'>Documents</a>")
             }
 
             group("Prompt List") {
@@ -80,16 +71,6 @@ class OpenEmojiDialogPanel {
                 }.layout(RowLayout.PARENT_GRID).resizableRow()
             }
         }
-    }
-
-    private fun configureStartDirectoryField() {
-        customEmojiDirectoryComponent.addBrowseFolderListener(
-                "Choose Custom Emoji Folder",
-                "Choose custom emoji folder",
-                null,
-                FileChooserDescriptorFactory.createSingleFolderDescriptor(),
-                TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
-        )
     }
 
     private fun createPromptListTable(): JComponent {
