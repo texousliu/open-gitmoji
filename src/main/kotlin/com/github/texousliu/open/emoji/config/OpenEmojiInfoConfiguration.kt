@@ -43,7 +43,6 @@ class OpenEmojiInfoConfiguration : SearchableConfigurable {
         }
         if (emojiInfoListModified()) {
             OpenEmojiPersistent.getInstance().setOpenEmojiInfoList(panel.emojiInfoList)
-            panel.emojiInfoList.forEach { it.changed = false }
         }
     }
 

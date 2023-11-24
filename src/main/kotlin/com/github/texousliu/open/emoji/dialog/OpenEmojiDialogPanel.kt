@@ -47,11 +47,11 @@ class OpenEmojiDialogPanel {
             group("Custom") {
                 row {
                     cell(triggerWithColonCheckBox)
-                        .gap(RightGap.SMALL)
-                        .onReset {
-                            triggerWithColonCheckBox.isSelected =
-                                OpenEmojiPersistent.getInstance().getTriggerWithColon()
-                        }
+                            .gap(RightGap.SMALL)
+                            .onReset {
+                                triggerWithColonCheckBox.isSelected =
+                                        OpenEmojiPersistent.getInstance().getTriggerWithColon()
+                            }
                 }.rowComment("Optimize input habits and reduce trouble caused by unnecessary prompts")
             }
 
@@ -59,15 +59,15 @@ class OpenEmojiDialogPanel {
                 row("Configure prompt item expression") { }
                 row {
                     cell(createPromptListTable())
-                        .gap(RightGap.SMALL)
-                        .onReset {
-                            emojiPatterns.clear()
-                            OpenEmojiPersistent.getInstance().getOpenEmojiPatterns().forEach {
-                                emojiPatterns.add(it.clone())
-                            }
-                            emojiPatternsTableModel.fireTableDataChanged()
-                        }.resizableColumn()
-                        .align(Align.FILL)
+                            .gap(RightGap.SMALL)
+                            .onReset {
+                                emojiPatterns.clear()
+                                OpenEmojiPersistent.getInstance().getOpenEmojiPatterns().forEach {
+                                    emojiPatterns.add(it.clone())
+                                }
+                                emojiPatternsTableModel.fireTableDataChanged()
+                            }.resizableColumn()
+                            .align(Align.FILL)
                 }.layout(RowLayout.PARENT_GRID).resizableRow()
             }
         }
@@ -91,20 +91,20 @@ class OpenEmojiDialogPanel {
         enableColumn.cellEditor = BooleanTableCellEditor()
 
         val panel = ToolbarDecorator.createDecorator(emojiPatternsTable)
-            .setAddAction {
-                addPattern()
-            }.setEditAction {
-                editSelectedPattern()
-            }
-            .setMoveUpAction {
-                moveUpPattern()
-            }
-            .setMoveDownAction {
-                moveDownPattern()
-            }
-            .setRemoveAction {
-                removePattern()
-            }.createPanel()
+                .setAddAction {
+                    addPattern()
+                }.setEditAction {
+                    editSelectedPattern()
+                }
+                .setMoveUpAction {
+                    moveUpPattern()
+                }
+                .setMoveDownAction {
+                    moveDownPattern()
+                }
+                .setRemoveAction {
+                    removePattern()
+                }.createPanel()
         panel.preferredSize = Dimension(0, 300)
         return panel
     }
@@ -167,8 +167,8 @@ class OpenEmojiDialogPanel {
         emojiPatterns[swap] = selectPattern
 
         emojiPatternsTableModel.fireTableRowsUpdated(
-            swap.coerceAtMost(selectedIndex),
-            swap.coerceAtLeast(selectedIndex)
+                swap.coerceAtMost(selectedIndex),
+                swap.coerceAtLeast(selectedIndex)
         )
         emojiPatternsTable.selectionModel.setSelectionInterval(swap, swap)
     }
@@ -223,14 +223,14 @@ class OpenEmojiDialogPanel {
                     cell(enable)
                     // 添加帮助图标
                     contextHelp(
-                        "Configure whether the regular expression takes effect. Some expressions do not need to take effect in real time, so this configuration item is provided.",
-                        "Enable pattern help"
+                            "Configure whether the regular expression takes effect. Some expressions do not need to take effect in real time, so this configuration item is provided.",
+                            "Enable pattern help"
                     )
                 }
                 row("Pattern: ") {
                     cell(pattern).align(Align.FILL).focused()
-                        .comment(
-                            """
+                            .comment(
+                                    """
                             The system provides the following placeholders by default:<br>
                             #{G}: Replace with emoji <br>
                             #{GU}: Replace with emoji unicode <br>
@@ -239,7 +239,7 @@ class OpenEmojiDialogPanel {
                             #{DATE}: Replace with the current system date <br>
                             #{TIME}: Replace with the current system time
                         """.trimIndent(), 50
-                        )
+                            )
                 }.layout(RowLayout.PARENT_GRID)
                 row("Example: ") {
                     cell(example).align(Align.FILL)

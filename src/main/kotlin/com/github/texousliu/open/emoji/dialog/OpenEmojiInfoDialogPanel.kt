@@ -81,7 +81,7 @@ class OpenEmojiInfoDialogPanel {
                             emojiInfoTableModel.fireTableDataChanged()
                         }.resizableColumn()
                         .align(Align.FILL)
-            }
+            }.resizableRow()
         }
     }
 
@@ -90,7 +90,7 @@ class OpenEmojiInfoDialogPanel {
         // 获取所有自定义 emoji
         OpenEmojiUtils.emojiInfoListWithCustom(directory, emojiInfoList)
         // 更新表格
-        emojiInfoTableModel.fireTableDataChanged()
+        withSelectionFireTableDataChanged()
     }
 
     private fun configureStartDirectoryField() {
@@ -164,6 +164,15 @@ class OpenEmojiInfoDialogPanel {
         }
     }
 
+    private fun withSelectionFireTableDataChanged() {
+        var selectedRow = emojiInfoTable.selectedRow
+        if (selectedRow < 0) selectedRow = emojiInfoList.size - 1
+        if (selectedRow >= emojiInfoList.size) selectedRow = emojiInfoList.size - 1
+        emojiInfoTableModel.fireTableDataChanged()
+        emojiInfoTable.selectionModel.setSelectionInterval(selectedRow, selectedRow)
+        emojiInfoTable.scrollRectToVisible(emojiInfoTable.getCellRect(selectedRow, 0, true))
+    }
+
     private fun editSelectedEmoji() {
         stopEditing()
         val selectedIndex: Int = emojiInfoTable.selectedRow
@@ -219,7 +228,7 @@ class OpenEmojiInfoDialogPanel {
             }
         }
         if (modify) {
-            emojiInfoTableModel.fireTableDataChanged()
+            withSelectionFireTableDataChanged()
         }
         return modify
     }
@@ -227,7 +236,7 @@ class OpenEmojiInfoDialogPanel {
     fun resetToDefault() {
         emojiInfoList.clear()
         emojiInfoList.addAll(OpenEmojiUtils.emojiInfoList(customEmojiDirectoryComponent.text))
-        emojiInfoTableModel.fireTableDataChanged()
+        withSelectionFireTableDataChanged()
     }
 
     fun reloadCustom() {
@@ -323,14 +332,14 @@ class OpenEmojiInfoDialogPanel {
     }
 
     private class OpenEmojiInfoResetFromDiskAnAction(icon: Icon,
-                                                     var panel: OpenEmojiInfoDialogPanel) : AnAction(icon) {
+                                                     var panel: OpenEmojiInfoDialogPanel) : AnAction({ "Reset to default" }, { "reset to default with custom directory emojis" }, icon) {
         override fun actionPerformed(e: AnActionEvent) {
             panel.resetToDefault()
         }
     }
 
     private class OpenEmojiInfoReloadCustomAnAction(icon: Icon,
-                                                    var panel: OpenEmojiInfoDialogPanel) : AnAction(icon) {
+                                                    var panel: OpenEmojiInfoDialogPanel) : AnAction({ "Reload custom emoji but don`t remove exists" }, { "reload custom emoji but not remove exists custom emojis" }, icon) {
         override fun actionPerformed(e: AnActionEvent) {
             panel.reloadCustom()
         }

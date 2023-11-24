@@ -3,6 +3,8 @@
 # Open Gitmoji Changelog
 
 ## Unreleased
+- 添加 `Emoji Info List` 界面
+- 迁移 custom emoji folder 配置界面到 `Emoji Info List` 界面
 
 ## 2.0.5
 

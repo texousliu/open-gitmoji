@@ -5,16 +5,17 @@ import com.google.gson.annotations.SerializedName
 import javax.swing.Icon
 
 open class OpenEmoji(
-    var emoji: String,
-    val entity: String,
-    val code: String,
-    val name: String,
-    val description: String,
-    @SerializedName("cn_description")
-    val cnDescription: String
+        var emoji: String,
+        val entity: String,
+        val code: String,
+        val name: String,
+        val description: String,
+        @SerializedName("cn_description")
+        val cnDescription: String
 ) {
 
-    private var isCustom = false
+    var isCustom = false
+
     @Transient
     private lateinit var _icon: Icon
 
@@ -26,7 +27,11 @@ open class OpenEmoji(
     }
 
     fun custom() {
-        isCustom = true
+        custom(true)
+    }
+
+    fun custom(isCustom: Boolean) {
+        this.isCustom = isCustom
     }
 
 }

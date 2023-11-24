@@ -31,7 +31,7 @@ class OpenEmojiInfoIconTableCellRenderer(private val emojiInfoList: MutableList<
     ): Component {
         val tableCellRendererComponent = super
                 .getTableCellRendererComponent(table, value, selected, focus, row, column)
-        withBackground(tableCellRendererComponent, emojiInfoList, table, selected, row)
+        withForeground(tableCellRendererComponent, emojiInfoList, table, selected, row)
         setText("")
         return tableCellRendererComponent
     }

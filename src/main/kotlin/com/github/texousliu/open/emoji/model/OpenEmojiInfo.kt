@@ -25,7 +25,14 @@ class OpenEmojiInfo(
             emoji.cnDescription,
             enable,
             type
-    )
+    ) {
+        isCustom = emoji.isCustom
+    }
+
+    private fun markCustom(isCustom: Boolean): OpenEmojiInfo {
+        super.custom(isCustom)
+        return this
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -46,7 +53,7 @@ class OpenEmojiInfo(
     }
 
     public override fun clone(): OpenEmojiInfo {
-        return OpenEmojiInfo(emoji, entity, code, name, description, cnDescription, enable, type)
+        return OpenEmojiInfo(emoji, entity, code, name, description, cnDescription, enable, type).markCustom(isCustom)
     }
 
 }

@@ -7,7 +7,7 @@ import javax.swing.JTable
 
 interface OpenEmojiInfoChangedTableCellRenderer {
 
-    fun withBackground(
+    fun withForeground(
             tableCellRendererComponent: Component,
             emojiInfoList: MutableList<OpenEmojiInfo>,
             table: JTable?,
@@ -15,10 +15,10 @@ interface OpenEmojiInfoChangedTableCellRenderer {
             row: Int,
     ): Component {
         val openEmojiInfo = emojiInfoList[row]
-        tableCellRendererComponent.background =
-                if (openEmojiInfo.changed) JBColor.GREEN
-                else if (isSelected) table!!.selectionBackground
-                else table!!.background
+        tableCellRendererComponent.foreground =
+                if (openEmojiInfo.changed) JBColor.RED
+                else if (isSelected) table!!.selectionForeground
+                else table!!.foreground
         return tableCellRendererComponent
     }
 

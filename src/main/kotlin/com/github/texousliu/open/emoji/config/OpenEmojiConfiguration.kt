@@ -28,7 +28,7 @@ class OpenEmojiConfiguration : SearchableConfigurable {
     }
 
     override fun isModified(): Boolean =
-        triggerWithColonModified() || emojiPatternsModified()
+            triggerWithColonModified() || emojiPatternsModified()
 
     override fun getDisplayName(): String = "Open Gitmoji Settings"
 

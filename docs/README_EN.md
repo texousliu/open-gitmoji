@@ -25,7 +25,20 @@
         - date (#{DATE})
         - time (#{TIME})
 - [X] Custom emoji support.
-    - Configuration path: `File | Settings | Other Settings | Open Gitmoji Settings | Custom`
+    - Configuration path: `File | Settings | Other Settings | Open Gitmoji Settings | Emoji Info List`
+-
+- [X] emoji display interface
+    - Configuration path: `File | Settings | Other Settings | Open Gitmoji Settings | Emoji Info List`
+    - [X] emoji list
+    - [X] emoji editor
+    - [ ] emoji json copy
+    - [X] emoji refresh
+    - [ ] Custom sample copy
+    - [X] emoji enable or disable
+    - [X] emoji duplication check (custom, override, default)
+    - [X] reset button
+    - [X] refresh button
+- [ ] MessageBound support
 
 ## Instructions for use
 
@@ -33,7 +46,7 @@
 
 #### Custom
 
-Configuration path: `File | Settings | Other Settings | Open Gitmoji Settings | Custom`
+Configuration path: `File | Settings | Other Settings | Open Gitmoji Settings | Emoji Info List`
 
 1. Get prompt through text starting with `:` or `:` Such as `: s`
     - Purpose: Mainly to reduce interference caused by pop-up lists when inputting and submitting information to users

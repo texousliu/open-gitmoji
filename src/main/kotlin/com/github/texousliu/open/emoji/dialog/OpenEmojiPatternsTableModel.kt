@@ -6,12 +6,12 @@ import com.intellij.util.ui.ItemRemovable
 import javax.swing.table.AbstractTableModel
 
 class OpenEmojiPatternsTableModel(private var openEmojiPatterns: MutableList<OpenEmojiPattern>) : AbstractTableModel(),
-    ItemRemovable {
+        ItemRemovable {
 
     private val ourColumnNames = arrayOf(
-        "Pattern",
-        "Example",
-        "Enable"
+            "Pattern",
+            "Example",
+            "Enable"
     )
     private val ourColumnClasses = arrayOf<Class<*>>(String::class.java, String::class.java, Boolean::class.java)
 

@@ -26,20 +26,20 @@ class OpenEmojiInfoTypeTableCellRenderer(private val emojiInfoList: MutableList<
     ): Component {
         val tableCellRendererComponent = super
                 .getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column)
-        tableCellRendererComponent.foreground = when (value) {
+        tableCellRendererComponent.background = when (value) {
             OpenEmojiInfoType.OVERRIDE -> {
                 JBColor.RED
             }
 
             OpenEmojiInfoType.CUSTOM -> {
-                JBColor.CYAN
+                JBColor.GREEN
             }
 
             else -> {
-                if (isSelected) table!!.selectionForeground else table!!.foreground
+                if (isSelected) table!!.selectionBackground else table!!.background
             }
         }
-        withBackground(tableCellRendererComponent, emojiInfoList, table, isSelected, row)
+        withForeground(tableCellRendererComponent, emojiInfoList, table, isSelected, row)
         return tableCellRendererComponent
     }
 }

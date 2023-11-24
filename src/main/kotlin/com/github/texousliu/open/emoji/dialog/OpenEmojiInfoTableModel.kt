@@ -6,23 +6,23 @@ import javax.swing.Icon
 import javax.swing.table.AbstractTableModel
 
 class OpenEmojiInfoTableModel(private var openEmojiInfos: MutableList<OpenEmojiInfo>) : AbstractTableModel(),
-    ItemRemovable {
+        ItemRemovable {
 
     private val ourColumnNames = arrayOf(
-        "Icon",
-        "Code",
-        "Description",
-        "Type",
-        "Enable",
+            "Icon",
+            "Code",
+            "Description",
+            "Type",
+            "Enable",
     )
     private val ourColumnClasses =
-        arrayOf<Class<*>>(
-            Icon::class.java,
-            String::class.java,
-            String::class.java,
-            String::class.java,
-            Boolean::class.java
-        )
+            arrayOf<Class<*>>(
+                    Icon::class.java,
+                    String::class.java,
+                    String::class.java,
+                    String::class.java,
+                    Boolean::class.java
+            )
 
 
     override fun getColumnName(column: Int): String {

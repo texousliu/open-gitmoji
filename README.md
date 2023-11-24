@@ -25,18 +25,19 @@
         - date（#{DATE}）
         - time（#{TIME}）
 - [X] 自定义 emoji 支持.
-    - 配置路径：`File | Settings | Other Settings | Open Gitmoji Settings | Custom`
+    - 配置路径：`File | Settings | Other Settings | Open Gitmoji Settings | Emoji Info List`
 
-- [ ] emoji 展示界面
-  - [ ] emoji 列表
-  - [ ] emoji 编辑
-  - [ ] emoji json 拷贝
-  - [ ] emoji 刷新
-  - [ ] 自定义示例拷贝
-  - [ ] emoji 启用禁用
-  - [ ] emoji 查重(custom, override, default)
-  - [ ] reset 按钮
-  - [ ] refresh 按钮
+- [X] emoji 展示界面
+    - 配置路径：`File | Settings | Other Settings | Open Gitmoji Settings | Emoji Info List`
+    - [X] emoji 列表
+    - [X] emoji 编辑
+    - [ ] emoji json 拷贝
+    - [X] emoji 刷新
+    - [ ] 自定义示例拷贝
+    - [X] emoji 启用禁用
+    - [X] emoji 查重(custom, override, default)
+    - [X] reset 按钮
+    - [X] refresh 按钮
 - [ ] MessageBound 支持
 
 ## 使用说明
@@ -45,7 +46,7 @@
 
 #### Custom
 
-配置路径: `File | Settings | Other Settings | Open Gitmoji Settings | Custom`
+配置路径: `File | Settings | Other Settings | Open Gitmoji Settings | Emoji Info List`
 
 1. Get prompt through text starting with `:` or `：`. Such as `:s`
     - 用途: 主要是为了减少输入提交信息时列表弹出对用户造成的干扰

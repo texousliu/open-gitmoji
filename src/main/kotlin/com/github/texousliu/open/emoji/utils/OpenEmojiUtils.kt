@@ -2,8 +2,10 @@ package com.github.texousliu.open.emoji.utils
 
 import com.github.texousliu.open.emoji.context.OpenEmojiCache
 import com.github.texousliu.open.emoji.model.*
+import com.github.texousliu.open.emoji.persistence.OpenEmojiInfoSerializer
 import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.util.IconLoader
@@ -15,8 +17,13 @@ import javax.swing.ImageIcon
 
 object OpenEmojiUtils {
 
-    const val EMOJI_FILE_NAME = "emojis.json"
+    private const val EMOJI_FILE_NAME = "emojis.json"
     const val REPLACE_SUFFIX_MARK = "$$:$$"
+
+    val GSON = Gson()
+    val GSON_INFO: Gson = GsonBuilder()
+            .registerTypeAdapter(OpenEmojiInfo::class.java, OpenEmojiInfoSerializer())
+            .create()
 
     private const val G = "#{G}"
     private const val GU = "#{GU}"
@@ -33,9 +40,9 @@ object OpenEmojiUtils {
 
     fun replace(pattern: String, emoji: OpenEmoji): String {
         val params = mapOf(
-            G to emoji.emoji, GU to emoji.code,
-            DESC to emoji.description, DESC_CN to emoji.cnDescription,
-            DATE to date(), TIME to time()
+                G to emoji.emoji, GU to emoji.code,
+                DESC to emoji.description, DESC_CN to emoji.cnDescription,
+                DATE to date(), TIME to time()
         )
         return replace(pattern, params)
     }
@@ -74,13 +81,13 @@ object OpenEmojiUtils {
     }
 
     fun emojiInfoListWithCustom(
-        directory: String?,
-        emojiInfoList: MutableList<OpenEmojiInfo>
+            directory: String?,
+            emojiInfoList: MutableList<OpenEmojiInfo>
     ): MutableList<OpenEmojiInfo> = emojiInfoListWithCustom(customEmojiInfoList(directory), emojiInfoList)
 
     fun emojiInfoListWithCustom(
-        customEmojiInfoList: MutableList<OpenEmojiInfo>?,
-        emojiInfoList: MutableList<OpenEmojiInfo>
+            customEmojiInfoList: MutableList<OpenEmojiInfo>?,
+            emojiInfoList: MutableList<OpenEmojiInfo>
     ): MutableList<OpenEmojiInfo> {
         customEmojiInfoList?.forEach {
             val index = emojiInfoList.indexOf(it)
