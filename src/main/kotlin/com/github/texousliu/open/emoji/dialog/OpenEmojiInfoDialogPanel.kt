@@ -9,21 +9,19 @@ import com.github.texousliu.open.emoji.model.OpenEmojiInfoType
 import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
 import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
 import com.intellij.icons.AllIcons
-import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
+import com.intellij.openapi.observable.util.whenTextChanged
 import com.intellij.openapi.ui.*
-import com.intellij.ui.BooleanTableCellEditor
-import com.intellij.ui.DoubleClickListener
-import com.intellij.ui.TableUtil
-import com.intellij.ui.ToolbarDecorator
+import com.intellij.ui.*
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
-import com.intellij.ui.dsl.builder.Align
 import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.gridLayout.HorizontalAlign
+import com.intellij.ui.dsl.gridLayout.VerticalAlign
 import com.intellij.ui.scale.JBUIScale.scale
 import com.intellij.ui.table.JBTable
 import java.awt.Dimension
@@ -54,6 +52,7 @@ class OpenEmojiInfoDialogPanel {
                 return true
             }
         }.installOn(emojiInfoTable)
+
         configureStartDirectoryField()
     }
 
@@ -62,10 +61,10 @@ class OpenEmojiInfoDialogPanel {
             row("Custom Emoji Folder:") {
                 cell(customEmojiDirectoryComponent)
                         .resizableColumn()
-                        .align(Align.FILL)
-                        .onChanged {
-                            customEmojiDirectoryChanged(it.text)
-                        }
+                        .horizontalAlign(HorizontalAlign.FILL)
+//                        .onChanged {
+//                            customEmojiDirectoryChanged(it.text)
+//                        }
                         .onReset {
                             customEmojiDirectoryComponent.text =
                                     OpenEmojiPersistent.getInstance().getCustomEmojiDirectory()
@@ -80,7 +79,8 @@ class OpenEmojiInfoDialogPanel {
                             }
                             emojiInfoTableModel.fireTableDataChanged()
                         }.resizableColumn()
-                        .align(Align.FILL)
+                        .horizontalAlign(HorizontalAlign.FILL)
+                        .verticalAlign(VerticalAlign.FILL)
             }.resizableRow()
         }
     }
@@ -101,6 +101,9 @@ class OpenEmojiInfoDialogPanel {
                 FileChooserDescriptorFactory.createSingleFolderDescriptor(),
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
         )
+        customEmojiDirectoryTextField.whenTextChanged {
+            customEmojiDirectoryChanged(customEmojiDirectoryComponent.text)
+        }
     }
 
     private fun createEmojiConfigTable(): JComponent {
@@ -288,25 +291,25 @@ class OpenEmojiInfoDialogPanel {
                     cell(icon)
                 }
                 row("Type: ") {
-                    cell(type).align(Align.FILL)
+                    cell(type).horizontalAlign(HorizontalAlign.FILL)
                 }
                 row {
                     label("Emoji: ")
-                    cell(emoji).align(Align.FILL)
+                    cell(emoji).horizontalAlign(HorizontalAlign.FILL)
                     label("Code: ")
-                    cell(code).align(Align.FILL)
+                    cell(code).horizontalAlign(HorizontalAlign.FILL)
                 }.layout(RowLayout.PARENT_GRID)
                 row {
                     label("Name: ")
-                    cell(name).align(Align.FILL)
+                    cell(name).horizontalAlign(HorizontalAlign.FILL)
                     label("Entity: ")
-                    cell(entity).align(Align.FILL)
+                    cell(entity).horizontalAlign(HorizontalAlign.FILL)
                 }.layout(RowLayout.PARENT_GRID)
                 row("Description: ") {
-                    cell(description).align(Align.FILL)
+                    cell(description).horizontalAlign(HorizontalAlign.FILL)
                 }.layout(RowLayout.PARENT_GRID)
                 row("Description CN: ") {
-                    cell(cnDescription).align(Align.FILL)
+                    cell(cnDescription).horizontalAlign(HorizontalAlign.FILL)
                 }.layout(RowLayout.PARENT_GRID)
             }
         }
@@ -332,14 +335,14 @@ class OpenEmojiInfoDialogPanel {
     }
 
     private class OpenEmojiInfoResetFromDiskAnAction(icon: Icon,
-                                                     var panel: OpenEmojiInfoDialogPanel) : AnAction({ "Reset to default" }, { "reset to default with custom directory emojis" }, icon) {
+                                                     var panel: OpenEmojiInfoDialogPanel) : AnActionButton({ "Reset to default" }, { "reset to default with custom directory emojis" }, icon) {
         override fun actionPerformed(e: AnActionEvent) {
             panel.resetToDefault()
         }
     }
 
     private class OpenEmojiInfoReloadCustomAnAction(icon: Icon,
-                                                    var panel: OpenEmojiInfoDialogPanel) : AnAction({ "Reload custom emoji but don`t remove exists" }, { "reload custom emoji but not remove exists custom emojis" }, icon) {
+                                                    var panel: OpenEmojiInfoDialogPanel) : AnActionButton({ "Reload custom emoji but don`t remove exists" }, { "reload custom emoji but not remove exists custom emojis" }, icon) {
         override fun actionPerformed(e: AnActionEvent) {
             panel.reloadCustom()
         }
