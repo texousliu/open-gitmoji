@@ -11,7 +11,6 @@ import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
-import com.intellij.openapi.observable.util.whenTextChanged
 import com.intellij.openapi.ui.*
 import com.intellij.ui.*
 import com.intellij.ui.components.JBCheckBox
@@ -28,6 +27,8 @@ import java.awt.Dimension
 import java.awt.event.MouseEvent
 import javax.swing.Icon
 import javax.swing.JComponent
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
 import javax.swing.table.TableCellEditor
 
 
@@ -101,9 +102,19 @@ class OpenEmojiInfoDialogPanel {
                 FileChooserDescriptorFactory.createSingleFolderDescriptor(),
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
         )
-        customEmojiDirectoryTextField.whenTextChanged {
-            customEmojiDirectoryChanged(customEmojiDirectoryComponent.text)
-        }
+        customEmojiDirectoryTextField.document.addDocumentListener(object : DocumentListener {
+            override fun insertUpdate(e: DocumentEvent?) {
+                customEmojiDirectoryChanged(customEmojiDirectoryComponent.text)
+            }
+
+            override fun removeUpdate(e: DocumentEvent?) {
+                customEmojiDirectoryChanged(customEmojiDirectoryComponent.text)
+            }
+
+            override fun changedUpdate(e: DocumentEvent?) {
+                customEmojiDirectoryChanged(customEmojiDirectoryComponent.text)
+            }
+        })
     }
 
     private fun createEmojiConfigTable(): JComponent {
