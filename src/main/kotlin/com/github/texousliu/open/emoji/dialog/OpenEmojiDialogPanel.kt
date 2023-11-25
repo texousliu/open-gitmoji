@@ -69,8 +69,8 @@ class OpenEmojiDialogPanel {
                                 emojiPatternsTableModel.fireTableDataChanged()
                             }.resizableColumn()
                             .align(Align.FILL)
-                }.layout(RowLayout.PARENT_GRID).resizableRow()
-            }
+                }.resizableRow()
+            }.resizableRow()
         }
     }
 
