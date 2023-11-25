@@ -45,4 +45,9 @@
         </projectConfigurable>
     </extensions>
 
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup id="Custom Open Emoji Notification Group"
+                           displayType="BALLOON"/>
+    </extensions>
+
 </idea-plugin>

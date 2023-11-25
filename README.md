@@ -38,7 +38,7 @@
     - [X] emoji 查重(custom, override, default)
     - [X] reset 按钮
     - [X] refresh 按钮
-- [ ] MessageBound 支持
+- [X] MessageBound 支持
 - [ ] 多语言支持
 
 ## 使用说明
