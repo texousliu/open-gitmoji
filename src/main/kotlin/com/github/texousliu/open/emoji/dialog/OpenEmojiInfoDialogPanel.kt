@@ -1,5 +1,6 @@
 package com.github.texousliu.open.emoji.dialog
 
+import com.github.texousliu.open.emoji.config.OpenEmojiBundle
 import com.github.texousliu.open.emoji.dialog.renderer.OpenEmojiInfoBooleanTableCellRenderer
 import com.github.texousliu.open.emoji.dialog.renderer.OpenEmojiInfoIconTableCellRenderer
 import com.github.texousliu.open.emoji.dialog.renderer.OpenEmojiInfoStringTableCellRenderer
@@ -59,7 +60,7 @@ class OpenEmojiInfoDialogPanel {
 
     private fun emojiInfoSettingsDialogPanel(): DialogPanel {
         return panel {
-            row("Custom Emoji Folder:") {
+            row(OpenEmojiBundle.message("settings.info.custom.directory.label")) {
                 cell(customEmojiDirectoryComponent)
                         .resizableColumn()
                         .horizontalAlign(HorizontalAlign.FILL)
@@ -70,7 +71,7 @@ class OpenEmojiInfoDialogPanel {
                             customEmojiDirectoryComponent.text =
                                     OpenEmojiPersistent.getInstance().getCustomEmojiDirectory()
                         }
-            }.rowComment("Configure your own emojis beyond additional system presets. <a href='https://github.com/texousliu/open-gitmoji'>Documents</a>")
+            }.rowComment(OpenEmojiBundle.message("settings.info.custom.directory.comment"))
             row {
                 cell(createEmojiConfigTable())
                         .onReset {
@@ -96,8 +97,8 @@ class OpenEmojiInfoDialogPanel {
 
     private fun configureStartDirectoryField() {
         customEmojiDirectoryComponent.addBrowseFolderListener(
-                "Choose Custom Emoji Folder",
-                "Choose custom emoji folder",
+                OpenEmojiBundle.message("settings.info.custom.directory.choose.title"),
+                OpenEmojiBundle.message("settings.info.custom.directory.choose.desc"),
                 null,
                 FileChooserDescriptorFactory.createSingleFolderDescriptor(),
                 TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
@@ -197,7 +198,7 @@ class OpenEmojiInfoDialogPanel {
         val selectConfig = emojiInfoList[selectedIndex]
 
         val dialog = EmojiConfigInfoDialogWrapper(selectConfig)
-        dialog.title = "Edit Emoji"
+        dialog.title = OpenEmojiBundle.message("settings.info.emoji.title.edit")
         if (!dialog.showAndGet()) {
             return
         }
@@ -259,7 +260,7 @@ class OpenEmojiInfoDialogPanel {
 
     private class EmojiConfigInfoDialogWrapper() : DialogWrapper(true) {
 
-        var enable = JBCheckBox("Enable emoji")
+        var enable = JBCheckBox(OpenEmojiBundle.message("settings.info.emoji.enable.label"))
         var icon = JBLabel(AllIcons.Actions.Refresh)
         var type = JBTextField()
         var emoji = JBTextField()
@@ -283,7 +284,7 @@ class OpenEmojiInfoDialogPanel {
         }
 
         init {
-            title = "Add Emoji"
+            title = OpenEmojiBundle.message("settings.info.emoji.title.add")
             type.isEditable = false
             emoji.isEditable = false
             entity.isEditable = false
@@ -301,26 +302,33 @@ class OpenEmojiInfoDialogPanel {
                     cell(enable).gap(RightGap.SMALL)
                     cell(icon)
                 }
-                row("Type: ") {
-                    cell(type).horizontalAlign(HorizontalAlign.FILL)
+                row(OpenEmojiBundle.message("settings.info.emoji.type.label")) {
+                    cell(type)
+                            .horizontalAlign(HorizontalAlign.FILL)
                 }
                 row {
-                    label("Emoji: ")
-                    cell(emoji).horizontalAlign(HorizontalAlign.FILL)
-                    label("Code: ")
-                    cell(code).horizontalAlign(HorizontalAlign.FILL)
+                    label(OpenEmojiBundle.message("settings.info.emoji.emoji.label"))
+                    cell(emoji)
+                            .horizontalAlign(HorizontalAlign.FILL)
+                    label(OpenEmojiBundle.message("settings.info.emoji.code.label"))
+                    cell(code)
+                            .horizontalAlign(HorizontalAlign.FILL)
                 }.layout(RowLayout.PARENT_GRID)
                 row {
-                    label("Name: ")
-                    cell(name).horizontalAlign(HorizontalAlign.FILL)
-                    label("Entity: ")
-                    cell(entity).horizontalAlign(HorizontalAlign.FILL)
+                    label(OpenEmojiBundle.message("settings.info.emoji.name.label"))
+                    cell(name)
+                            .horizontalAlign(HorizontalAlign.FILL)
+                    label(OpenEmojiBundle.message("settings.info.emoji.entity.label"))
+                    cell(entity)
+                            .horizontalAlign(HorizontalAlign.FILL)
                 }.layout(RowLayout.PARENT_GRID)
-                row("Description: ") {
-                    cell(description).horizontalAlign(HorizontalAlign.FILL)
+                row(OpenEmojiBundle.message("settings.info.emoji.desc.label")) {
+                    cell(description)
+                            .horizontalAlign(HorizontalAlign.FILL)
                 }.layout(RowLayout.PARENT_GRID)
-                row("Description CN: ") {
-                    cell(cnDescription).horizontalAlign(HorizontalAlign.FILL)
+                row(OpenEmojiBundle.message("settings.info.emoji.desc-cn.label")) {
+                    cell(cnDescription)
+                            .horizontalAlign(HorizontalAlign.FILL)
                 }.layout(RowLayout.PARENT_GRID)
             }
         }
@@ -334,7 +342,7 @@ class OpenEmojiInfoDialogPanel {
 
         override fun doValidate(): ValidationInfo? {
             if (isEmpty(emoji.text) || isEmpty(code.text)) {
-                return ValidationInfo("Emoji and code is required")
+                return ValidationInfo(OpenEmojiBundle.message("settings.info.emoji.validate.info"))
             }
             return super.doValidate()
         }
@@ -346,14 +354,18 @@ class OpenEmojiInfoDialogPanel {
     }
 
     private class OpenEmojiInfoResetFromDiskAnAction(icon: Icon,
-                                                     var panel: OpenEmojiInfoDialogPanel) : AnActionButton({ "Reset to default" }, { "reset to default with custom directory emojis" }, icon) {
+                                                     var panel: OpenEmojiInfoDialogPanel)
+        : AnActionButton({ OpenEmojiBundle.message("settings.info.emoji.reset.title") },
+            { OpenEmojiBundle.message("settings.info.emoji.reset.desc") }, icon) {
         override fun actionPerformed(e: AnActionEvent) {
             panel.resetToDefault()
         }
     }
 
     private class OpenEmojiInfoReloadCustomAnAction(icon: Icon,
-                                                    var panel: OpenEmojiInfoDialogPanel) : AnActionButton({ "Reload custom emoji but don`t remove exists" }, { "reload custom emoji but not remove exists custom emojis" }, icon) {
+                                                    var panel: OpenEmojiInfoDialogPanel)
+        : AnActionButton({ OpenEmojiBundle.message("settings.info.emoji.reload.title") },
+            { OpenEmojiBundle.message("settings.info.emoji.reload.desc") }, icon) {
         override fun actionPerformed(e: AnActionEvent) {
             panel.reloadCustom()
         }

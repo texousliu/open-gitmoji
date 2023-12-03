@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 2.0.7
+
+- 迁移面板信息到 message bundle
+- 修复 pattern 面板高度问题
+- 添加 commit 界面刷新 emoji 结果通知
+
 ## 2.0.6
 
 - 添加 `Emoji Info List` 界面

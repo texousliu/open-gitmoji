@@ -30,7 +30,7 @@ class OpenEmojiConfiguration : SearchableConfigurable {
     override fun isModified(): Boolean =
             triggerWithColonModified() || emojiPatternsModified()
 
-    override fun getDisplayName(): String = "Open Gitmoji Settings"
+    override fun getDisplayName(): String = OpenEmojiBundle.message("settings.title")
 
     override fun getId(): String = "com.github.texousliu.emoji.settings.OpenEmojiSettings"
 

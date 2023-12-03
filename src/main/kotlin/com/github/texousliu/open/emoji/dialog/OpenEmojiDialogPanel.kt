@@ -1,5 +1,6 @@
 package com.github.texousliu.open.emoji.dialog
 
+import com.github.texousliu.open.emoji.config.OpenEmojiBundle
 import com.github.texousliu.open.emoji.model.OpenEmojiPattern
 import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
 import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
@@ -13,6 +14,7 @@ import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
+import com.intellij.ui.dsl.gridLayout.VerticalAlign
 import com.intellij.ui.scale.JBUIScale.scale
 import com.intellij.ui.table.JBTable
 import java.awt.Dimension
@@ -25,7 +27,7 @@ import javax.swing.table.TableCellEditor
 
 class OpenEmojiDialogPanel {
 
-    val triggerWithColonCheckBox = JBCheckBox("Get prompt through text starting with ':' or '：'. Such as ':s'")
+    val triggerWithColonCheckBox = JBCheckBox(OpenEmojiBundle.message("settings.trigger.label"))
     val emojiPatterns = mutableListOf<OpenEmojiPattern>()
     private val emojiPatternsTableModel = OpenEmojiPatternsTableModel(emojiPatterns)
     private val emojiPatternsTable = JBTable(emojiPatternsTableModel)
@@ -44,7 +46,7 @@ class OpenEmojiDialogPanel {
 
     private fun emojiSettingsDialogPanel(): DialogPanel {
         return panel {
-            group("Custom") {
+            group(OpenEmojiBundle.message("settings.group.custom.title")) {
                 row {
                     cell(triggerWithColonCheckBox)
                             .gap(RightGap.SMALL)
@@ -52,11 +54,11 @@ class OpenEmojiDialogPanel {
                                 triggerWithColonCheckBox.isSelected =
                                         OpenEmojiPersistent.getInstance().getTriggerWithColon()
                             }
-                }.rowComment("Optimize input habits and reduce trouble caused by unnecessary prompts")
+                }.rowComment(OpenEmojiBundle.message("settings.trigger.comment"))
             }
 
-            group("Prompt List") {
-                row("Configure prompt item expression") { }
+            group(OpenEmojiBundle.message("settings.group.prompt.title")) {
+                row(OpenEmojiBundle.message("settings.group.prompt.label")) { }
                 row {
                     cell(createPromptListTable())
                             .gap(RightGap.SMALL)
@@ -68,8 +70,9 @@ class OpenEmojiDialogPanel {
                                 emojiPatternsTableModel.fireTableDataChanged()
                             }.resizableColumn()
                             .horizontalAlign(HorizontalAlign.FILL)
-                }.layout(RowLayout.PARENT_GRID).resizableRow()
-            }
+                            .verticalAlign(VerticalAlign.FILL)
+                }.resizableRow()
+            }.resizableRow()
         }
     }
 
@@ -132,7 +135,7 @@ class OpenEmojiDialogPanel {
         val selectPattern = emojiPatterns[selectedIndex]
 
         val dialog = PatternInfoDialogWrapper(selectPattern.pattern, selectPattern.enable)
-        dialog.title = "Edit Pattern"
+        dialog.title = OpenEmojiBundle.message("settings.pattern.title.edit")
         if (!dialog.showAndGet()) {
             return
         }
@@ -183,7 +186,7 @@ class OpenEmojiDialogPanel {
 
     private class PatternInfoDialogWrapper() : DialogWrapper(true) {
 
-        var enable = JBCheckBox("Enable pattern")
+        var enable = JBCheckBox(OpenEmojiBundle.message("settings.pattern.enable.label"))
         var pattern = JBTextField()
         var example = JBTextField()
 
@@ -193,7 +196,7 @@ class OpenEmojiDialogPanel {
         }
 
         init {
-            title = "Add Pattern"
+            title = OpenEmojiBundle.message("settings.pattern.title.add")
             pattern.document.addDocumentListener(object : DocumentListener {
                 override fun insertUpdate(e: DocumentEvent?) {
                     generatorDemo(pattern.text)
@@ -223,26 +226,21 @@ class OpenEmojiDialogPanel {
                     cell(enable)
                     // 添加帮助图标
                     contextHelp(
-                            "Configure whether the regular expression takes effect. Some expressions do not need to take effect in real time, so this configuration item is provided.",
-                            "Enable pattern help"
+                            OpenEmojiBundle.message("settings.pattern.enable.context-help.description"),
+                            OpenEmojiBundle.message("settings.pattern.enable.context-help.title")
                     )
                 }
-                row("Pattern: ") {
-                    cell(pattern).horizontalAlign(HorizontalAlign.FILL).focused()
+                row(OpenEmojiBundle.message("settings.pattern.pattern.label")) {
+                    cell(pattern)
+                            .horizontalAlign(HorizontalAlign.FILL)
+                            .focused()
                             .comment(
-                                    """
-                            The system provides the following placeholders by default:<br>
-                            #{G}: Replace with emoji <br>
-                            #{GU}: Replace with emoji unicode <br>
-                            #{DESC}: Replace with emoji description (English) <br>
-                            #{DESC_CN}: Replace with emoji description (Chinese) <br>
-                            #{DATE}: Replace with the current system date <br>
-                            #{TIME}: Replace with the current system time
-                        """.trimIndent(), 50
+                                    OpenEmojiBundle.message("settings.pattern.pattern.comment").trimIndent(), 50
                             )
                 }.layout(RowLayout.PARENT_GRID)
-                row("Example: ") {
-                    cell(example).horizontalAlign(HorizontalAlign.FILL)
+                row(OpenEmojiBundle.message("settings.pattern.example.label")) {
+                    cell(example)
+                            .horizontalAlign(HorizontalAlign.FILL)
                 }.layout(RowLayout.PARENT_GRID)
             }
         }
@@ -253,7 +251,7 @@ class OpenEmojiDialogPanel {
 
         override fun doValidate(): ValidationInfo? {
             if (pattern.text == null || pattern.text.trim().isEmpty()) {
-                return ValidationInfo("Pattern is required")
+                return ValidationInfo(OpenEmojiBundle.message("settings.pattern.validate.info"))
             }
             return super.doValidate()
         }
