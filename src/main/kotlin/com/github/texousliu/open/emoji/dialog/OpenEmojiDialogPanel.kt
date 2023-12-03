@@ -72,7 +72,7 @@ class OpenEmojiDialogPanel {
                             .horizontalAlign(HorizontalAlign.FILL)
                             .verticalAlign(VerticalAlign.FILL)
                 }.resizableRow()
-            }.resizableRow()
+            }
         }
     }
 
