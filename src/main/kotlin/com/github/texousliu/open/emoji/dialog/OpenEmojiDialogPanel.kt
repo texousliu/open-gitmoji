@@ -14,6 +14,7 @@ import com.intellij.ui.dsl.builder.RightGap
 import com.intellij.ui.dsl.builder.RowLayout
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.gridLayout.HorizontalAlign
+import com.intellij.ui.dsl.gridLayout.VerticalAlign
 import com.intellij.ui.scale.JBUIScale.scale
 import com.intellij.ui.table.JBTable
 import java.awt.Dimension
@@ -69,6 +70,7 @@ class OpenEmojiDialogPanel {
                                 emojiPatternsTableModel.fireTableDataChanged()
                             }.resizableColumn()
                             .horizontalAlign(HorizontalAlign.FILL)
+                            .verticalAlign(VerticalAlign.FILL)
                 }.resizableRow()
             }.resizableRow()
         }
