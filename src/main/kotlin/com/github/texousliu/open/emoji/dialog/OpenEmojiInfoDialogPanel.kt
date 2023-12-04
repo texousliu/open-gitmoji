@@ -1,6 +1,7 @@
 package com.github.texousliu.open.emoji.dialog
 
 import com.github.texousliu.open.emoji.config.OpenEmojiBundle
+import com.github.texousliu.open.emoji.context.OpenEmojiCache
 import com.github.texousliu.open.emoji.dialog.renderer.OpenEmojiInfoBooleanTableCellRenderer
 import com.github.texousliu.open.emoji.dialog.renderer.OpenEmojiInfoIconTableCellRenderer
 import com.github.texousliu.open.emoji.dialog.renderer.OpenEmojiInfoStringTableCellRenderer
@@ -91,7 +92,7 @@ class OpenEmojiInfoDialogPanel {
         // 获取所有自定义 emoji
         OpenEmojiUtils.emojiInfoListWithCustom(directory, emojiInfoList)
         // 更新表格
-        withSelectionFireTableDataChanged()
+        withSelectionFireTableDataChanged(null)
     }
 
     private fun configureStartDirectoryField() {
@@ -156,17 +157,27 @@ class OpenEmojiInfoDialogPanel {
         stopEditing()
         val addEmojiDialog = EmojiConfigInfoDialogWrapper()
         if (addEmojiDialog.showAndGet()) {
-            emojiInfoList.add(addEmojiDialog.load())
-
-            val index: Int = emojiInfoList.size - 1
-            emojiInfoTableModel.fireTableRowsInserted(index, index)
-            emojiInfoTable.selectionModel.setSelectionInterval(index, index)
-            emojiInfoTable.scrollRectToVisible(emojiInfoTable.getCellRect(index, 0, true))
+            val add = addEmojiDialog.load()
+            add.type = OpenEmojiInfoType.CUSTOM
+            val existsIndex = emojiInfoList.indexOf(add)
+            if (existsIndex < 0) {
+                add.markCustom(true)
+                emojiInfoList.add(add)
+                val index: Int = emojiInfoList.size - 1
+//                emojiInfoTableModel.fireTableRowsInserted(index, index)
+//                emojiInfoTable.selectionModel.setSelectionInterval(index, index)
+//                emojiInfoTable.scrollRectToVisible(emojiInfoTable.getCellRect(index, 0, true))
+                withSelectionFireTableDataChanged(index)
+            } else {
+                val exists = emojiInfoList[existsIndex]
+                exists.change(add)
+                withSelectionFireTableDataChanged(existsIndex)
+            }
         }
     }
 
-    private fun withSelectionFireTableDataChanged() {
-        var selectedRow = emojiInfoTable.selectedRow
+    private fun withSelectionFireTableDataChanged(sr: Int?) {
+        var selectedRow = sr?:emojiInfoTable.selectedRow
         if (selectedRow < 0) selectedRow = emojiInfoList.size - 1
         if (selectedRow >= emojiInfoList.size) selectedRow = emojiInfoList.size - 1
         emojiInfoTableModel.fireTableDataChanged()
@@ -184,11 +195,11 @@ class OpenEmojiInfoDialogPanel {
         val selectConfig = emojiInfoList[selectedIndex]
 
         val dialog = EmojiConfigInfoDialogWrapper(selectConfig)
-        dialog.title = OpenEmojiBundle.message("settings.info.emoji.title.edit")
+        dialog.enableEdit()
         if (!dialog.showAndGet()) {
             return
         }
-        emojiInfoList[selectedIndex] = dialog.load()
+        selectConfig.change(dialog.load())
         emojiInfoTableModel.fireTableRowsUpdated(selectedIndex, selectedIndex)
         emojiInfoTable.selectionModel.setSelectionInterval(selectedIndex, selectedIndex)
     }
@@ -197,7 +208,14 @@ class OpenEmojiInfoDialogPanel {
         stopEditing()
         val selectedIndex: Int = emojiInfoTable.selectedRow
         if (selectedIndex >= 0 && selectedIndex < emojiInfoTableModel.rowCount) {
-            TableUtil.removeSelectedItems(emojiInfoTable)
+            val select = emojiInfoList[selectedIndex]
+            if (select.type == OpenEmojiInfoType.OVERRIDE) {
+                emojiInfoList[selectedIndex] = OpenEmojiCache.get(select)
+                emojiInfoTableModel.fireTableRowsUpdated(selectedIndex, selectedIndex)
+                emojiInfoTable.selectionModel.setSelectionInterval(selectedIndex, selectedIndex)
+            } else {
+                TableUtil.removeSelectedItems(emojiInfoTable)
+            }
         }
     }
 
@@ -220,16 +238,14 @@ class OpenEmojiInfoDialogPanel {
                 modify = true
             } else {
                 val cei = config[indexOf]
-                if (cei.enable != emojiInfo.enable
-                        || cei.emoji != emojiInfo.emoji
-                        || cei.type != emojiInfo.type) {
+                if (cei.modified(emojiInfo)) {
                     emojiInfo.changed = true
                     modify = true
                 }
             }
         }
         if (modify) {
-            withSelectionFireTableDataChanged()
+            withSelectionFireTableDataChanged(null)
         }
         return modify
     }
@@ -237,7 +253,7 @@ class OpenEmojiInfoDialogPanel {
     fun resetToDefault() {
         emojiInfoList.clear()
         emojiInfoList.addAll(OpenEmojiUtils.emojiInfoList(customEmojiDirectoryComponent.text))
-        withSelectionFireTableDataChanged()
+        withSelectionFireTableDataChanged(null)
     }
 
     fun reloadCustom() {
@@ -245,7 +261,6 @@ class OpenEmojiInfoDialogPanel {
     }
 
     private class EmojiConfigInfoDialogWrapper() : DialogWrapper(true) {
-
         var enable = JBCheckBox(OpenEmojiBundle.message("settings.info.emoji.enable.label"))
         var icon = JBLabel(AllIcons.Actions.Refresh)
         var type = JBTextField()
@@ -272,12 +287,12 @@ class OpenEmojiInfoDialogPanel {
         init {
             title = OpenEmojiBundle.message("settings.info.emoji.title.add")
             type.isEditable = false
-            emoji.isEditable = false
-            entity.isEditable = false
-            code.isEditable = false
-            name.isEditable = false
-            description.isEditable = false
-            cnDescription.isEditable = false
+            emoji.isEditable = true
+            entity.isEditable = true
+            code.isEditable = true
+            name.isEditable = true
+            description.isEditable = true
+            cnDescription.isEditable = true
             enable.isSelected = true
             init()
         }
@@ -317,6 +332,12 @@ class OpenEmojiInfoDialogPanel {
                     emoji.text, entity.text, code.text,
                     name.text, description.text, cnDescription.text, enable.isSelected
             )
+        }
+
+        fun enableEdit() {
+            this.title = OpenEmojiBundle.message("settings.info.emoji.title.edit")
+            this.emoji.isEditable = false
+            this.code.isEditable = false
         }
 
         override fun doValidate(): ValidationInfo? {

@@ -28,7 +28,7 @@ class OpenEmojiInfoTypeTableCellRenderer(private val emojiInfoList: MutableList<
                 .getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column)
         tableCellRendererComponent.background = when (value) {
             OpenEmojiInfoType.OVERRIDE -> {
-                JBColor.RED
+                JBColor.CYAN
             }
 
             OpenEmojiInfoType.CUSTOM -> {

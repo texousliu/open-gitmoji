@@ -6,12 +6,12 @@ import javax.swing.Icon
 
 open class OpenEmoji(
         var emoji: String,
-        val entity: String,
+        var entity: String,
         val code: String,
-        val name: String,
-        val description: String,
+        var name: String,
+        var description: String,
         @SerializedName("cn_description")
-        val cnDescription: String
+        var cnDescription: String
 ) {
 
     var isCustom = false

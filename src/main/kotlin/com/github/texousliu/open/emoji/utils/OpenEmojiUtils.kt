@@ -96,9 +96,14 @@ object OpenEmojiUtils {
                 emojiInfoList.add(it)
             } else {
                 val oldEmojiInfo = emojiInfoList[index]
-                if (oldEmojiInfo.type != OpenEmojiInfoType.CUSTOM) {
+                if (oldEmojiInfo.type == OpenEmojiInfoType.DEFAULT) {
                     it.type = OpenEmojiInfoType.OVERRIDE
                     it.enable = oldEmojiInfo.enable
+                    it.name = oldEmojiInfo.name
+                    it.entity = oldEmojiInfo.entity
+                    it.description = oldEmojiInfo.description
+                    it.cnDescription = oldEmojiInfo.cnDescription
+
                     emojiInfoList[index] = it
                 }
             }
