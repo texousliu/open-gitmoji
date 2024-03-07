@@ -177,7 +177,7 @@ class OpenEmojiInfoDialogPanel {
     }
 
     private fun withSelectionFireTableDataChanged(sr: Int?) {
-        var selectedRow = sr?:emojiInfoTable.selectedRow
+        var selectedRow = sr ?: emojiInfoTable.selectedRow
         if (selectedRow < 0) selectedRow = emojiInfoList.size - 1
         if (selectedRow >= emojiInfoList.size) selectedRow = emojiInfoList.size - 1
         emojiInfoTableModel.fireTableDataChanged()
@@ -270,6 +270,8 @@ class OpenEmojiInfoDialogPanel {
         var name = JBTextField()
         var description = JBTextField()
         var cnDescription = JBTextField()
+        var iconPath = JBTextField()
+        var isCustom = true
 
 
         constructor(config: OpenEmojiInfo) : this() {
@@ -282,6 +284,8 @@ class OpenEmojiInfoDialogPanel {
             this.description.text = config.description
             this.cnDescription.text = config.cnDescription
             this.icon.icon = config.getIcon()
+            this.iconPath.text = config.getIconPath()
+            this.isCustom = config.getCustom()
         }
 
         init {
@@ -294,7 +298,15 @@ class OpenEmojiInfoDialogPanel {
             description.isEditable = true
             cnDescription.isEditable = true
             enable.isSelected = true
+            iconPath.isEditable = false
+
+            OpenEmojiUtils.addDocListener(code, this::generatorIconPath)
+
             init()
+        }
+
+        private fun generatorIconPath(code: String) {
+            iconPath.text = OpenEmojiUtils.getIconPath(code, isCustom).replace("\\", "/")
         }
 
         override fun createCenterPanel(): JComponent {
@@ -302,6 +314,9 @@ class OpenEmojiInfoDialogPanel {
                 row {
                     cell(enable).gap(RightGap.SMALL)
                     cell(icon)
+                }
+                row {
+                    cell(iconPath).align(Align.FILL)
                 }
                 row(OpenEmojiBundle.message("settings.info.emoji.type.label")) {
                     cell(type).align(Align.FILL)
@@ -338,6 +353,7 @@ class OpenEmojiInfoDialogPanel {
             this.title = OpenEmojiBundle.message("settings.info.emoji.title.edit")
             this.emoji.isEditable = false
             this.code.isEditable = false
+            this.iconPath.isEditable = false
         }
 
         override fun doValidate(): ValidationInfo? {
