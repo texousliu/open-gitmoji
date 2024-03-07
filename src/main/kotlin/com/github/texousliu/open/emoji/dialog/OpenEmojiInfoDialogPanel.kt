@@ -319,7 +319,8 @@ class OpenEmojiInfoDialogPanel {
                     cell(icon)
                 }
                 row {
-                    cell(iconPath).align(Align.FILL)
+                    cell(iconPath)
+                            .horizontalAlign(HorizontalAlign.FILL)
                 }
                 row(OpenEmojiBundle.message("settings.info.emoji.type.label")) {
                     cell(type)
