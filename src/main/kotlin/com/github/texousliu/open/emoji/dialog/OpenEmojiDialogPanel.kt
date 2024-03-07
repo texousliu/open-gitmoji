@@ -20,8 +20,6 @@ import com.intellij.ui.table.JBTable
 import java.awt.Dimension
 import java.awt.event.MouseEvent
 import javax.swing.JComponent
-import javax.swing.event.DocumentEvent
-import javax.swing.event.DocumentListener
 import javax.swing.table.TableCellEditor
 
 
@@ -197,20 +195,9 @@ class OpenEmojiDialogPanel {
 
         init {
             title = OpenEmojiBundle.message("settings.pattern.title.add")
-            pattern.document.addDocumentListener(object : DocumentListener {
-                override fun insertUpdate(e: DocumentEvent?) {
-                    generatorDemo(pattern.text)
-                }
 
-                override fun removeUpdate(e: DocumentEvent?) {
-                    generatorDemo(pattern.text)
-                }
+            OpenEmojiUtils.addDocListener(pattern, this::generatorDemo)
 
-                override fun changedUpdate(e: DocumentEvent?) {
-                    generatorDemo(pattern.text)
-                }
-
-            })
             example.isEditable = false
             enable.isSelected = true
             init()

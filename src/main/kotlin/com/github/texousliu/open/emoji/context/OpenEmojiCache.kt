@@ -21,4 +21,9 @@ object OpenEmojiCache {
         emojiInfoList.addAll(OpenEmojiUtils.emojiInfoList(directory))
     }
 
+    fun get(value: OpenEmojiInfo) : OpenEmojiInfo {
+        val indexOf = emojiInfoList.indexOf(value)
+        return if (indexOf < 0) value else emojiInfoList[indexOf]
+    }
+
 }

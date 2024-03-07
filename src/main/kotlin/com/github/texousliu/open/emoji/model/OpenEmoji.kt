@@ -6,12 +6,12 @@ import javax.swing.Icon
 
 open class OpenEmoji(
         var emoji: String,
-        val entity: String,
+        var entity: String,
         val code: String,
-        val name: String,
-        val description: String,
+        var name: String,
+        var description: String,
         @SerializedName("cn_description")
-        val cnDescription: String
+        var cnDescription: String
 ) {
 
     var isCustom = false
@@ -21,9 +21,13 @@ open class OpenEmoji(
 
     fun getIcon(): Icon {
         if (!this::_icon.isInitialized) {
-            _icon = OpenEmojiUtils.getIcon(code.replace(":".toRegex(), ""), isCustom)
+            _icon = OpenEmojiUtils.getIcon(code, isCustom)
         }
         return _icon
+    }
+
+    fun getIconPath(): String {
+        return OpenEmojiUtils.getIconPath(code, isCustom).replace("\\", "/")
     }
 
     fun custom() {
@@ -32,6 +36,10 @@ open class OpenEmoji(
 
     fun custom(isCustom: Boolean) {
         this.isCustom = isCustom
+    }
+
+    fun getCustom(): Boolean {
+        return this.isCustom
     }
 
 }

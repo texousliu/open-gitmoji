@@ -4,6 +4,12 @@
 
 ## Unreleased
 
+## 2.0.8
+
+- 完善编辑功能
+- 完善添加表单功能（图标暂不可选）
+- 完善移除功能
+
 ## 2.0.7
 
 - 迁移面板信息到 message bundle
@@ -60,7 +66,8 @@
 
 ## 1.0.3
 
-- Add text starting with : to prompt for configuration. Solve the problem that it will be triggered when there is no need to prompt
+- Add text starting with : to prompt for configuration. Solve the problem that it will be triggered when there is no
+  need to prompt
 - 添加以 : 开头的文本才会提示配置，解决不需要提示的时候也会触发的问题
 - add '：' supported（添加中文冒号支持）
 
