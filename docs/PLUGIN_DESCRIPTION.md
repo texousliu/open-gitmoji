@@ -1,4 +1,5 @@
 ### A plug-in for easy use of `emoji`
+
 **Feature:**
 
 - Easy way for input emoji unicode or emoji code
@@ -32,6 +33,7 @@
 ### 一个便于使用 `emoji` 的插件
 
 **特性：**
+
 - 输入 emoji-unicode 或 emoji-code 的简单方法。
 - 自定义提示列表。
 - 自定义以 `:` 开头提示。

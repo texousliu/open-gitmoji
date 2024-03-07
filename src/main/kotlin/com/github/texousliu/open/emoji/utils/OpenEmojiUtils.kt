@@ -12,8 +12,12 @@ import com.intellij.openapi.util.IconLoader
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.function.Consumer
 import javax.swing.Icon
 import javax.swing.ImageIcon
+import javax.swing.JTextField
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
 
 object OpenEmojiUtils {
 
@@ -96,9 +100,14 @@ object OpenEmojiUtils {
                 emojiInfoList.add(it)
             } else {
                 val oldEmojiInfo = emojiInfoList[index]
-                if (oldEmojiInfo.type != OpenEmojiInfoType.CUSTOM) {
+                if (oldEmojiInfo.type == OpenEmojiInfoType.DEFAULT) {
                     it.type = OpenEmojiInfoType.OVERRIDE
                     it.enable = oldEmojiInfo.enable
+                    it.name = oldEmojiInfo.name
+                    it.entity = oldEmojiInfo.entity
+                    it.description = oldEmojiInfo.description
+                    it.cnDescription = oldEmojiInfo.cnDescription
+
                     emojiInfoList[index] = it
                 }
             }
@@ -125,19 +134,43 @@ object OpenEmojiUtils {
         return result
     }
 
-    fun getIcon(name: String, isCustom: Boolean): Icon {
-        return if (isCustom) getCustomIcon(name) else
-            IconLoader.getIcon("/icons/emojis/${name}.png", OpenEmoji::class.java)
+    fun getIcon(code: String, isCustom: Boolean): Icon {
+        val name = getIconName(code)
+        val iconPath = getIconPath(name, isCustom)
+        return if (isCustom) getCustomIcon(iconPath) else
+            IconLoader.getIcon(iconPath, OpenEmoji::class.java)
     }
 
-    private fun getCustomIcon(name: String): Icon {
+    fun getIconPath(code: String, isCustom: Boolean): String {
+        val name = getIconName(code)
+        return if (isCustom) "${
+            OpenEmojiPersistent.getInstance().getCustomEmojiDirectory()
+        }/icons/${name}.png" else "/icons/emojis/${name}.png"
+    }
+
+    fun getIconName(code: String): String {
+        return code.replace(":".toRegex(), "")
+    }
+
+    fun addDocListener(doc: JTextField, method: Consumer<String>) {
+        doc.document.addDocumentListener(object : DocumentListener {
+            override fun insertUpdate(e: DocumentEvent?) {
+                method.accept(doc.text)
+            }
+
+            override fun removeUpdate(e: DocumentEvent?) {
+                method.accept(doc.text)
+            }
+
+            override fun changedUpdate(e: DocumentEvent?) {
+                method.accept(doc.text)
+            }
+        })
+    }
+
+    private fun getCustomIcon(filePath: String): Icon {
         return try {
-            val filePath = "${
-                OpenEmojiPersistent.getInstance().getCustomEmojiDirectory()
-            }/icons/${name}.png"
-
             if (!File(filePath).exists()) return AllIcons.Actions.Refresh
-
             return ImageIcon(filePath)
         } catch (e: Exception) {
             AllIcons.Actions.Refresh

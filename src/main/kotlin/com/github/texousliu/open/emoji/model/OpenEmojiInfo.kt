@@ -29,7 +29,7 @@ class OpenEmojiInfo(
         isCustom = emoji.isCustom
     }
 
-    private fun markCustom(isCustom: Boolean): OpenEmojiInfo {
+    fun markCustom(isCustom: Boolean): OpenEmojiInfo {
         super.custom(isCustom)
         return this
     }
@@ -55,5 +55,24 @@ class OpenEmojiInfo(
     public override fun clone(): OpenEmojiInfo {
         return OpenEmojiInfo(emoji, entity, code, name, description, cnDescription, enable, type).markCustom(isCustom)
     }
+
+    fun modified(old: OpenEmojiInfo): Boolean = this.enable != old.enable || this.type != old.type || infoChanged(old)
+
+    fun change(value: OpenEmojiInfo): OpenEmojiInfo {
+        this.enable = value.enable
+        if (infoChanged(value)) {
+            this.type = if (this.type == OpenEmojiInfoType.DEFAULT) OpenEmojiInfoType.OVERRIDE else this.type
+            this.name = value.name
+            this.entity = value.entity
+            this.description = value.description
+            this.cnDescription = value.cnDescription
+        }
+        return this
+    }
+
+    private fun infoChanged(old: OpenEmojiInfo): Boolean = this.entity != old.entity
+            || this.name != old.name
+            || this.description != old.description
+            || this.cnDescription != old.cnDescription
 
 }
