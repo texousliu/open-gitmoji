@@ -9,6 +9,8 @@ import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.util.IconLoader
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -166,6 +168,10 @@ object OpenEmojiUtils {
                 method.accept(doc.text)
             }
         })
+    }
+
+    fun copyToClipboard(text: String) {
+        Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(text), null)
     }
 
     private fun getCustomIcon(filePath: String): Icon {

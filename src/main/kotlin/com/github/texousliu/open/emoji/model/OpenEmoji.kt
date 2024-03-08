@@ -1,18 +1,16 @@
 package com.github.texousliu.open.emoji.model
 
 import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
-import com.google.gson.annotations.SerializedName
 import javax.swing.Icon
 
 open class OpenEmoji(
-        var emoji: String,
-        var entity: String,
-        val code: String,
-        var name: String,
-        var description: String,
-        @SerializedName("cn_description")
-        var cnDescription: String
-) {
+        emoji: String,
+        entity: String,
+        code: String,
+        name: String,
+        description: String,
+        cnDescription: String
+) : OpenEmojiBase(emoji, entity, code, name, description, cnDescription) {
 
     var isCustom = false
 

@@ -31,7 +31,7 @@
     - Configuration path: `File | Settings | Other Settings | Open Gitmoji Settings | Emoji Info List`
     - [X] emoji list
     - [X] emoji editor
-    - [ ] emoji json copy
+    - [X] emoji json copy
     - [X] emoji refresh
     - [ ] Custom sample copy
     - [X] emoji enable or disable

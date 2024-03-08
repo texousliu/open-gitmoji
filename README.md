@@ -31,7 +31,7 @@
     - 配置路径：`File | Settings | Other Settings | Open Gitmoji Settings | Emoji Info List`
     - [X] emoji 列表
     - [X] emoji 编辑
-    - [ ] emoji json 拷贝（tool bar 加 按钮）
+    - [X] emoji json 拷贝（tool bar 加 按钮）
     - [X] emoji 刷新
     - [ ] 自定义示例拷贝
     - [X] emoji 启用禁用

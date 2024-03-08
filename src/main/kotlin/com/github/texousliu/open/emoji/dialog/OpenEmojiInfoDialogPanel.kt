@@ -147,7 +147,9 @@ class OpenEmojiInfoDialogPanel {
                 .setRemoveAction {
                     removeEmoji()
                 }.addExtraActions(OpenEmojiInfoResetFromDiskAnAction(AllIcons.General.Reset, this),
-                        OpenEmojiInfoReloadCustomAnAction(AllIcons.Actions.BuildAutoReloadChanges, this))
+                        OpenEmojiInfoReloadCustomAnAction(AllIcons.Actions.BuildAutoReloadChanges, this),
+                        OpenEmojiInfoCopyCustomAnAction(AllIcons.Actions.Copy, this)
+                )
                 .createPanel()
         panel.preferredSize = Dimension(0, 300)
         return panel
@@ -258,6 +260,14 @@ class OpenEmojiInfoDialogPanel {
 
     fun reloadCustom() {
         customEmojiDirectoryChanged(customEmojiDirectoryComponent.text)
+    }
+
+    fun copyEmojiJson() {
+        val selectedIndex: Int = emojiInfoTable.selectedRow
+        if (selectedIndex >= 0 && selectedIndex < emojiInfoTableModel.rowCount) {
+            val select = emojiInfoList[selectedIndex]
+            OpenEmojiUtils.copyToClipboard(OpenEmojiUtils.GSON.toJson(select.toBase()))
+        }
     }
 
     private class EmojiConfigInfoDialogWrapper() : DialogWrapper(true) {
@@ -384,6 +394,15 @@ class OpenEmojiInfoDialogPanel {
             { OpenEmojiBundle.message("settings.info.emoji.reload.desc") }, icon) {
         override fun actionPerformed(e: AnActionEvent) {
             panel.reloadCustom()
+        }
+    }
+
+    private class OpenEmojiInfoCopyCustomAnAction(icon: Icon,
+                                                  var panel: OpenEmojiInfoDialogPanel)
+        : AnAction({ OpenEmojiBundle.message("settings.info.emoji.copy.title") },
+            { OpenEmojiBundle.message("settings.info.emoji.copy.desc") }, icon) {
+        override fun actionPerformed(e: AnActionEvent) {
+            panel.copyEmojiJson()
         }
     }
 
