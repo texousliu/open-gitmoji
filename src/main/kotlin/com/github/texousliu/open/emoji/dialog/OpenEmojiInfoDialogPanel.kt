@@ -11,14 +11,13 @@ import com.github.texousliu.open.emoji.model.OpenEmojiInfoType
 import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
 import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
 import com.intellij.icons.AllIcons
+import com.intellij.notification.NotificationGroupManager
+import com.intellij.notification.NotificationType
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.ui.*
-import com.intellij.ui.BooleanTableCellEditor
-import com.intellij.ui.DoubleClickListener
-import com.intellij.ui.TableUtil
-import com.intellij.ui.ToolbarDecorator
+import com.intellij.ui.*
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
@@ -262,12 +261,20 @@ class OpenEmojiInfoDialogPanel {
         customEmojiDirectoryChanged(customEmojiDirectoryComponent.text)
     }
 
-    fun copyEmojiJson() {
+    fun copyEmojiJson(): String {
         val selectedIndex: Int = emojiInfoTable.selectedRow
         if (selectedIndex >= 0 && selectedIndex < emojiInfoTableModel.rowCount) {
             val select = emojiInfoList[selectedIndex]
-            OpenEmojiUtils.copyToClipboard(OpenEmojiUtils.GSON.toJson(select.toBase()))
+            val emojiJson = OpenEmojiUtils.GSON.toJson(select.toBase())
+            OpenEmojiUtils.copyToClipboard(emojiJson)
+            return emojiJson
         }
+        return "Nothing"
+    }
+
+    fun selectedEmoji(): Boolean {
+        val selectedIndex: Int = emojiInfoTable.selectedRow
+        return selectedIndex >= 0 && selectedIndex < emojiInfoTableModel.rowCount
     }
 
     private class EmojiConfigInfoDialogWrapper() : DialogWrapper(true) {
@@ -399,11 +406,20 @@ class OpenEmojiInfoDialogPanel {
 
     private class OpenEmojiInfoCopyCustomAnAction(icon: Icon,
                                                   var panel: OpenEmojiInfoDialogPanel)
-        : AnAction({ OpenEmojiBundle.message("settings.info.emoji.copy.title") },
+        : AnActionButton({ OpenEmojiBundle.message("settings.info.emoji.copy.title") },
             { OpenEmojiBundle.message("settings.info.emoji.copy.desc") }, icon) {
         override fun actionPerformed(e: AnActionEvent) {
-            panel.copyEmojiJson()
+            val info = panel.copyEmojiJson()
+            NotificationGroupManager.getInstance()
+                    .getNotificationGroup("Custom Open Emoji Notification Group")
+                    .createNotification("$info Copied", NotificationType.INFORMATION)
+                    .notify(e.project)
         }
+
+        override fun updateButton(e: AnActionEvent) {
+            e.presentation.isEnabled = panel.selectedEmoji()
+        }
+
     }
 
 }
