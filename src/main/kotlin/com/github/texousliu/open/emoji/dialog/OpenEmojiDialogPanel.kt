@@ -25,6 +25,7 @@ import javax.swing.table.TableCellEditor
 class OpenEmojiDialogPanel {
 
     val triggerWithColonCheckBox = JBCheckBox(OpenEmojiBundle.message("settings.trigger.label"))
+    val editorEmojiSupportedCheckBox = JBCheckBox(OpenEmojiBundle.message("settings.editor-emoji-supported.label"))
     val emojiPatterns = mutableListOf<OpenEmojiPattern>()
     private val emojiPatternsTableModel = OpenEmojiPatternsTableModel(emojiPatterns)
     private val emojiPatternsTable = JBTable(emojiPatternsTableModel)
@@ -52,6 +53,14 @@ class OpenEmojiDialogPanel {
                                         OpenEmojiPersistent.getInstance().getTriggerWithColon()
                             }
                 }.rowComment(OpenEmojiBundle.message("settings.trigger.comment"))
+                row {
+                    cell(editorEmojiSupportedCheckBox)
+                            .gap(RightGap.SMALL)
+                            .onReset {
+                                editorEmojiSupportedCheckBox.isSelected =
+                                        OpenEmojiPersistent.getInstance().getEditorEmojiSupported()
+                            }
+                }.rowComment(OpenEmojiBundle.message("settings.editor-emoji-supported.comment"))
             }
 
             group(OpenEmojiBundle.message("settings.group.prompt.title")) {
@@ -88,6 +97,20 @@ class OpenEmojiDialogPanel {
         enableColumn.minWidth = enableColumn.maxWidth
         enableColumn.cellRenderer = BooleanTableCellRenderer()
         enableColumn.cellEditor = BooleanTableCellEditor()
+
+        val enableCommitColumn = emojiPatternsTable.columnModel.getColumn(3)
+        val enableCommitWidth = headerFontMetrics.stringWidth(emojiPatternsTable.getColumnName(3)) + scale(20)
+        enableCommitColumn.maxWidth = scale(enableCommitWidth)
+        enableCommitColumn.minWidth = enableCommitColumn.maxWidth
+        enableCommitColumn.cellRenderer = BooleanTableCellRenderer()
+        enableCommitColumn.cellEditor = BooleanTableCellEditor()
+
+        val enableEditorColumn = emojiPatternsTable.columnModel.getColumn(4)
+        val enableEditorWidth = headerFontMetrics.stringWidth(emojiPatternsTable.getColumnName(4)) + scale(20)
+        enableEditorColumn.maxWidth = scale(enableEditorWidth)
+        enableEditorColumn.minWidth = enableEditorColumn.maxWidth
+        enableEditorColumn.cellRenderer = BooleanTableCellRenderer()
+        enableEditorColumn.cellEditor = BooleanTableCellEditor()
 
         val panel = ToolbarDecorator.createDecorator(emojiPatternsTable)
                 .setAddAction {
@@ -130,7 +153,8 @@ class OpenEmojiDialogPanel {
         // 获取选择的内容
         val selectPattern = emojiPatterns[selectedIndex]
 
-        val dialog = PatternInfoDialogWrapper(selectPattern.pattern, selectPattern.enable)
+        val dialog = PatternInfoDialogWrapper(selectPattern.pattern,
+                selectPattern.enable, selectPattern.enableCommit, selectPattern.enableEditor)
         dialog.title = OpenEmojiBundle.message("settings.pattern.title.edit")
         if (!dialog.showAndGet()) {
             return
@@ -183,11 +207,15 @@ class OpenEmojiDialogPanel {
     private class PatternInfoDialogWrapper() : DialogWrapper(true) {
 
         var enable = JBCheckBox(OpenEmojiBundle.message("settings.pattern.enable.label"))
+        var enableCommit = JBCheckBox(OpenEmojiBundle.message("settings.pattern.enable-commit.label"))
+        var enableEditor = JBCheckBox(OpenEmojiBundle.message("settings.pattern.enable-editor.label"))
         var pattern = JBTextField()
         var example = JBTextField()
 
-        constructor(pattern: String, enable: Boolean) : this() {
+        constructor(pattern: String, enable: Boolean, enableCommit: Boolean, enableEditor: Boolean) : this() {
             this.enable.isSelected = enable
+            this.enableCommit.isSelected = enableCommit
+            this.enableEditor.isSelected = enableEditor
             this.pattern.text = pattern
         }
 
@@ -198,6 +226,8 @@ class OpenEmojiDialogPanel {
 
             example.isEditable = false
             enable.isSelected = true
+            enableCommit.isSelected = true
+            enableEditor.isSelected = false
             init()
         }
 
@@ -214,6 +244,8 @@ class OpenEmojiDialogPanel {
                             OpenEmojiBundle.message("settings.pattern.enable.context-help.description"),
                             OpenEmojiBundle.message("settings.pattern.enable.context-help.title")
                     )
+                    cell(enableCommit)
+                    cell(enableEditor)
                 }
                 row(OpenEmojiBundle.message("settings.pattern.pattern.label")) {
                     cell(pattern).align(Align.FILL).focused()
@@ -228,7 +260,7 @@ class OpenEmojiDialogPanel {
         }
 
         fun load(): OpenEmojiPattern {
-            return OpenEmojiPattern(pattern.text, enable.isSelected)
+            return OpenEmojiPattern(pattern.text, enable.isSelected, enableCommit.isSelected, enableEditor.isSelected)
         }
 
         override fun doValidate(): ValidationInfo? {

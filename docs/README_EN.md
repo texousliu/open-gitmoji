@@ -39,6 +39,10 @@
     - [X] reset button
     - [X] refresh button
 - [ ] MessageBound support
+- [ ] Multi-language support
+- [X] Editor supports emoji insertion
+- [ ] Multiple Emoji selection support
+    - [ ] combination selection, deduplication according to priority
 
 ## Instructions for use
 

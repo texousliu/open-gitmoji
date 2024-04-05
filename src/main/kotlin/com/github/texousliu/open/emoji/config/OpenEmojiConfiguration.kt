@@ -17,18 +17,26 @@ class OpenEmojiConfiguration : SearchableConfigurable {
         if (config.size != panel.emojiPatterns.size) return true
         for ((index, emojiPattern) in panel.emojiPatterns.withIndex()) {
             if (config[index] != emojiPattern) return true
-            if (config[index].enable != emojiPattern.enable) return true
+            if (config[index].enable != emojiPattern.enable
+                    || config[index].enableCommit != emojiPattern.enableCommit
+                    || config[index].enableEditor != emojiPattern.enableEditor) return true
         }
         return false
     }
 
 
     private fun triggerWithColonModified(): Boolean {
-        return panel.triggerWithColonCheckBox.isSelected != OpenEmojiPersistent.getInstance().getTriggerWithColon()
+        return panel.triggerWithColonCheckBox.isSelected !=
+                OpenEmojiPersistent.getInstance().getTriggerWithColon()
+    }
+
+    private fun editorEmojiSupportedModified(): Boolean {
+        return panel.editorEmojiSupportedCheckBox.isSelected !=
+                OpenEmojiPersistent.getInstance().getEditorEmojiSupported()
     }
 
     override fun isModified(): Boolean =
-            triggerWithColonModified() || emojiPatternsModified()
+            triggerWithColonModified() || editorEmojiSupportedModified() || emojiPatternsModified()
 
     override fun getDisplayName(): String = OpenEmojiBundle.message("settings.title")
 
@@ -37,6 +45,9 @@ class OpenEmojiConfiguration : SearchableConfigurable {
     override fun apply() {
         if (triggerWithColonModified()) {
             OpenEmojiPersistent.getInstance().setTriggerWithColon(panel.triggerWithColonCheckBox.isSelected)
+        }
+        if (editorEmojiSupportedModified()) {
+            OpenEmojiPersistent.getInstance().setEditorEmojiSupported(panel.editorEmojiSupportedCheckBox.isSelected)
         }
         if (emojiPatternsModified()) {
             OpenEmojiPersistent.getInstance().setOpenEmojiPatterns(panel.emojiPatterns)

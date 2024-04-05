@@ -1,5 +1,6 @@
 package com.github.texousliu.open.emoji.contributor
 
+import com.github.texousliu.open.emoji.constants.WorkEnv
 import com.github.texousliu.open.emoji.model.OpenEmoji
 import com.github.texousliu.open.emoji.model.OpenEmojiInfo
 import com.github.texousliu.open.emoji.model.OpenEmojiPattern
@@ -11,7 +12,7 @@ import com.intellij.patterns.PlatformPatterns
 import com.intellij.psi.PsiPlainText
 import com.intellij.util.ProcessingContext
 
-class OpenEmojiCompletionContributor : CompletionContributor() {
+class OpenEmojiCommitCompletionContributor : CompletionContributor() {
 
     private val openEmojiInsertHandler = OpenEmojiInsertHandler()
 
@@ -28,20 +29,26 @@ class OpenEmojiCompletionContributor : CompletionContributor() {
                     ) {
                         // 如果不是多行文本输入框，直接返回
                         if (parameters.editor.isOneLineMode) return
+
                         val doc = parameters.editor.document.charsSequence
                         if (doc.isEmpty()) return
-                        if (OpenEmojiPersistent.getInstance().getTriggerWithColon()) {
-                            val str = result.prefixMatcher.prefix
-                            if (str.isEmpty()) return
+
+                        val persistent = OpenEmojiPersistent.getInstance()
+                        val str = result.prefixMatcher.prefix
+                        if (str.isEmpty()) return
+
+                        if (persistent.getTriggerWithColon()) {
                             if (!doc.contains(":$str") && !doc.contains("：$str")) return
                         }
 
-                        var emojiPatterns = OpenEmojiPersistent.getInstance().getOpenEmojiPatterns()
+                        var emojiPatterns = persistent.getOpenEmojiPatterns()
+                                .filter { it.enable && it.enableCommit }.toMutableList()
                         if (emojiPatterns.isEmpty()) {
-                            emojiPatterns = mutableListOf(OpenEmojiPersistent.getInstance().getDefaultOpenEmojiPattern())
+                            emojiPatterns = mutableListOf(persistent.getDefaultOpenEmojiPattern(WorkEnv.COMMIT))
                         }
+
                         // 预置 git emoji
-                        OpenEmojiPersistent.getInstance().getOpenEmojiInfoList().filter { it.enable }
+                        persistent.getOpenEmojiInfoList().filter { it.enable }
                                 .forEach { emoji -> emojiToPrompt(emoji, result, emojiPatterns) }
                     }
                 })
@@ -52,7 +59,7 @@ class OpenEmojiCompletionContributor : CompletionContributor() {
             result: CompletionResultSet,
             emojiPatterns: MutableList<OpenEmojiPattern>
     ) {
-        emojiPatterns.stream().filter { it != null && it.enable }.forEach { pattern ->
+        emojiPatterns.forEach { pattern ->
             val str = lookupString(emoji, pattern)
             result.addElement(
                     LookupElementBuilder

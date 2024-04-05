@@ -4,6 +4,11 @@
 
 ## Unreleased
 
+## 3.0.0
+
+- 添加 Editor Emoji 输入支持(注释中需要使用 `ctrl + alt + space` 来获取提示)
+- 表达式列表添加各个场景的开关按钮
+
 ## 2.0.9
 
 - 添加 emoji json 拷贝功能

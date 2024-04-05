@@ -31,7 +31,10 @@
     <extensions defaultExtensionNs="com.intellij">
         <completion.contributor language="TEXT"
                                 order="first, before commitCompletion"
-                                implementationClass="com.github.texousliu.open.emoji.contributor.OpenEmojiCompletionContributor"/>
+                                implementationClass="com.github.texousliu.open.emoji.contributor.OpenEmojiCommitCompletionContributor"/>
+        <completion.contributor language="any"
+                                order="first"
+                                implementationClass="com.github.texousliu.open.emoji.contributor.OpenEmojiEditorCompletionContributor"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">

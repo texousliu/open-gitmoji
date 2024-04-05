@@ -11,9 +11,16 @@ class OpenEmojiPatternsTableModel(private var openEmojiPatterns: MutableList<Ope
     private val ourColumnNames = arrayOf(
             "Pattern",
             "Example",
-            "Enable"
+            "Enable",
+            "Commit",
+            "Editor"
     )
-    private val ourColumnClasses = arrayOf<Class<*>>(String::class.java, String::class.java, Boolean::class.java)
+    private val ourColumnClasses = arrayOf<Class<*>>(
+            String::class.java,
+            String::class.java,
+            Boolean::class.java,
+            Boolean::class.java,
+            Boolean::class.java)
 
 
     override fun getColumnName(column: Int): String {
@@ -25,7 +32,7 @@ class OpenEmojiPatternsTableModel(private var openEmojiPatterns: MutableList<Ope
     }
 
     override fun getColumnCount(): Int {
-        return 3
+        return 5
     }
 
     override fun getRowCount(): Int {
@@ -33,7 +40,7 @@ class OpenEmojiPatternsTableModel(private var openEmojiPatterns: MutableList<Ope
     }
 
     override fun isCellEditable(rowIndex: Int, columnIndex: Int): Boolean {
-        return columnIndex == 2
+        return columnIndex == 2 || columnIndex == 3 || columnIndex == 4
     }
 
     override fun getValueAt(row: Int, column: Int): Any {
@@ -49,6 +56,14 @@ class OpenEmojiPatternsTableModel(private var openEmojiPatterns: MutableList<Ope
 
             2 -> {
                 pattern.enable
+            }
+
+            3 -> {
+                pattern.enableCommit
+            }
+
+            4 -> {
+                pattern.enableEditor
             }
 
             else -> {
@@ -67,6 +82,14 @@ class OpenEmojiPatternsTableModel(private var openEmojiPatterns: MutableList<Ope
             1 -> {}
             2 -> {
                 pattern.enable = (value as Boolean?)!!
+            }
+
+            3 -> {
+                pattern.enableCommit = (value as Boolean?)!!
+            }
+
+            4 -> {
+                pattern.enableEditor = (value as Boolean?)!!
             }
 
             else -> {

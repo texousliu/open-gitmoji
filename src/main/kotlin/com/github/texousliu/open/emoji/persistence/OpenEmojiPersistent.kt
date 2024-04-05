@@ -1,5 +1,6 @@
 package com.github.texousliu.open.emoji.persistence
 
+import com.github.texousliu.open.emoji.constants.WorkEnv
 import com.github.texousliu.open.emoji.context.OpenEmojiCache
 import com.github.texousliu.open.emoji.model.OpenEmojiInfo
 import com.github.texousliu.open.emoji.model.OpenEmojiPattern
@@ -27,6 +28,9 @@ class OpenEmojiPersistent : PersistentStateComponent<OpenEmojiPersistent> {
     private var customEmojiDirectory: String = ""
 
     @Property
+    private var editorEmojiSupported: Boolean = false
+
+    @Property
     @OptionTag(converter = OpenEmojiPatternListConverter::class)
     private var openEmojiPatterns: MutableList<OpenEmojiPattern> = mutableListOf()
 
@@ -35,7 +39,10 @@ class OpenEmojiPersistent : PersistentStateComponent<OpenEmojiPersistent> {
     private var openEmojiInfoList: MutableList<OpenEmojiInfo> = mutableListOf()
 
     private val defaultOpenEmojiPattern: OpenEmojiPattern =
-            OpenEmojiPattern("#{G} [#{DATE}] #{DESC_CN}: ", true)
+            OpenEmojiPattern("#{G} [#{DATE}] #{DESC_CN}: ")
+
+    private val defaultOpenEmojiPatternEditor: OpenEmojiPattern =
+            OpenEmojiPattern("#{G} ", enableEditor = true)
 
     companion object {
         @JvmStatic
@@ -62,6 +69,14 @@ class OpenEmojiPersistent : PersistentStateComponent<OpenEmojiPersistent> {
         this.customEmojiDirectory = customEmojiDirectory ?: ""
     }
 
+    fun getEditorEmojiSupported(): Boolean {
+        return editorEmojiSupported
+    }
+
+    fun setEditorEmojiSupported(editorEmojiSupported: Boolean?) {
+        this.editorEmojiSupported = editorEmojiSupported ?: false
+    }
+
     fun getOpenEmojiPatterns(): MutableList<OpenEmojiPattern> {
         return openEmojiPatterns
     }
@@ -80,8 +95,11 @@ class OpenEmojiPersistent : PersistentStateComponent<OpenEmojiPersistent> {
         openEmojiInfoList?.forEach { this.openEmojiInfoList.add(it.clone()) }
     }
 
-    fun getDefaultOpenEmojiPattern(): OpenEmojiPattern {
-        return defaultOpenEmojiPattern
+    fun getDefaultOpenEmojiPattern(env: WorkEnv?): OpenEmojiPattern {
+        return if (env == null || env == WorkEnv.COMMIT)
+            defaultOpenEmojiPattern
+        else
+            defaultOpenEmojiPatternEditor
     }
 
     fun refresh() {
@@ -98,6 +116,7 @@ class OpenEmojiPersistent : PersistentStateComponent<OpenEmojiPersistent> {
     override fun loadState(state: OpenEmojiPersistent) {
         this.triggerWithColon = state.triggerWithColon
         this.customEmojiDirectory = state.customEmojiDirectory
+        this.editorEmojiSupported = state.editorEmojiSupported
         this.openEmojiPatterns = state.openEmojiPatterns
         this.openEmojiInfoList = state.openEmojiInfoList
     }
