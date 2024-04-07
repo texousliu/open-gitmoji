@@ -21,6 +21,7 @@ version = properties("pluginVersion")
 
 // Configure project's dependencies
 repositories {
+    gradlePluginPortal()
     mavenCentral()
 }
 

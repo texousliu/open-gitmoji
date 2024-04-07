@@ -40,7 +40,7 @@
     - [X] refresh 按钮
 - [X] MessageBound 支持
 - [ ] 多语言支持
-- [ ] 编辑器支持 emoji 插入
+- [X] 编辑器支持 emoji 插入
 - [ ] 多 Emoji 选择支持
   - [ ] 组合选择，按优先级去重
 

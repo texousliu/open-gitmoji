@@ -17,69 +17,83 @@ class OpenEmojiEditorCompletionContributor : CompletionContributor() {
 
     init {
         extend(
-                CompletionType.BASIC,
-                PlatformPatterns.psiElement(),
-                object : CompletionProvider<CompletionParameters>() {
+            CompletionType.BASIC,
+            PlatformPatterns.psiElement(),
+            object : CompletionProvider<CompletionParameters>() {
 
-                    override fun addCompletions(
-                            parameters: CompletionParameters,
-                            context: ProcessingContext,
-                            result: CompletionResultSet
-                    ) {
-                        val persistent = OpenEmojiPersistent.getInstance()
-                        // 校验开关
-                        if (!persistent.getEditorEmojiSupported()) return
+                override fun addCompletions(
+                    parameters: CompletionParameters,
+                    context: ProcessingContext,
+                    result: CompletionResultSet
+                ) {
+                    val persistent = OpenEmojiPersistent.getInstance()
+                    // 校验开关 编写
+                    if (!persistent.getEditorEmojiSupported()) return
 
+                    // 获取匹配文本
+                    val matcherString = result.prefixMatcher.prefix
+                    if (matcherString.isEmpty()) return
+
+                    // 获取输入文本，以 space 或者 colon 或者中文 colon
+                    val inputString = handlerString(handlerString(handlerString(matcherString, ":"), "："), " ")
+
+                    // 如果配置了以 colon 开头
+                    if (persistent.getTriggerWithColon()) {
+                        // 获取输入 offset
                         val doc = parameters.editor.document.charsSequence
-                        if (doc.isEmpty()) return
+                        val offset = parameters.editor.caretModel.offset
 
-                        var str = result.prefixMatcher.prefix
-                        if (str.isEmpty()) return
+                        // 获取输入及之前的文本
+                        val text = doc.substring(0, offset)
 
-                        if (persistent.getTriggerWithColon()) {
-                            str = handlerString(str)
-                            if (!doc.contains(":$str") && !doc.contains("：$str")) return
-                        }
-
-                        var emojiPatterns = persistent.getOpenEmojiPatterns()
-                                .filter { it.enable && it.enableEditor }.toMutableList()
-                        if (emojiPatterns.isEmpty()) {
-                            emojiPatterns = mutableListOf(persistent.getDefaultOpenEmojiPattern(WorkEnv.EDITOR))
-                        }
-
-                        // 预置 git emoji
-                        persistent.getOpenEmojiInfoList().filter { it.enable }
-                                .forEach { emoji ->
-                                    emojiToPrompt(emoji, result, emojiPatterns)
-                                }
+                        // 判断是否是以 colon with input 结尾
+                        if (!text.endsWith(":$inputString") && !text.equals("“：$inputString")) return
                     }
-                })
+
+                    // 兼容代码提示需要在前面补全的字符
+                    val needAppendString = matcherString.substring(0, matcherString.lastIndexOf(inputString))
+
+                    // 获取 emoji 表达式
+                    var emojiPatterns = persistent.getOpenEmojiPatterns()
+                        .filter { it.enable && it.enableEditor }.toMutableList()
+                    if (emojiPatterns.isEmpty()) {
+                        emojiPatterns = mutableListOf(persistent.getDefaultOpenEmojiPattern(WorkEnv.EDITOR))
+                    }
+
+                    // 预置 git emoji
+                    persistent.getOpenEmojiInfoList().filter { it.enable }
+                        .forEach { emoji ->
+                            emojiToPrompt(emoji, result, emojiPatterns, needAppendString)
+                        }
+                }
+            })
     }
 
     private fun emojiToPrompt(
-            emoji: OpenEmojiInfo,
-            result: CompletionResultSet,
-            emojiPatterns: MutableList<OpenEmojiPattern>
+        emoji: OpenEmojiInfo,
+        result: CompletionResultSet,
+        emojiPatterns: MutableList<OpenEmojiPattern>,
+        needAppendString: String
     ) {
         emojiPatterns.forEach { pattern ->
             val str = lookupString(emoji, pattern)
             result.addElement(
-                    LookupElementBuilder
-                            .create(emoji, "${str}${OpenEmojiUtils.REPLACE_SUFFIX_MARK}")
-                            .withPresentableText(str)
-                            // .withTailText(emoji.description)
-                            .withTypeText(emoji.description)
-                            .withLookupStrings(
-                                    listOf(
-                                            emoji.code.lowercase(),
-                                            emoji.description.lowercase(),
-                                            emoji.cnDescription.lowercase(),
-                                            emoji.name.lowercase(),
-                                            emoji.entity.lowercase()
-                                    )
-                            )
-                            .withIcon(emoji.getIcon())
-                            .withInsertHandler(openEmojiInsertHandler)
+                LookupElementBuilder
+                    .create(emoji, "${needAppendString}${str}${OpenEmojiUtils.REPLACE_SUFFIX_MARK}")
+                    .withPresentableText(str)
+                    // .withTailText(emoji.description)
+                    .withTypeText(emoji.description)
+                    .withLookupStrings(
+                        listOf(
+                            "${needAppendString}${emoji.code.lowercase()}",
+                            "${needAppendString}${emoji.description.lowercase()}",
+                            "${needAppendString}${emoji.cnDescription.lowercase()}",
+                            "${needAppendString}${emoji.name.lowercase()}",
+                            "${needAppendString}${emoji.entity.lowercase()}"
+                        )
+                    )
+                    .withIcon(emoji.getIcon())
+                    .withInsertHandler(openEmojiInsertHandler)
             )
         }
     }
@@ -88,17 +102,9 @@ class OpenEmojiEditorCompletionContributor : CompletionContributor() {
         return OpenEmojiUtils.replace(pattern.pattern, emoji)
     }
 
-    private fun handlerString(str: String): String {
-        var result = str
-        var lastIndexOf = str.lastIndexOf(":")
-        if (lastIndexOf > -1) {
-            result = str.substring(lastIndexOf + 1)
-        }
-        lastIndexOf = str.lastIndexOf("：")
-        if (lastIndexOf > -1) {
-            result = result.substring(lastIndexOf + 1)
-        }
-        return result
+    private fun handlerString(str: String, split: String): String {
+        val lastIndexOf = str.lastIndexOf(split)
+        return if (lastIndexOf > -1) str.substring(lastIndexOf + 1) else str
     }
 
 }

@@ -5,6 +5,7 @@
     <vendor>texousliu</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
 
     <description>
         <![CDATA[
@@ -35,6 +36,10 @@
         <completion.contributor language="any"
                                 order="first"
                                 implementationClass="com.github.texousliu.open.emoji.contributor.OpenEmojiEditorCompletionContributor"/>
+
+        <completion.confidence language="JAVA"
+                               implementationClass="com.github.texousliu.open.emoji.contributor.OpenEmojiDocCompletionConfidence"
+                               order="first, before javadoc"/>
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
