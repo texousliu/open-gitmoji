@@ -81,7 +81,7 @@ class OpenBasePatternTableDialogPanel(private val emojiPatternList: MutableList<
             .setRemoveAction {
                 removePattern()
             }.createPanel()
-        panel.preferredSize = Dimension(0, 300)
+        panel.preferredSize = Dimension(0, 150)
         return panel
     }
 
