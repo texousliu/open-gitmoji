@@ -1,7 +1,8 @@
 package com.github.texousliu.open.emoji.persistence
 
 import com.github.texousliu.open.emoji.constants.WorkEnv
-import com.github.texousliu.open.emoji.context.OpenEmojiCache
+import com.github.texousliu.open.emoji.context.OpenEditorEmojiCache
+import com.github.texousliu.open.emoji.context.OpenGitEmojiCache
 import com.github.texousliu.open.emoji.model.OpenEmojiInfo
 import com.github.texousliu.open.emoji.model.OpenEmojiPattern
 import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
@@ -35,20 +36,28 @@ class OpenEmojiPersistent : PersistentStateComponent<OpenEmojiPersistent> {
     private var openEmojiPatterns: MutableList<OpenEmojiPattern> = mutableListOf()
 
     @Property
+    @OptionTag(converter = OpenEmojiPatternListConverter::class)
+    private var openEditorEmojiPatterns: MutableList<OpenEmojiPattern> = mutableListOf()
+
+    @Property
     @OptionTag(converter = OpenEmojiInfoListConverter::class)
     private var openEmojiInfoList: MutableList<OpenEmojiInfo> = mutableListOf()
 
+    @Property
+    @OptionTag(converter = OpenEmojiInfoListConverter::class)
+    private var openEditorEmojiInfoList: MutableList<OpenEmojiInfo> = mutableListOf()
+
     private val defaultOpenEmojiPattern: OpenEmojiPattern =
-            OpenEmojiPattern("#{G} [#{DATE}] #{DESC_CN}: ")
+        OpenEmojiPattern("#{G} [#{DATE}] #{DESC_CN}: ")
 
     private val defaultOpenEmojiPatternEditor: OpenEmojiPattern =
-            OpenEmojiPattern("#{G} ", enableEditor = true)
+        OpenEmojiPattern("#{G} ", enableEditor = true)
 
     companion object {
         @JvmStatic
         fun getInstance(): OpenEmojiPersistent {
             return ApplicationManager.getApplication().getService(
-                    OpenEmojiPersistent::class.java
+                OpenEmojiPersistent::class.java
             )
         }
     }
@@ -86,13 +95,31 @@ class OpenEmojiPersistent : PersistentStateComponent<OpenEmojiPersistent> {
         openEmojiPatterns?.forEach { this.openEmojiPatterns.add(it.clone()) }
     }
 
+    fun getOpenEditorEmojiPatterns(): MutableList<OpenEmojiPattern> {
+        return openEditorEmojiPatterns
+    }
+
+    fun setOpenEditorEmojiPatterns(openEmojiPatterns: MutableList<OpenEmojiPattern>?) {
+        this.openEditorEmojiPatterns.clear()
+        openEmojiPatterns?.forEach { this.openEditorEmojiPatterns.add(it.clone()) }
+    }
+
     fun getOpenEmojiInfoList(): MutableList<OpenEmojiInfo> {
-        return if (openEmojiInfoList.isEmpty()) OpenEmojiCache.emojiInfoList() else openEmojiInfoList
+        return if (openEmojiInfoList.isEmpty()) OpenGitEmojiCache.emojiInfoList() else openEmojiInfoList
     }
 
     fun setOpenEmojiInfoList(openEmojiInfoList: MutableList<OpenEmojiInfo>?) {
         this.openEmojiInfoList.clear()
         openEmojiInfoList?.forEach { this.openEmojiInfoList.add(it.clone()) }
+    }
+
+    fun getOpenEditorEmojiInfoList(): MutableList<OpenEmojiInfo> {
+        return if (openEditorEmojiInfoList.isEmpty()) OpenEditorEmojiCache.emojiInfoList() else openEditorEmojiInfoList
+    }
+
+    fun setOpenEditorEmojiInfoList(openEmojiInfoList: MutableList<OpenEmojiInfo>?) {
+        this.openEditorEmojiInfoList.clear()
+        openEmojiInfoList?.forEach { this.openEditorEmojiInfoList.add(it.clone()) }
     }
 
     fun getDefaultOpenEmojiPattern(env: WorkEnv?): OpenEmojiPattern {
@@ -104,7 +131,7 @@ class OpenEmojiPersistent : PersistentStateComponent<OpenEmojiPersistent> {
 
     fun refresh() {
         // 刷新 context
-        OpenEmojiCache.refresh(customEmojiDirectory)
+        OpenGitEmojiCache.refresh(customEmojiDirectory)
         // 刷新存储
         OpenEmojiUtils.emojiInfoListWithCustom(customEmojiDirectory, openEmojiInfoList)
     }

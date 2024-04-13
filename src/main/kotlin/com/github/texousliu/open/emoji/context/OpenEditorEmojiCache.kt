@@ -4,7 +4,7 @@ import com.github.texousliu.open.emoji.model.OpenEmojiInfo
 import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
 import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
 
-object OpenEmojiCache {
+object OpenEditorEmojiCache {
 
     private val emojiInfoList = mutableListOf<OpenEmojiInfo>()
 

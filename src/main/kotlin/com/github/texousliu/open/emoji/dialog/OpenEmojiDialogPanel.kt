@@ -63,8 +63,8 @@ class OpenEmojiDialogPanel {
                 }.rowComment(OpenEmojiBundle.message("settings.editor-emoji-supported.comment"))
             }
 
-            group(OpenEmojiBundle.message("settings.group.prompt.title")) {
-                row(OpenEmojiBundle.message("settings.group.prompt.label")) { }
+            group(OpenEmojiBundle.message("settings.group.pattern.title")) {
+                row(OpenEmojiBundle.message("settings.group.pattern.label")) { }
                 row {
                     cell(createPromptListTable())
                             .gap(RightGap.SMALL)

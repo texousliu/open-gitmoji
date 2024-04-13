@@ -1,0 +1,68 @@
+package com.github.texousliu.open.emoji.dialog
+
+import com.github.texousliu.open.emoji.config.OpenEmojiBundle
+import com.github.texousliu.open.emoji.model.OpenEmojiInfo
+import com.github.texousliu.open.emoji.model.OpenEmojiPattern
+import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
+import com.intellij.openapi.ui.DialogPanel
+import com.intellij.ui.dsl.builder.Align
+import com.intellij.ui.dsl.builder.RightGap
+import com.intellij.ui.dsl.builder.panel
+
+
+class OpenEditorEmojiDialogPanel {
+
+    private val editorEmojiPatterns = mutableListOf<OpenEmojiPattern>()
+    private val editorEmojiInfoList = mutableListOf<OpenEmojiInfo>()
+    private val editorEmojiPatternTableDialogPanel = OpenBasePatternTableDialogPanel(editorEmojiPatterns)
+    private val editorEmojiInfoTableDialogPanel = OpenBaseEmojiTableDialogPanel(editorEmojiInfoList)
+
+    val editorEmojiSettingsPanel = gitEmojiSettingsDialogPanel()
+
+    fun markModified(): Boolean {
+        // 注意这边不能调换位置
+        return editorEmojiInfoTableDialogPanel.markModifiedEmojis()
+                || editorEmojiPatternTableDialogPanel.markModifiedPatterns()
+    }
+
+    fun apply() {
+        if (editorEmojiInfoTableDialogPanel.isModifiedEmojis()) {
+            OpenEmojiPersistent.getInstance().setOpenEditorEmojiInfoList(editorEmojiInfoList)
+            editorEmojiInfoTableDialogPanel.onApply()
+        }
+        if (editorEmojiPatternTableDialogPanel.isModifiedPatterns()) {
+            OpenEmojiPersistent.getInstance().setOpenEmojiPatterns(editorEmojiPatterns)
+            editorEmojiPatternTableDialogPanel.onApply()
+        }
+    }
+
+    private fun gitEmojiSettingsDialogPanel(): DialogPanel {
+        return panel {
+            group(OpenEmojiBundle.message("settings.group.pattern.title")) {
+                row(OpenEmojiBundle.message("settings.group.pattern.label")) { }
+                row {
+                    cell(editorEmojiPatternTableDialogPanel.create())
+                        .gap(RightGap.SMALL)
+                        .onReset {
+                            editorEmojiPatternTableDialogPanel.onReset(
+                                OpenEmojiPersistent.getInstance().getOpenEditorEmojiPatterns()
+                            )
+                        }.resizableColumn()
+                        .align(Align.FILL)
+                }.resizableRow()
+            }.resizableRow()
+            group(OpenEmojiBundle.message("settings.group.emoji.title")) {
+                row {
+                    cell(editorEmojiInfoTableDialogPanel.create())
+                        .onReset {
+                            editorEmojiInfoTableDialogPanel.onReset(
+                                OpenEmojiPersistent.getInstance().getOpenEditorEmojiInfoList()
+                            )
+                        }.resizableColumn()
+                        .align(Align.FILL)
+                }.resizableRow()
+            }
+        }
+    }
+
+}

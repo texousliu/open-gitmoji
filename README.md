@@ -41,8 +41,25 @@
 - [X] MessageBound 支持
 - [ ] 多语言支持
 - [X] 编辑器支持 emoji 插入
-- [ ] 多 Emoji 选择支持
+- [ ] 多来源 Emoji 选择支持
   - [ ] 组合选择，按优先级去重
+
+- [ ] 重构配置界面
+  - [ ] 通用配置界面编写
+    - `:` 开头选项
+    - editor 输入选项
+    - emoji list（包括 gitemoji 和 emoji）
+  - [ ] Git emoji 配置界面编写
+    - pattern 列表
+    - gitemoji 列表
+    - 从 emoji 添加功能（弹窗选择，添加）
+  - [ ] Edit emoji 配置界面编写
+    - pattern 列表
+    - emoji 列表
+    - 从 gitmoji 添加功能（弹窗选择，添加）
+
+- [ ] [Gitmoji](https://gitmoji.dev/) 对比更新工具
+- [ ] [Copy emoji](https://emojicopy.com/) 对比更新工具
 
 ## 使用说明
 

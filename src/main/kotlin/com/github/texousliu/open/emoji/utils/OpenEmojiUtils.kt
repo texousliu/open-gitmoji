@@ -1,6 +1,6 @@
 package com.github.texousliu.open.emoji.utils
 
-import com.github.texousliu.open.emoji.context.OpenEmojiCache
+import com.github.texousliu.open.emoji.context.OpenGitEmojiCache
 import com.github.texousliu.open.emoji.model.*
 import com.github.texousliu.open.emoji.persistence.OpenEmojiInfoSerializer
 import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
@@ -41,7 +41,7 @@ object OpenEmojiUtils {
     private val PATTERNS = arrayOf(G, GU, DESC, DESC_CN, DATE, TIME)
 
     fun demo(pattern: String): String {
-        return replace(pattern, OpenEmojiCache.emojiInfoList()[0])
+        return replace(pattern, OpenGitEmojiCache.emojiInfoList()[0])
     }
 
     fun replace(pattern: String, emoji: OpenEmoji): String {

@@ -24,8 +24,8 @@
                 class="com.github.texousliu.open.emoji.config.OpenEmojiGitCommitRefreshAction"
                 text="Refresh Custom Emojis" icon="AllIcons.Actions.Refresh"
                 description="Refresh custom emojis">
-<!--            <keyboard-shortcut first-keystroke="ctrl alt g" keymap="$default" />-->
-            <add-to-group group-id="Vcs.MessageActionGroup" anchor="first" />
+            <!--            <keyboard-shortcut first-keystroke="ctrl alt g" keymap="$default" />-->
+            <add-to-group group-id="Vcs.MessageActionGroup" anchor="first"/>
         </action>
     </actions>
 
@@ -43,13 +43,19 @@
     </extensions>
 
     <extensions defaultExtensionNs="com.intellij">
-        <projectConfigurable displayName="Open Gitmoji Settings"
+        <projectConfigurable displayName="Open Emoji Settings"
                              instance="com.github.texousliu.open.emoji.config.OpenEmojiConfiguration"
                              groupId="other"
                              id="com.github.texousliu.emoji.settings.OpenEmojiSettings">
             <configurable displayName="Emoji Info List"
                           instance="com.github.texousliu.open.emoji.config.OpenEmojiInfoConfiguration"
                           id="com.github.texousliu.emoji.settings.OpenEmojiInfoSettings"/>
+            <configurable displayName="Git Emoji"
+                          instance="com.github.texousliu.open.emoji.config.OpenGitEmojiConfiguration"
+                          id="com.github.texousliu.emoji.settings.OpenGitEmojiSettings"/>
+            <configurable displayName="Editor Emoji"
+                          instance="com.github.texousliu.open.emoji.config.OpenEditorEmojiConfiguration"
+                          id="com.github.texousliu.emoji.settings.OpenEditorEmojiSettings"/>
         </projectConfigurable>
     </extensions>
 

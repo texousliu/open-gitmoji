@@ -1,22 +1,21 @@
 package com.github.texousliu.open.emoji.dialog
 
 import com.github.texousliu.open.emoji.config.OpenEmojiBundle
-import com.github.texousliu.open.emoji.context.OpenGitEmojiCache
 import com.github.texousliu.open.emoji.dialog.renderer.OpenEmojiInfoBooleanTableCellRenderer
 import com.github.texousliu.open.emoji.dialog.renderer.OpenEmojiInfoIconTableCellRenderer
 import com.github.texousliu.open.emoji.dialog.renderer.OpenEmojiInfoStringTableCellRenderer
 import com.github.texousliu.open.emoji.dialog.renderer.OpenEmojiInfoTypeTableCellRenderer
 import com.github.texousliu.open.emoji.model.OpenEmojiInfo
 import com.github.texousliu.open.emoji.model.OpenEmojiInfoType
-import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
 import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
 import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
-import com.intellij.openapi.ui.*
+import com.intellij.openapi.ui.DialogWrapper
+import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.*
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBLabel
@@ -34,18 +33,13 @@ import javax.swing.JComponent
 import javax.swing.table.TableCellEditor
 
 
-class OpenEmojiInfoDialogPanel {
+class OpenBaseEmojiTableDialogPanel(private val emojiInfoList: MutableList<OpenEmojiInfo>) {
 
     private val headerGap = scale(20)
 
-    val emojiInfoList = mutableListOf<OpenEmojiInfo>()
     private val emojiInfoTableModel = OpenEmojiInfoTableModel(emojiInfoList)
     private val emojiInfoTable = JBTable(emojiInfoTableModel)
-
-    val customEmojiDirectoryTextField = JBTextField()
-    private val customEmojiDirectoryComponent = TextFieldWithBrowseButton(customEmojiDirectoryTextField)
-
-    val emojiInfoSettingsPanel = emojiInfoSettingsDialogPanel()
+    private val configEmojiInfoList = mutableListOf<OpenEmojiInfo>()
 
     init {
         emojiInfoTable.setShowGrid(false)
@@ -55,62 +49,15 @@ class OpenEmojiInfoDialogPanel {
                 return true
             }
         }.installOn(emojiInfoTable)
-        configureStartDirectoryField()
     }
 
-    private fun emojiInfoSettingsDialogPanel(): DialogPanel {
-        return panel {
-            row(OpenEmojiBundle.message("settings.info.custom.directory.label")) {
-                cell(customEmojiDirectoryComponent)
-                        .resizableColumn()
-                        .align(Align.FILL)
-                        .onChanged {
-                            customEmojiDirectoryChanged(it.text)
-                        }
-                        .onReset {
-                            customEmojiDirectoryComponent.text =
-                                    OpenEmojiPersistent.getInstance().getCustomEmojiDirectory()
-                        }
-            }.rowComment(OpenEmojiBundle.message("settings.info.custom.directory.comment"))
-            row {
-                cell(createEmojiConfigTable())
-                        .onReset {
-                            emojiInfoList.clear()
-                            OpenEmojiPersistent.getInstance().getOpenEmojiInfoList().forEach {
-                                emojiInfoList.add(it.clone())
-                            }
-                            emojiInfoTableModel.fireTableDataChanged()
-                        }.resizableColumn()
-                        .align(Align.FILL)
-            }.resizableRow()
-        }
-    }
-
-    private fun customEmojiDirectoryChanged(directory: String) {
-        stopEditing()
-        // 获取所有自定义 emoji
-        OpenEmojiUtils.emojiInfoListWithCustom(directory, emojiInfoList)
-        // 更新表格
-        withSelectionFireTableDataChanged(null)
-    }
-
-    private fun configureStartDirectoryField() {
-        customEmojiDirectoryComponent.addBrowseFolderListener(
-                OpenEmojiBundle.message("settings.info.custom.directory.choose.title"),
-                OpenEmojiBundle.message("settings.info.custom.directory.choose.desc"),
-                null,
-                FileChooserDescriptorFactory.createSingleFolderDescriptor(),
-                TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
-        )
-    }
-
-    private fun createEmojiConfigTable(): JComponent {
+    fun create(): JComponent {
         val tableHeader = emojiInfoTable.tableHeader
         val headerFontMetrics = tableHeader.getFontMetrics(tableHeader.font)
 
         val iconColumn = emojiInfoTable.columnModel.getColumn(0)
         val iconColumnWidth = headerFontMetrics.stringWidth(
-                emojiInfoTable.getColumnName(0) + headerGap
+            emojiInfoTable.getColumnName(0) + headerGap
         )
         iconColumn.preferredWidth = iconColumnWidth
         iconColumn.minWidth = iconColumnWidth
@@ -135,23 +82,70 @@ class OpenEmojiInfoDialogPanel {
         enableColumn.cellRenderer = OpenEmojiInfoBooleanTableCellRenderer(emojiInfoList)
         enableColumn.cellEditor = BooleanTableCellEditor()
 
+        val copyAction: AnAction = OpenEmojiInfoCopyCustomAnAction(AllIcons.Actions.Copy, this)
         val panel = ToolbarDecorator.createDecorator(emojiInfoTable)
-                .setAddAction {
-                    addEmoji()
-                }.setEditAction {
-                    editSelectedEmoji()
-                }
-                .setMoveUpAction(null)
-                .setMoveDownAction(null)
-                .setRemoveAction {
-                    removeEmoji()
-                }.addExtraActions(OpenEmojiInfoResetFromDiskAnAction(AllIcons.General.Reset, this),
-                        OpenEmojiInfoReloadCustomAnAction(AllIcons.Actions.BuildAutoReloadChanges, this),
-                        OpenEmojiInfoCopyCustomAnAction(AllIcons.Actions.Copy, this)
-                )
-                .createPanel()
+            .setAddAction {
+                addEmoji()
+            }.setEditAction {
+                editSelectedEmoji()
+            }
+            .setMoveUpAction(null)
+            .setMoveDownAction(null)
+            .setRemoveAction {
+                removeEmoji()
+            }.addExtraAction(copyAction)
+            .createPanel()
         panel.preferredSize = Dimension(0, 300)
         return panel
+    }
+
+    fun onReset(emojiInfoList: MutableList<OpenEmojiInfo>) {
+        this.emojiInfoList.clear()
+        emojiInfoList.forEach {
+            this.emojiInfoList.add(it.clone())
+            this.configEmojiInfoList.add(it.clone())
+        }
+        emojiInfoTableModel.fireTableDataChanged()
+    }
+
+    fun onApply() {
+        this.configEmojiInfoList.clear()
+        this.configEmojiInfoList.addAll(emojiInfoList)
+    }
+
+    fun markModifiedEmojis(): Boolean {
+        var modify = false
+        if (configEmojiInfoList.size != emojiInfoList.size) modify = true
+        for (emojiInfo in emojiInfoList) {
+            val indexOf = configEmojiInfoList.indexOf(emojiInfo)
+            emojiInfo.changed = false
+            if (indexOf < 0) {
+                emojiInfo.changed = true
+                modify = true
+            } else {
+                val cei = configEmojiInfoList[indexOf]
+                if (cei.modified(emojiInfo)) {
+                    emojiInfo.changed = true
+                    modify = true
+                }
+            }
+        }
+        if (modify) {
+            withSelectionFireTableDataChanged(null)
+        }
+        return modify
+    }
+
+    fun isModifiedEmojis(): Boolean {
+        if (configEmojiInfoList.size != emojiInfoList.size) return true
+        for (emojiInfo in emojiInfoList) {
+            val indexOf = configEmojiInfoList.indexOf(emojiInfo)
+            if (indexOf < 0) return true
+            val cei = configEmojiInfoList[indexOf]
+            if (cei.modified(emojiInfo))
+                return true
+        }
+        return false
     }
 
     private fun addEmoji() {
@@ -165,9 +159,6 @@ class OpenEmojiInfoDialogPanel {
                 add.markCustom(true)
                 emojiInfoList.add(add)
                 val index: Int = emojiInfoList.size - 1
-//                emojiInfoTableModel.fireTableRowsInserted(index, index)
-//                emojiInfoTable.selectionModel.setSelectionInterval(index, index)
-//                emojiInfoTable.scrollRectToVisible(emojiInfoTable.getCellRect(index, 0, true))
                 withSelectionFireTableDataChanged(index)
             } else {
                 val exists = emojiInfoList[existsIndex]
@@ -211,7 +202,7 @@ class OpenEmojiInfoDialogPanel {
         if (selectedIndex >= 0 && selectedIndex < emojiInfoTableModel.rowCount) {
             val select = emojiInfoList[selectedIndex]
             if (select.type == OpenEmojiInfoType.OVERRIDE) {
-                emojiInfoList[selectedIndex] = OpenGitEmojiCache.get(select)
+                emojiInfoList[selectedIndex] = get(select)
                 emojiInfoTableModel.fireTableRowsUpdated(selectedIndex, selectedIndex)
                 emojiInfoTable.selectionModel.setSelectionInterval(selectedIndex, selectedIndex)
             } else {
@@ -227,41 +218,7 @@ class OpenEmojiInfoDialogPanel {
         }
     }
 
-    fun markModifiedEmojis(): Boolean {
-        var modify = false
-        val config = OpenEmojiPersistent.getInstance().getOpenEmojiInfoList()
-        if (config.size != emojiInfoList.size) modify = true
-        for (emojiInfo in emojiInfoList) {
-            val indexOf = config.indexOf(emojiInfo)
-            emojiInfo.changed = false
-            if (indexOf < 0) {
-                emojiInfo.changed = true
-                modify = true
-            } else {
-                val cei = config[indexOf]
-                if (cei.modified(emojiInfo)) {
-                    emojiInfo.changed = true
-                    modify = true
-                }
-            }
-        }
-        if (modify) {
-            withSelectionFireTableDataChanged(null)
-        }
-        return modify
-    }
-
-    fun resetToDefault() {
-        emojiInfoList.clear()
-        emojiInfoList.addAll(OpenEmojiUtils.emojiInfoList(customEmojiDirectoryComponent.text))
-        withSelectionFireTableDataChanged(null)
-    }
-
-    fun reloadCustom() {
-        customEmojiDirectoryChanged(customEmojiDirectoryComponent.text)
-    }
-
-    fun copyEmojiJson(): String {
+    private fun copyEmojiJson(): String {
         val selectedIndex: Int = emojiInfoTable.selectedRow
         if (selectedIndex >= 0 && selectedIndex < emojiInfoTableModel.rowCount) {
             val select = emojiInfoList[selectedIndex]
@@ -272,9 +229,14 @@ class OpenEmojiInfoDialogPanel {
         return "Nothing"
     }
 
-    fun selectedEmoji(): Boolean {
+    private fun selectedEmoji(): Boolean {
         val selectedIndex: Int = emojiInfoTable.selectedRow
         return selectedIndex >= 0 && selectedIndex < emojiInfoTableModel.rowCount
+    }
+
+    fun get(value: OpenEmojiInfo): OpenEmojiInfo {
+        val indexOf = configEmojiInfoList.indexOf(value)
+        return if (indexOf < 0) value else configEmojiInfoList[indexOf]
     }
 
     private class EmojiConfigInfoDialogWrapper() : DialogWrapper(true) {
@@ -361,8 +323,8 @@ class OpenEmojiInfoDialogPanel {
 
         fun load(): OpenEmojiInfo {
             return OpenEmojiInfo(
-                    emoji.text, entity.text, code.text,
-                    name.text, description.text, cnDescription.text, enable.isSelected
+                emoji.text, entity.text, code.text,
+                name.text, description.text, cnDescription.text, enable.isSelected
             )
         }
 
@@ -386,38 +348,27 @@ class OpenEmojiInfoDialogPanel {
 
     }
 
-    private class OpenEmojiInfoResetFromDiskAnAction(icon: Icon,
-                                                     var panel: OpenEmojiInfoDialogPanel)
-        : AnAction({ OpenEmojiBundle.message("settings.info.emoji.reset.title") },
-            { OpenEmojiBundle.message("settings.info.emoji.reset.desc") }, icon) {
-        override fun actionPerformed(e: AnActionEvent) {
-            panel.resetToDefault()
-        }
-    }
-
-    private class OpenEmojiInfoReloadCustomAnAction(icon: Icon,
-                                                    var panel: OpenEmojiInfoDialogPanel)
-        : AnAction({ OpenEmojiBundle.message("settings.info.emoji.reload.title") },
-            { OpenEmojiBundle.message("settings.info.emoji.reload.desc") }, icon) {
-        override fun actionPerformed(e: AnActionEvent) {
-            panel.reloadCustom()
-        }
-    }
-
-    private class OpenEmojiInfoCopyCustomAnAction(icon: Icon,
-                                                  var panel: OpenEmojiInfoDialogPanel)
-        : AnActionButton({ OpenEmojiBundle.message("settings.info.emoji.copy.title") },
-            { OpenEmojiBundle.message("settings.info.emoji.copy.desc") }, icon) {
+    private class OpenEmojiInfoCopyCustomAnAction(
+        icon: Icon,
+        var panel: OpenBaseEmojiTableDialogPanel
+    ) : AnActionButton(
+        { OpenEmojiBundle.message("settings.info.emoji.copy.title") },
+        { OpenEmojiBundle.message("settings.info.emoji.copy.desc") }, icon
+    ) {
         override fun actionPerformed(e: AnActionEvent) {
             val info = panel.copyEmojiJson()
             NotificationGroupManager.getInstance()
-                    .getNotificationGroup("Custom Open Emoji Notification Group")
-                    .createNotification("$info Copied", NotificationType.INFORMATION)
-                    .notify(e.project)
+                .getNotificationGroup("Custom Open Emoji Notification Group")
+                .createNotification("$info Copied", NotificationType.INFORMATION)
+                .notify(e.project)
         }
 
         override fun updateButton(e: AnActionEvent) {
             e.presentation.isEnabled = panel.selectedEmoji()
+        }
+
+        override fun getActionUpdateThread(): ActionUpdateThread {
+            return ActionUpdateThread.EDT
         }
 
     }
