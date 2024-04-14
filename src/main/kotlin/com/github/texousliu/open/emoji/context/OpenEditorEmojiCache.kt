@@ -18,7 +18,7 @@ object OpenEditorEmojiCache {
 
     fun refresh(directory: String) {
         emojiInfoList.clear()
-        emojiInfoList.addAll(OpenEmojiUtils.emojiInfoList(directory))
+        emojiInfoList.addAll(OpenEmojiUtils.defaultEditorEmojiInfoList())
     }
 
     fun get(value: OpenEmojiInfo) : OpenEmojiInfo {

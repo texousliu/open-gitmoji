@@ -4,12 +4,12 @@ import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
 import javax.swing.Icon
 
 open class OpenEmoji(
-        emoji: String,
-        entity: String,
-        code: String,
-        name: String,
-        description: String,
-        cnDescription: String
+    emoji: String,
+    entity: String,
+    code: String,
+    name: String,
+    description: String,
+    cnDescription: String
 ) : OpenEmojiBase(emoji, entity, code, name, description, cnDescription) {
 
     var isCustom = false
@@ -19,7 +19,11 @@ open class OpenEmoji(
 
     fun getIcon(): Icon {
         if (!this::_icon.isInitialized) {
+            // TODO
             _icon = OpenEmojiUtils.getIcon(code, isCustom)
+//            val icon = TextIcon(emoji, JBUI.CurrentTheme.Link.Foreground.ENABLED, null, 0)
+//            icon.setFont(JBUI.Fonts.toolbarFont())
+//            _icon = icon
         }
         return _icon
     }

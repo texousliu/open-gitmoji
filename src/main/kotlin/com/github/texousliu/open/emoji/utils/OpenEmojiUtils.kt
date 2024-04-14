@@ -24,6 +24,7 @@ import javax.swing.event.DocumentListener
 object OpenEmojiUtils {
 
     private const val EMOJI_FILE_NAME = "emojis.json"
+    private const val EDITOR_EMOJI_FILE_NAME = "emojicopy.json"
     const val REPLACE_SUFFIX_MARK = "$$:$$"
 
     val GSON = Gson()
@@ -56,6 +57,19 @@ object OpenEmojiUtils {
     fun defaultEmojis(): MutableList<OpenEmoji> {
         val result = mutableListOf<OpenEmoji>()
         javaClass.getResourceAsStream("/${EMOJI_FILE_NAME}").use { inputStream ->
+            if (inputStream != null) {
+                val text = inputStream.bufferedReader().readText()
+                Gson().fromJson(text, OpenEmojiList::class.java).also {
+                    it.emojis.forEach(result::add)
+                }
+            }
+        }
+        return result
+    }
+
+    fun defaultEditorEmojis(): MutableList<OpenEmoji> {
+        val result = mutableListOf<OpenEmoji>()
+        javaClass.getResourceAsStream("/${EDITOR_EMOJI_FILE_NAME}").use { inputStream ->
             if (inputStream != null) {
                 val text = inputStream.bufferedReader().readText()
                 Gson().fromJson(text, OpenEmojiList::class.java).also {
@@ -119,6 +133,10 @@ object OpenEmojiUtils {
 
     fun defaultEmojiInfoList(): MutableList<OpenEmojiInfo> {
         return convert(defaultEmojis())
+    }
+
+    fun defaultEditorEmojiInfoList(): MutableList<OpenEmojiInfo> {
+        return convert(defaultEditorEmojis())
     }
 
     fun customEmojiInfoList(directory: String?): MutableList<OpenEmojiInfo> {

@@ -16,6 +16,13 @@ plugins {
     id("org.jetbrains.qodana") version "2023.2.1"
 }
 
+dependencies {
+    // https://mvnrepository.com/artifact/com.squareup.okhttp3/okhttp
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    // https://mvnrepository.com/artifact/com.google.code.gson/gson
+    implementation("com.google.code.gson:gson:2.10.1")
+}
+
 group = properties("pluginGroup")
 version = properties("pluginVersion")
 
@@ -74,9 +81,9 @@ tasks {
 
         // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
         pluginDescription.set(
-                projectDir.resolve("docs/PLUGIN_DESCRIPTION.md")
-                    .readText()
-                    .run { markdownToHTML(this) }
+            projectDir.resolve("docs/PLUGIN_DESCRIPTION.md")
+                .readText()
+                .run { markdownToHTML(this) }
         )
 
         // Get the latest available change notes from the changelog file
