@@ -1,5 +1,6 @@
 package com.github.texousliu.open.emoji.dialog
 
+import com.github.texousliu.open.emoji.compatiable.BrowseFolderActionListener
 import com.github.texousliu.open.emoji.config.OpenEmojiBundle
 import com.github.texousliu.open.emoji.context.OpenEmojiCache
 import com.github.texousliu.open.emoji.dialog.renderer.OpenEmojiInfoBooleanTableCellRenderer
@@ -13,6 +14,7 @@ import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
 import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
@@ -95,13 +97,21 @@ class OpenEmojiInfoDialogPanel {
     }
 
     private fun configureStartDirectoryField() {
-        customEmojiDirectoryComponent.addBrowseFolderListener(
-                OpenEmojiBundle.message("settings.info.custom.directory.choose.title"),
-                OpenEmojiBundle.message("settings.info.custom.directory.choose.desc"),
-                null,
-                FileChooserDescriptorFactory.createSingleFolderDescriptor(),
-                TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
+        customEmojiDirectoryComponent.addActionListener(BrowseFolderActionListener(
+            customEmojiDirectoryComponent,
+            null,
+            FileChooserDescriptorFactory.createSingleFolderDescriptor()
+                .withTitle(OpenEmojiBundle.message("settings.info.custom.directory.choose.title"))
+                .withDescription(OpenEmojiBundle.message("settings.info.custom.directory.choose.desc")),
+            TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT)
         )
+//        customEmojiDirectoryComponent.addBrowseFolderListener(
+//                OpenEmojiBundle.message("settings.info.custom.directory.choose.title"),
+//                OpenEmojiBundle.message("settings.info.custom.directory.choose.desc"),
+//                null,
+//                FileChooserDescriptorFactory.createSingleFolderDescriptor(),
+//                TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
+//        )
     }
 
     private fun createEmojiConfigTable(): JComponent {
@@ -418,6 +428,14 @@ class OpenEmojiInfoDialogPanel {
 
         override fun updateButton(e: AnActionEvent) {
             e.presentation.isEnabled = panel.selectedEmoji()
+        }
+
+        /**
+         * 兼容 IntelliJ IDEA Ultimate 2024.3 eap (243.16718.32)
+         * 直接返回 EDT
+         */
+        override fun getActionUpdateThread(): ActionUpdateThread {
+            return ActionUpdateThread.EDT
         }
 
     }

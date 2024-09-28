@@ -4,6 +4,9 @@
 
 ## Unreleased
 
+## 3.0.1
+- 修改废弃api调用
+
 ## 3.0.0
 
 - 添加 Editor Emoji 输入支持
