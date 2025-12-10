@@ -4,6 +4,16 @@
 
 ## Unreleased
 
+## 4.0.0
+
+- 升级 plugin 2.x
+- 修改废弃 api 调用
+- 升级idea支持 2024.3
+
+## 3.0.1
+
+- 修改废弃api调用
+
 ## 3.0.0
 
 - 添加 Editor Emoji 输入支持
