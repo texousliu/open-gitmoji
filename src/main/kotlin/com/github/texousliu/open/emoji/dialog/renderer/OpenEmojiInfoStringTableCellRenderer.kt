@@ -1,6 +1,6 @@
 package com.github.texousliu.open.emoji.dialog.renderer
 
-import com.github.texousliu.open.emoji.model.OpenEmojiInfo
+import com.github.texousliu.open.emoji.model.EmojiConfigState
 import java.awt.Component
 import javax.swing.JTable
 import javax.swing.table.DefaultTableCellRenderer
@@ -11,7 +11,7 @@ import javax.swing.table.DefaultTableCellRenderer
  * @author liuxiaohua
  * @since 2023-11-22
  */
-class OpenEmojiInfoStringTableCellRenderer(private val emojiInfoList: MutableList<OpenEmojiInfo>)
+class OpenEmojiInfoStringTableCellRenderer(private val emojiInfoList: MutableList<EmojiConfigState>)
     : DefaultTableCellRenderer(), OpenEmojiInfoChangedTableCellRenderer {
 
     override fun getTableCellRendererComponent(

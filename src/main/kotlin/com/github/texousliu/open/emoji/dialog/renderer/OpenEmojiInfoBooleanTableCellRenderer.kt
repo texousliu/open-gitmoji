@@ -1,11 +1,11 @@
 package com.github.texousliu.open.emoji.dialog.renderer
 
-import com.github.texousliu.open.emoji.model.OpenEmojiInfo
+import com.github.texousliu.open.emoji.model.EmojiConfigState
 import com.intellij.ui.BooleanTableCellRenderer
 import java.awt.Component
 import javax.swing.JTable
 
-class OpenEmojiInfoBooleanTableCellRenderer(private val emojiInfoList: MutableList<OpenEmojiInfo>)
+class OpenEmojiInfoBooleanTableCellRenderer(private val emojiInfoList: MutableList<EmojiConfigState>)
     : BooleanTableCellRenderer(), OpenEmojiInfoChangedTableCellRenderer {
 
     override fun getTableCellRendererComponent(

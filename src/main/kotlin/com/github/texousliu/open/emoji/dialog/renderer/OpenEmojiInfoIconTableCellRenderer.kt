@@ -1,6 +1,6 @@
 package com.github.texousliu.open.emoji.dialog.renderer
 
-import com.github.texousliu.open.emoji.model.OpenEmojiInfo
+import com.github.texousliu.open.emoji.model.EmojiConfigState
 import com.intellij.util.ui.table.IconTableCellRenderer
 import org.jetbrains.annotations.NotNull
 import java.awt.Component
@@ -13,7 +13,7 @@ import javax.swing.JTable
  * @author liuxiaohua
  * @since 2023-11-22
  */
-class OpenEmojiInfoIconTableCellRenderer(private val emojiInfoList: MutableList<OpenEmojiInfo>)
+class OpenEmojiInfoIconTableCellRenderer(private val emojiInfoList: MutableList<EmojiConfigState>)
     : IconTableCellRenderer<Icon>(), OpenEmojiInfoChangedTableCellRenderer {
 
     @NotNull

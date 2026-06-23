@@ -19,7 +19,7 @@ class OpenEmojiInfoConfiguration : SearchableConfigurable {
             val indexOf = config.indexOf(emojiInfo)
             if (indexOf < 0) return true
             val cei = config[indexOf]
-            if (cei.modified(emojiInfo))
+            if (cei.enabled != emojiInfo.enabled || cei.emoji.data != emojiInfo.emoji.data)
                 return true
         }
         return false

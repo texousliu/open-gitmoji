@@ -1,10 +1,11 @@
 package com.github.texousliu.open.emoji.contributor
 
 import com.github.texousliu.open.emoji.constants.WorkEnv
+import com.github.texousliu.open.emoji.model.EmojiConfigState
 import com.github.texousliu.open.emoji.model.OpenEmoji
-import com.github.texousliu.open.emoji.model.OpenEmojiInfo
 import com.github.texousliu.open.emoji.model.OpenEmojiPattern
 import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
+import com.github.texousliu.open.emoji.service.IconLoaderService
 import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
 import com.intellij.codeInsight.completion.*
 import com.intellij.codeInsight.lookup.LookupElementBuilder
@@ -47,7 +48,7 @@ class OpenEmojiEditorCompletionContributor : CompletionContributor() {
                         val text = doc.substring(0, offset)
 
                         // 判断是否是以 colon with input 结尾
-                        if (!text.endsWith(":$inputString") && !text.equals("“：$inputString")) return
+                        if (!text.endsWith(":$inputString") && !text.equals("：$inputString")) return
                     }
 
                     // 兼容代码提示需要在前面补全的字符
@@ -61,7 +62,7 @@ class OpenEmojiEditorCompletionContributor : CompletionContributor() {
                     }
 
                     // 预置 git emoji
-                    persistent.getOpenEmojiInfoList().filter { it.enable }
+                    persistent.getOpenEmojiInfoList().filter { it.enabled }
                         .forEach { emoji ->
                             emojiToPrompt(emoji, result, emojiPatterns, needAppendString)
                         }
@@ -70,29 +71,29 @@ class OpenEmojiEditorCompletionContributor : CompletionContributor() {
     }
 
     private fun emojiToPrompt(
-        emoji: OpenEmojiInfo,
+        emoji: EmojiConfigState,
         result: CompletionResultSet,
         emojiPatterns: MutableList<OpenEmojiPattern>,
         needAppendString: String
     ) {
         emojiPatterns.forEach { pattern ->
-            val str = lookupString(emoji, pattern)
+            val str = lookupString(emoji.emoji, pattern)
             result.addElement(
                 LookupElementBuilder
-                    .create(emoji, "${needAppendString}${str}${OpenEmojiUtils.REPLACE_SUFFIX_MARK}")
+                    .create(emoji.emoji, "${needAppendString}${str}${OpenEmojiUtils.REPLACE_SUFFIX_MARK}")
                     .withPresentableText(str)
                     // .withTailText(emoji.description)
-                    .withTypeText(emoji.description)
+                    .withTypeText(emoji.emoji.description)
                     .withLookupStrings(
                         listOf(
-                            "${needAppendString}${emoji.code.lowercase()}",
-                            "${needAppendString}${emoji.description.lowercase()}",
-                            "${needAppendString}${emoji.cnDescription.lowercase()}",
-                            "${needAppendString}${emoji.name.lowercase()}",
-                            "${needAppendString}${emoji.entity.lowercase()}"
+                            "${needAppendString}${emoji.emoji.code.lowercase()}",
+                            "${needAppendString}${emoji.emoji.description.lowercase()}",
+                            "${needAppendString}${emoji.emoji.cnDescription.lowercase()}",
+                            "${needAppendString}${emoji.emoji.name.lowercase()}",
+                            "${needAppendString}${emoji.emoji.entity.lowercase()}"
                         )
                     )
-                    .withIcon(emoji.getIcon())
+                    .withIcon(IconLoaderService.getIcon(emoji.emoji))
                     .withInsertHandler(openEmojiInsertHandler)
             )
         }

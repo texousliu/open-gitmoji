@@ -1,11 +1,12 @@
 package com.github.texousliu.open.emoji.dialog
 
-import com.github.texousliu.open.emoji.model.OpenEmojiInfo
+import com.github.texousliu.open.emoji.model.EmojiConfigState
+import com.github.texousliu.open.emoji.service.IconLoaderService
 import com.intellij.util.ui.ItemRemovable
 import javax.swing.Icon
 import javax.swing.table.AbstractTableModel
 
-class OpenEmojiInfoTableModel(private var openEmojiInfos: MutableList<OpenEmojiInfo>) : AbstractTableModel(),
+class OpenEmojiInfoTableModel(private var openEmojiInfos: MutableList<EmojiConfigState>) : AbstractTableModel(),
         ItemRemovable {
 
     private val ourColumnNames = arrayOf(
@@ -49,23 +50,23 @@ class OpenEmojiInfoTableModel(private var openEmojiInfos: MutableList<OpenEmojiI
         val config = openEmojiInfos[row]
         return when (column) {
             0 -> {
-                config.getIcon()
+                IconLoaderService.getIcon(config.emoji)
             }
 
             1 -> {
-                config.code
+                config.emoji.code
             }
 
             2 -> {
-                config.description
+                config.emoji.description
             }
 
             3 -> {
-                config.type
+                config.emoji.source.name
             }
 
             4 -> {
-                config.enable
+                config.enabled
             }
 
             else -> {
@@ -91,7 +92,7 @@ class OpenEmojiInfoTableModel(private var openEmojiInfos: MutableList<OpenEmojiI
             }
 
             4 -> {
-                config.enable = (value as Boolean?)!!
+                config.enabled = (value as Boolean?)!!
             }
 
             else -> {

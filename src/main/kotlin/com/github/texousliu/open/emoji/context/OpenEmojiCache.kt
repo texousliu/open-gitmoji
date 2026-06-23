@@ -1,18 +1,18 @@
 package com.github.texousliu.open.emoji.context
 
-import com.github.texousliu.open.emoji.model.OpenEmojiInfo
+import com.github.texousliu.open.emoji.model.EmojiConfigState
 import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
 import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
 
 object OpenEmojiCache {
 
-    private val emojiInfoList = mutableListOf<OpenEmojiInfo>()
+    private val emojiInfoList = mutableListOf<EmojiConfigState>()
 
     init {
         refresh(OpenEmojiPersistent.getInstance().getCustomEmojiDirectory())
     }
 
-    fun emojiInfoList(): MutableList<OpenEmojiInfo> {
+    fun emojiInfoList(): MutableList<EmojiConfigState> {
         return emojiInfoList
     }
 
@@ -21,7 +21,7 @@ object OpenEmojiCache {
         emojiInfoList.addAll(OpenEmojiUtils.emojiInfoList(directory))
     }
 
-    fun get(value: OpenEmojiInfo) : OpenEmojiInfo {
+    fun get(value: EmojiConfigState): EmojiConfigState {
         val indexOf = emojiInfoList.indexOf(value)
         return if (indexOf < 0) value else emojiInfoList[indexOf]
     }
