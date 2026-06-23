@@ -1,43 +1,39 @@
 package com.github.texousliu.open.emoji.model
 
-import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
-import javax.swing.Icon
+/**
+ * Domain object representing an emoji with its source information.
+ *
+ * Does NOT perform icon loading — icon resolution is handled by [IconLoaderService]
+ * outside the model layer.
+ */
+class OpenEmoji(
+    val data: OpenEmojiData,
+    val source: EmojiSource = EmojiSource.DEFAULT,
+    val iconPath: String? = null
+) {
+    val emoji: String get() = data.emoji
+    val entity: String get() = data.entity
+    val code: String get() = data.code
+    val name: String get() = data.name
+    val description: String get() = data.description
+    val cnDescription: String get() = data.cnDescription
+    val semver: String? get() = data.semver
 
-open class OpenEmoji(
-        emoji: String,
-        entity: String,
-        code: String,
-        name: String,
-        description: String,
-        cnDescription: String
-) : OpenEmojiBase(emoji, entity, code, name, description, cnDescription) {
+    /**
+     * Returns the icon file name derived from the code (without colons).
+     * Example: ":art:" -> "art"
+     */
+    fun iconName(): String = code.replace(":", "")
 
-    var isCustom = false
-
-    @Transient
-    private lateinit var _icon: Icon
-
-    fun getIcon(): Icon {
-        if (!this::_icon.isInitialized) {
-            _icon = OpenEmojiUtils.getIcon(code, isCustom)
-        }
-        return _icon
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is OpenEmoji) return false
+        return this.code == other.code
     }
 
-    fun getIconPath(): String {
-        return OpenEmojiUtils.getIconPath(code, isCustom).replace("\\", "/")
-    }
+    override fun hashCode(): Int = code.hashCode()
 
-    fun custom() {
-        custom(true)
+    override fun toString(): String {
+        return "OpenEmoji(code=$code, emoji=$emoji, source=$source)"
     }
-
-    fun custom(isCustom: Boolean) {
-        this.isCustom = isCustom
-    }
-
-    fun getCustom(): Boolean {
-        return this.isCustom
-    }
-
 }

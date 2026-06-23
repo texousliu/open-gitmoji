@@ -7,9 +7,12 @@ import com.github.texousliu.open.emoji.dialog.renderer.OpenEmojiInfoBooleanTable
 import com.github.texousliu.open.emoji.dialog.renderer.OpenEmojiInfoIconTableCellRenderer
 import com.github.texousliu.open.emoji.dialog.renderer.OpenEmojiInfoStringTableCellRenderer
 import com.github.texousliu.open.emoji.dialog.renderer.OpenEmojiInfoTypeTableCellRenderer
-import com.github.texousliu.open.emoji.model.OpenEmojiInfo
-import com.github.texousliu.open.emoji.model.OpenEmojiInfoType
+import com.github.texousliu.open.emoji.model.EmojiConfigState
+import com.github.texousliu.open.emoji.model.EmojiSource
+import com.github.texousliu.open.emoji.model.OpenEmoji
+import com.github.texousliu.open.emoji.model.OpenEmojiData
 import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
+import com.github.texousliu.open.emoji.service.IconLoaderService
 import com.github.texousliu.open.emoji.utils.OpenEmojiUtils
 import com.intellij.icons.AllIcons
 import com.intellij.notification.NotificationGroupManager
@@ -40,7 +43,7 @@ class OpenEmojiInfoDialogPanel {
 
     private val headerGap = scale(20)
 
-    val emojiInfoList = mutableListOf<OpenEmojiInfo>()
+    val emojiInfoList = mutableListOf<EmojiConfigState>()
     private val emojiInfoTableModel = OpenEmojiInfoTableModel(emojiInfoList)
     private val emojiInfoTable = JBTable(emojiInfoTableModel)
 
@@ -105,13 +108,6 @@ class OpenEmojiInfoDialogPanel {
                 .withDescription(OpenEmojiBundle.message("settings.info.custom.directory.choose.desc")),
             TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT)
         )
-//        customEmojiDirectoryComponent.addBrowseFolderListener(
-//                OpenEmojiBundle.message("settings.info.custom.directory.choose.title"),
-//                OpenEmojiBundle.message("settings.info.custom.directory.choose.desc"),
-//                null,
-//                FileChooserDescriptorFactory.createSingleFolderDescriptor(),
-//                TextComponentAccessor.TEXT_FIELD_WHOLE_TEXT
-//        )
     }
 
     private fun createEmojiConfigTable(): JComponent {
@@ -135,7 +131,7 @@ class OpenEmojiInfoDialogPanel {
         descriptionColumn.cellRenderer = OpenEmojiInfoStringTableCellRenderer(emojiInfoList)
 
         val typeColumn = emojiInfoTable.columnModel.getColumn(3)
-        typeColumn.minWidth = headerFontMetrics.stringWidth(OpenEmojiInfoType.OVERRIDE.name) + headerGap
+        typeColumn.minWidth = headerFontMetrics.stringWidth(EmojiSource.OVERRIDE.name) + headerGap
         typeColumn.cellRenderer = OpenEmojiInfoTypeTableCellRenderer(emojiInfoList)
 
         val enableColumn = emojiInfoTable.columnModel.getColumn(4)
@@ -169,19 +165,15 @@ class OpenEmojiInfoDialogPanel {
         val addEmojiDialog = EmojiConfigInfoDialogWrapper()
         if (addEmojiDialog.showAndGet()) {
             val add = addEmojiDialog.load()
-            add.type = OpenEmojiInfoType.CUSTOM
             val existsIndex = emojiInfoList.indexOf(add)
             if (existsIndex < 0) {
-                add.markCustom(true)
                 emojiInfoList.add(add)
                 val index: Int = emojiInfoList.size - 1
-//                emojiInfoTableModel.fireTableRowsInserted(index, index)
-//                emojiInfoTable.selectionModel.setSelectionInterval(index, index)
-//                emojiInfoTable.scrollRectToVisible(emojiInfoTable.getCellRect(index, 0, true))
                 withSelectionFireTableDataChanged(index)
             } else {
                 val exists = emojiInfoList[existsIndex]
-                exists.change(add)
+                // 用新数据替换已有项，保留原有的 enabled 状态
+                emojiInfoList[existsIndex] = EmojiConfigState(add.emoji, exists.enabled, true)
                 withSelectionFireTableDataChanged(existsIndex)
             }
         }
@@ -210,7 +202,8 @@ class OpenEmojiInfoDialogPanel {
         if (!dialog.showAndGet()) {
             return
         }
-        selectConfig.change(dialog.load())
+        val loaded = dialog.load()
+        emojiInfoList[selectedIndex] = EmojiConfigState(loaded.emoji, loaded.enabled, true)
         emojiInfoTableModel.fireTableRowsUpdated(selectedIndex, selectedIndex)
         emojiInfoTable.selectionModel.setSelectionInterval(selectedIndex, selectedIndex)
     }
@@ -220,7 +213,7 @@ class OpenEmojiInfoDialogPanel {
         val selectedIndex: Int = emojiInfoTable.selectedRow
         if (selectedIndex >= 0 && selectedIndex < emojiInfoTableModel.rowCount) {
             val select = emojiInfoList[selectedIndex]
-            if (select.type == OpenEmojiInfoType.OVERRIDE) {
+            if (select.emoji.source == EmojiSource.OVERRIDE) {
                 emojiInfoList[selectedIndex] = OpenEmojiCache.get(select)
                 emojiInfoTableModel.fireTableRowsUpdated(selectedIndex, selectedIndex)
                 emojiInfoTable.selectionModel.setSelectionInterval(selectedIndex, selectedIndex)
@@ -243,14 +236,14 @@ class OpenEmojiInfoDialogPanel {
         if (config.size != emojiInfoList.size) modify = true
         for (emojiInfo in emojiInfoList) {
             val indexOf = config.indexOf(emojiInfo)
-            emojiInfo.changed = false
+            emojiInfo.dirty = false
             if (indexOf < 0) {
-                emojiInfo.changed = true
+                emojiInfo.dirty = true
                 modify = true
             } else {
                 val cei = config[indexOf]
-                if (cei.modified(emojiInfo)) {
-                    emojiInfo.changed = true
+                if (cei.enabled != emojiInfo.enabled || cei.emoji.data != emojiInfo.emoji.data) {
+                    emojiInfo.dirty = true
                     modify = true
                 }
             }
@@ -275,7 +268,7 @@ class OpenEmojiInfoDialogPanel {
         val selectedIndex: Int = emojiInfoTable.selectedRow
         if (selectedIndex >= 0 && selectedIndex < emojiInfoTableModel.rowCount) {
             val select = emojiInfoList[selectedIndex]
-            val emojiJson = OpenEmojiUtils.GSON.toJson(select.toBase())
+            val emojiJson = OpenEmojiUtils.GSON.toJson(select.emoji.data)
             OpenEmojiUtils.copyToClipboard(emojiJson)
             return emojiJson
         }
@@ -301,18 +294,18 @@ class OpenEmojiInfoDialogPanel {
         var isCustom = true
 
 
-        constructor(config: OpenEmojiInfo) : this() {
-            this.enable.isSelected = config.enable
-            this.type.text = config.type.name
-            this.emoji.text = config.emoji
-            this.entity.text = config.entity
-            this.code.text = config.code
-            this.name.text = config.name
-            this.description.text = config.description
-            this.cnDescription.text = config.cnDescription
-            this.icon.icon = config.getIcon()
-            this.iconPath.text = config.getIconPath()
-            this.isCustom = config.getCustom()
+        constructor(config: EmojiConfigState) : this() {
+            this.enable.isSelected = config.enabled
+            this.type.text = config.emoji.source.name
+            this.emoji.text = config.emoji.emoji
+            this.entity.text = config.emoji.entity
+            this.code.text = config.emoji.code
+            this.name.text = config.emoji.name
+            this.description.text = config.emoji.description
+            this.cnDescription.text = config.emoji.cnDescription
+            this.icon.icon = IconLoaderService.getIcon(config.emoji)
+            this.iconPath.text = IconLoaderService.getIconPath(config.emoji)
+            this.isCustom = config.emoji.source == EmojiSource.CUSTOM || config.emoji.source == EmojiSource.OVERRIDE
         }
 
         init {
@@ -333,7 +326,19 @@ class OpenEmojiInfoDialogPanel {
         }
 
         private fun generatorIconPath(code: String) {
-            iconPath.text = OpenEmojiUtils.getIconPath(code, isCustom).replace("\\", "/")
+            iconPath.text = OpenEmojiUtils.getIconPath(buildTempEmoji(code)).replace("\\", "/")
+        }
+
+        private fun buildTempEmoji(code: String): OpenEmoji {
+            val data = OpenEmojiData(
+                    emoji = emoji.text,
+                    entity = entity.text,
+                    code = code,
+                    name = name.text,
+                    description = description.text,
+                    cnDescription = cnDescription.text
+            )
+            return OpenEmoji(data, if (isCustom) EmojiSource.CUSTOM else EmojiSource.DEFAULT)
         }
 
         override fun createCenterPanel(): JComponent {
@@ -369,11 +374,13 @@ class OpenEmojiInfoDialogPanel {
             }
         }
 
-        fun load(): OpenEmojiInfo {
-            return OpenEmojiInfo(
-                    emoji.text, entity.text, code.text,
-                    name.text, description.text, cnDescription.text, enable.isSelected
+        fun load(): EmojiConfigState {
+            val data = OpenEmojiData(
+                    emoji = emoji.text, entity = entity.text, code = code.text,
+                    name = name.text, description = description.text, cnDescription = cnDescription.text
             )
+            val emojiObj = OpenEmoji(data, EmojiSource.CUSTOM)
+            return EmojiConfigState(emojiObj, enable.isSelected, false)
         }
 
         fun enableEdit() {

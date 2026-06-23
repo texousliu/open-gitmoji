@@ -1,7 +1,7 @@
 package com.github.texousliu.open.emoji.dialog.renderer
 
-import com.github.texousliu.open.emoji.model.OpenEmojiInfo
-import com.github.texousliu.open.emoji.model.OpenEmojiInfoType
+import com.github.texousliu.open.emoji.model.EmojiConfigState
+import com.github.texousliu.open.emoji.model.EmojiSource
 import com.intellij.ui.JBColor
 import java.awt.Component
 import javax.swing.JTable
@@ -13,7 +13,7 @@ import javax.swing.table.DefaultTableCellRenderer
  * @author liuxiaohua
  * @since 2023-11-22
  */
-class OpenEmojiInfoTypeTableCellRenderer(private val emojiInfoList: MutableList<OpenEmojiInfo>)
+class OpenEmojiInfoTypeTableCellRenderer(private val emojiInfoList: MutableList<EmojiConfigState>)
     : DefaultTableCellRenderer(), OpenEmojiInfoChangedTableCellRenderer {
 
     override fun getTableCellRendererComponent(
@@ -27,11 +27,11 @@ class OpenEmojiInfoTypeTableCellRenderer(private val emojiInfoList: MutableList<
         val tableCellRendererComponent = super
                 .getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column)
         tableCellRendererComponent.background = when (value) {
-            OpenEmojiInfoType.OVERRIDE -> {
+            EmojiSource.OVERRIDE.name -> {
                 JBColor.CYAN
             }
 
-            OpenEmojiInfoType.CUSTOM -> {
+            EmojiSource.CUSTOM.name -> {
                 JBColor.GREEN
             }
 

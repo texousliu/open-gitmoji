@@ -4,31 +4,29 @@ import com.github.texousliu.open.emoji.context.OpenEmojiCache
 import com.github.texousliu.open.emoji.model.*
 import com.github.texousliu.open.emoji.persistence.OpenEmojiInfoSerializer
 import com.github.texousliu.open.emoji.persistence.OpenEmojiPersistent
+import com.github.texousliu.open.emoji.repository.BuiltInEmojiRepository
+import com.github.texousliu.open.emoji.repository.LocalEmojiRepository
+import com.github.texousliu.open.emoji.service.IconLoaderService
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import com.intellij.icons.AllIcons
-import com.intellij.openapi.util.IconLoader
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
-import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.function.Consumer
 import javax.swing.Icon
-import javax.swing.ImageIcon
 import javax.swing.JTextField
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
 object OpenEmojiUtils {
 
-    private const val EMOJI_FILE_NAME = "emojis.json"
     const val REPLACE_SUFFIX_MARK = "$$:$$"
 
     val GSON = Gson()
     val GSON_INFO: Gson = GsonBuilder()
-            .registerTypeAdapter(OpenEmojiInfo::class.java, OpenEmojiInfoSerializer())
+            .registerTypeAdapter(EmojiConfigState::class.java, OpenEmojiInfoSerializer())
             .create()
 
     private const val G = "#{G}"
@@ -41,7 +39,9 @@ object OpenEmojiUtils {
     private val PATTERNS = arrayOf(G, GU, DESC, DESC_CN, DATE, TIME)
 
     fun demo(pattern: String): String {
-        return replace(pattern, OpenEmojiCache.emojiInfoList()[0])
+        val list = OpenEmojiCache.emojiInfoList()
+        if (list.isEmpty()) return pattern
+        return replace(pattern, list[0].emoji)
     }
 
     fun replace(pattern: String, emoji: OpenEmoji): String {
@@ -53,105 +53,70 @@ object OpenEmojiUtils {
         return replace(pattern, params)
     }
 
-    fun defaultEmojis(): MutableList<OpenEmoji> {
-        val result = mutableListOf<OpenEmoji>()
-        javaClass.getResourceAsStream("/${EMOJI_FILE_NAME}").use { inputStream ->
-            if (inputStream != null) {
-                val text = inputStream.bufferedReader().readText()
-                Gson().fromJson(text, OpenEmojiList::class.java).also {
-                    it.emojis.forEach(result::add)
-                }
-            }
-        }
-        return result
+    fun defaultEmojis(): List<OpenEmoji> {
+        return BuiltInEmojiRepository().load()
     }
 
-    fun customEmojis(directory: String?): MutableList<OpenEmoji> {
-        val result = mutableListOf<OpenEmoji>()
-        if (directory == null || directory.trim().isEmpty()) return result
-        val file = File("${directory}/$EMOJI_FILE_NAME")
-        if (file.exists()) {
-            file.inputStream().use { inputStream ->
-                val text = inputStream.bufferedReader().readText()
-                Gson().fromJson(text, OpenEmojiList::class.java).also { gmList ->
-                    if (gmList?.emojis != null) {
-                        gmList.emojis.forEach { gm ->
-                            gm.custom()
-                            result.add(gm)
-                        }
-                    }
-                }
-            }
-        }
-        return result
+    fun customEmojis(directory: String?): List<OpenEmoji> {
+        if (directory == null || directory.trim().isEmpty()) return emptyList()
+        return LocalEmojiRepository(directory).load()
     }
 
     fun emojiInfoListWithCustom(
             directory: String?,
-            emojiInfoList: MutableList<OpenEmojiInfo>
-    ): MutableList<OpenEmojiInfo> = emojiInfoListWithCustom(customEmojiInfoList(directory), emojiInfoList)
+            emojiInfoList: MutableList<EmojiConfigState>
+    ): MutableList<EmojiConfigState> = emojiInfoListWithCustom(customEmojiInfoList(directory), emojiInfoList)
 
     fun emojiInfoListWithCustom(
-            customEmojiInfoList: MutableList<OpenEmojiInfo>?,
-            emojiInfoList: MutableList<OpenEmojiInfo>
-    ): MutableList<OpenEmojiInfo> {
-        customEmojiInfoList?.forEach {
-            val index = emojiInfoList.indexOf(it)
+            customEmojiInfoList: List<EmojiConfigState>?,
+            emojiInfoList: MutableList<EmojiConfigState>
+    ): MutableList<EmojiConfigState> {
+        customEmojiInfoList?.forEach { customState ->
+            val index = emojiInfoList.indexOf(customState)
             if (index < 0) {
-                it.type = OpenEmojiInfoType.CUSTOM
-                emojiInfoList.add(it)
+                // 不存在，作为 CUSTOM 新增
+                emojiInfoList.add(customState)
             } else {
-                val oldEmojiInfo = emojiInfoList[index]
-                if (oldEmojiInfo.type == OpenEmojiInfoType.DEFAULT) {
-                    it.type = OpenEmojiInfoType.OVERRIDE
-                    it.enable = oldEmojiInfo.enable
-                    it.name = oldEmojiInfo.name
-                    it.entity = oldEmojiInfo.entity
-                    it.description = oldEmojiInfo.description
-                    it.cnDescription = oldEmojiInfo.cnDescription
-
-                    emojiInfoList[index] = it
+                val existingState = emojiInfoList[index]
+                if (existingState.emoji.source == EmojiSource.DEFAULT) {
+                    // 覆盖默认项，标记为 OVERRIDE，保留原有的 enabled 状态
+                    val overriddenEmoji = OpenEmoji(
+                            customState.emoji.data,
+                            EmojiSource.OVERRIDE,
+                            customState.emoji.iconPath
+                    )
+                    emojiInfoList[index] = EmojiConfigState(overriddenEmoji, existingState.enabled, existingState.dirty)
                 }
             }
         }
         return emojiInfoList
     }
 
-    fun defaultEmojiInfoList(): MutableList<OpenEmojiInfo> {
+    fun defaultEmojiInfoList(): MutableList<EmojiConfigState> {
         return convert(defaultEmojis())
     }
 
-    fun customEmojiInfoList(directory: String?): MutableList<OpenEmojiInfo> {
+    fun customEmojiInfoList(directory: String?): MutableList<EmojiConfigState> {
         return convert(customEmojis(directory))
     }
 
-    fun emojiInfoList(directory: String?): MutableList<OpenEmojiInfo> {
+    fun emojiInfoList(directory: String?): MutableList<EmojiConfigState> {
         return emojiInfoListWithCustom(customEmojiInfoList(directory), defaultEmojiInfoList())
     }
 
-    fun convert(dataList: Collection<OpenEmoji>?): MutableList<OpenEmojiInfo> {
-        val result = mutableListOf<OpenEmojiInfo>()
+    fun convert(dataList: Collection<OpenEmoji>?): MutableList<EmojiConfigState> {
+        val result = mutableListOf<EmojiConfigState>()
         if (dataList.isNullOrEmpty()) return result
-        dataList.forEach { result.add(OpenEmojiInfo(it)) }
+        dataList.forEach { result.add(EmojiConfigState(it)) }
         return result
     }
 
-    fun getIcon(code: String, isCustom: Boolean): Icon {
-        val name = getIconName(code)
-        val iconPath = getIconPath(name, isCustom)
-        return if (isCustom) getCustomIcon(iconPath) else
-            IconLoader.getIcon(iconPath, OpenEmoji::class.java)
+    fun getIcon(emoji: OpenEmoji): Icon {
+        return IconLoaderService.getIcon(emoji)
     }
 
-    fun getIconPath(code: String, isCustom: Boolean): String {
-        val name = getIconName(code)
-        return if (isCustom) "${
-            OpenEmojiPersistent.getInstance().getCustomEmojiDirectory()
-        }/icons/${name}.png" else "/icons/emojis/${name}.png"
-    }
-
-    fun getIconName(code: String): String {
-        return code.replace(":".toRegex(), "")
+    fun getIconPath(emoji: OpenEmoji): String {
+        return IconLoaderService.getIconPath(emoji).replace("\\", "/")
     }
 
     fun addDocListener(doc: JTextField, method: Consumer<String>) {
@@ -172,15 +137,6 @@ object OpenEmojiUtils {
 
     fun copyToClipboard(text: String) {
         Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(text), null)
-    }
-
-    private fun getCustomIcon(filePath: String): Icon {
-        return try {
-            if (!File(filePath).exists()) return AllIcons.Actions.Refresh
-            return ImageIcon(filePath)
-        } catch (e: Exception) {
-            AllIcons.Actions.Refresh
-        }
     }
 
     private fun replace(script: String, replace: Map<String, String>): String {
@@ -204,6 +160,6 @@ object OpenEmojiUtils {
     }
 
     class OpenEmojiPatternListTypeToken : TypeToken<MutableList<OpenEmojiPattern>>()
-    class OpenEmojiInfoListTypeToken : TypeToken<MutableList<OpenEmojiInfo>>()
+    class OpenEmojiInfoListTypeToken : TypeToken<MutableList<EmojiConfigState>>()
 
 }
